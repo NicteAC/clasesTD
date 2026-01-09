@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Desarrollo Front-End - Índice de Módulos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #2d5bff;
+        --secondary: #00d4aa;
+        --accent: #ff6b6b;
+        --dark: #1a1a2e;
+        --light: #f8f9fa;
+        --warning: #ffa500;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Sora", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f0f1e 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        color: var(--light);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* HEADER */
+      .header {
+        text-align: center;
+        padding: 3rem 0;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 3rem;
+      }
+
+      .header h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+      }
+
+      .header p {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* ESTADÍSTICAS */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-family: "Space Mono", monospace;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+      }
+
+      /* MÓDULOS */
+      .module {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .module:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+      }
+
+      .module-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .module-number {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        min-width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: "Space Mono", monospace;
+        flex-shrink: 0;
+      }
+
+      .module-title {
+        flex: 1;
+      }
+
+      .module-title h2 {
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+        color: var(--secondary);
+      }
+
+      .module-title .module-hours {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+        font-family: "Space Mono", monospace;
+      }
+
+      /* CLASES */
+      .classes {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .class-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .class-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--secondary);
+      }
+
+      .class-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .class-info h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        color: var(--light);
+      }
+
+      .class-info .duration {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-family: "Space Mono", monospace;
+      }
+
+      .class-link {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        text-decoration: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        white-space: nowrap;
+      }
+
+      .class-link:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(45, 91, 255, 0.4);
+      }
+
+      .class-link::after {
+        content: "→";
+        font-size: 1.2rem;
+      }
+
+      /* PLACEHOLDER PARA AGREGAR CLASES */
+      .add-class-placeholder {
+        background: rgba(255, 165, 0, 0.1);
+        border: 2px dashed var(--warning);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .add-class-placeholder h4 {
+        color: var(--warning);
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      }
+
+      .add-class-placeholder code {
+        display: block;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        font-family: "Space Mono", monospace;
+        font-size: 0.85rem;
+        text-align: left;
+        overflow-x: auto;
+      }
+
+      /* FOOTER */
+      .footer {
+        text-align: center;
+        padding: 2rem 0;
+        margin-top: 3rem;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* INSTRUCCIONES */
+      .instructions {
+        background: rgba(45, 91, 255, 0.1);
+        border: 2px solid var(--primary);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .instructions h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+      }
+
+      .instructions ol {
+        margin-left: 1.5rem;
+      }
+
+      .instructions li {
+        margin: 0.8rem 0;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .instructions code {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.9rem;
+        color: var(--secondary);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .header {
+          padding: 2rem 0;
+        }
+
+        .module {
+          padding: 1.5rem;
+        }
+
+        .module-header {
+          flex-direction: column;
+          align-items: start;
+        }
+
+        .class-header {
+          flex-direction: column;
+          align-items: start;
+        }
+
+        .class-link {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>💻 Desarrollo Front-End</h1>
+        <p>Programa de Formación Talento Digital</p>
+      </div>
+
+      <!-- ESTADÍSTICAS -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">7</div>
+          <div class="stat-label">Módulos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">402</div>
+          <div class="stat-label">Horas Totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">0</div>
+          <div class="stat-label">Clases Agregadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Posibilidades</div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 2 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">02</div>
+          <div class="module-title">
+            <h2>Fundamentos de Desarrollo Front-End</h2>
+            <p class="module-hours">⏱️ 72 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+            <div class="class-card">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 1: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>
+            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 2: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>
+            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 3: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 4: Aplicación de Estilos y Responsividad</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/ae4.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 5: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 6: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>            <div class="class-card" style="margin-top: 10px;">
+              <div class="class-header">
+                <div class="class-info">
+                  <h3>Clase 7: Título de tu clase</h3>
+                  <p class="duration">⏱️ 3 horas</p>
+                </div>
+                <a
+                  href="./modulo-02/clase-01/presentacion.html"
+                  class="class-link"
+                  >Ver Presentación</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 3 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">03</div>
+          <div class="module-title">
+            <h2>Desarrollo de la Interfaz de Usuario Web</h2>
+            <p class="module-hours">⏱️ 56 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 4 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">04</div>
+          <div class="module-title">
+            <h2>Fundamentos de Programación en JavaScript</h2>
+            <p class="module-hours">⏱️ 60 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 5 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">05</div>
+          <div class="module-title">
+            <h2>Programación Avanzada en JavaScript</h2>
+            <p class="module-hours">⏱️ 48 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 6 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">06</div>
+          <div class="module-title">
+            <h2>Desarrollo de Interfaces Interactivas con Framework Vue</h2>
+            <p class="module-hours">⏱️ 72 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 7 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">07</div>
+          <div class="module-title">
+            <h2>Desarrollo de Aplicaciones Front-End con Framework Vue</h2>
+            <p class="module-hours">⏱️ 76 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 8 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-number">08</div>
+          <div class="module-title">
+            <h2>Desarrollo de Portafolio de un Producto Digital</h2>
+            <p class="module-hours">⏱️ 18 horas</p>
+          </div>
+        </div>
+
+        <div class="classes">
+          <!-- PLACEHOLDER: Agrega tus clases aquí -->
+          <div class="add-class-placeholder">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <p>💻 Desarrollo Front-End - Programa de Formación 2026</p>
+        <p style="margin-top: 0.5rem">Total: 402 horas de formación técnica</p>
+      </div>
+    </div>
+
+    <script>
+      // Animación de entrada a los módulos
+      document.addEventListener("DOMContentLoaded", () => {
+        const modules = document.querySelectorAll(".module");
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.style.opacity = "0";
+                entry.target.style.transform = "translateY(20px)";
+
+                setTimeout(() => {
+                  entry.target.style.transition = "all 0.6s ease";
+                  entry.target.style.opacity = "1";
+                  entry.target.style.transform = "translateY(0)";
+                }, 100);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        modules.forEach((module) => observer.observe(module));
+      });
+
+      // Resaltar la clase actual si estamos en una página de presentación
+      const currentPath = window.location.pathname;
+      const links = document.querySelectorAll(".class-link");
+
+      links.forEach((link) => {
+        const href = link.getAttribute("href");
+        if (href && currentPath.includes(href.split("/")[1])) {
+          link.style.background =
+            "linear-gradient(135deg, var(--accent), var(--warning))";
+          link.parentElement.parentElement.style.background =
+            "rgba(255, 107, 107, 0.1)";
+        }
+      });
+    </script>
+  </body>
+</html>

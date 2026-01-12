@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Fundamentos - Clase Interactiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0f0f1e 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(45, 91, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transition: width 0.3s ease;
+        }
+
+        .slide-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        p, li {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(45, 91, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .timer-container {
+            background: rgba(45, 91, 255, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a45cc;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #00b890;
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .navigation {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .nav-btn {
+            padding: 0.8rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #1a45cc;
+            transform: translateX(5px);
+        }
+
+        .nav-btn.prev:hover:not(:disabled) {
+            transform: translateX(-5px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .accent-text {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .list-two-columns {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        .demo-highlight {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .intro-slide {
+            text-align: center;
+        }
+
+        .intro-slide h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-weight: 300;
+            margin-bottom: 3rem;
+        }
+
+        .break-slide {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2));
+            text-align: center;
+        }
+
+        .break-slide h1 {
+            font-size: 5rem;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="header">
+            <div class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">0</span>
+            </div>
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="slide-container" id="slide-container">
+            <!-- Slide 1: Portada -->
+            <div class="slide active">
+                <div class="content intro-slide">
+                    <h1>Fundamentos de HTML</h1>
+                    <p class="subtitle">Estructurando la Web desde Cero</p>
+                    <p style="font-size: 1.5rem; margin-top: 3rem;">Clase Práctica • 3 Horas</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Objetivos -->
+            <div class="slide">
+                <div class="content">
+                    <h1>¿Qué aprenderemos hoy?</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>📚 Fundamentos HTML5</h3>
+                            <p>Estructura básica, etiquetas y atributos esenciales</p>
+                        </div>
+                        <div class="card">
+                            <h3>🔗 Enlaces e Imágenes</h3>
+                            <p>Rutas absolutas, relativas y navegación</p>
+                        </div>
+                        <div class="card">
+                            <h3>📊 Tablas</h3>
+                            <p>Organización de datos estructurados</p>
+                        </div>
+                        <div class="card">
+                            <h3>📝 Formularios</h3>
+                            <p>Interacción con usuarios</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: ¿Qué es HTML? -->
+            <div class="slide">
+                <div class="content">
+                    <h1>¿Qué es HTML?</h1>
+                    <p style="font-size: 1.6rem; margin-bottom: 2rem;">HTML es el <span class="highlight">lenguaje fundamental</span> para estructurar contenido web</p>
+                    <div class="grid-2">
+                        <div>
+                            <h3>HyperText Markup Language</h3>
+                            <ul>
+                                <li>Lenguaje de <span class="highlight">marcado</span>, no de programación</li>
+                                <li>Define la <span class="highlight">estructura</span> y <span class="highlight">semántica</span> del contenido</li>
+                                <li>Base de toda página web</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>HTML5 (Versión Actual)</h3>
+                            <ul>
+                                <li>Elementos semánticos mejorados</li>
+                                <li>Mejor soporte multimedia</li>
+                                <li>APIs modernas integradas</li>
+                                <li>Mayor accesibilidad y SEO</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Elementos, Etiquetas y Atributos -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Elementos, Etiquetas y Atributos</h1>
+                    <div class="grid-2">
+                        <div>
+                            <div class="card" style="margin-bottom: 1.5rem;">
+                                <h3>Etiquetas</h3>
+                                <p>Símbolos que marcan y delimitan elementos</p>
+                                <div class="code-block">&lt;etiqueta&gt;<br>  Contenido<br>&lt;/etiqueta&gt;</div>
+                            </div>
+                            <div class="card">
+                                <h3>Elementos</h3>
+                                <p>Conjunto completo: apertura + contenido + cierre</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Atributos</h3>
+                            <p>Información adicional sobre un elemento</p>
+                            <div class="code-block">&lt;etiqueta atributo="valor"&gt;<br>  Contenido<br>&lt;/etiqueta&gt;</div>
+                            <p style="margin-top: 1rem;">Los atributos configuran propiedades específicas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Estructura Básica HTML -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Estructura Básica de un Documento HTML</h1>
+                    <div class="code-block" style="font-size: 1.2rem;">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Mi sitio web&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- Contenido visible va aquí --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+                    </div>
+                    <div class="grid-2" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>&lt;head&gt;</h3>
+                            <p>Información para el navegador: título, codificación, estilos</p>
+                        </div>
+                        <div class="card">
+                            <h3>&lt;body&gt;</h3>
+                            <p>Todo lo visible para el usuario</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: DEMO EN VIVO 1 -->
+            <div class="slide">
+                <div class="content">
+                    <div class="demo-highlight">
+                        <h1>🎬 DEMO EN VIVO 1</h1>
+                        <h2>Etiquetas Básicas y Atributos</h2>
+                        <p style="font-size: 1.4rem; margin-top: 1rem;">Vamos a crear nuestro primer archivo HTML explorando:</p>
+                        <ul style="font-size: 1.3rem; margin-top: 1rem;">
+                            <li>Encabezados (h1-h6)</li>
+                            <li>Párrafos y texto destacado</li>
+                            <li>Listas ordenadas y desordenadas</li>
+                            <li>Uso de atributos (style, title)</li>
+                        </ul>
+                        <p class="accent-text" style="font-size: 1.5rem; margin-top: 2rem;">⏱️ Duración: 20 minutos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Encabezados -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Encabezados (h1 - h6)</h1>
+                    <div class="two-column">
+                        <div>
+                            <h3>Jerarquía Semántica</h3>
+                            <ul>
+                                <li><span class="highlight">&lt;h1&gt;</span>: Título principal (solo uno por página)</li>
+                                <li><span class="highlight">&lt;h2&gt;</span>: Secciones principales</li>
+                                <li><span class="highlight">&lt;h3&gt;-&lt;h6&gt;</span>: Subsecciones</li>
+                                <li>Mantener orden lógico</li>
+                                <li>No saltar niveles</li>
+                            </ul>
+                        </div>
+                        <div class="code-block">
+&lt;h1&gt;Reino Animal&lt;/h1&gt;
+  &lt;h2&gt;Vertebrados&lt;/h2&gt;
+    &lt;h3&gt;Mamíferos&lt;/h3&gt;
+      &lt;h4&gt;Bípedos&lt;/h4&gt;
+      &lt;h4&gt;Cuadrúpedos&lt;/h4&gt;
+    &lt;h3&gt;Aves&lt;/h3&gt;
+  &lt;h2&gt;Invertebrados&lt;/h2&gt;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Párrafos y Listas -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Párrafos y Listas</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Párrafos &lt;p&gt;</h3>
+                            <p>Bloques de texto continuo</p>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;p&gt;Lorem ipsum dolor sit 
+amet, consectetur adipiscing 
+elit.&lt;/p&gt;
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Listas Desordenadas &lt;ul&gt;</h3>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;ul&gt;
+  &lt;li&gt;Item 1&lt;/li&gt;
+  &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;li&gt;Item 3&lt;/li&gt;
+&lt;/ul&gt;
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Texto Destacado</h3>
+                            <ul>
+                                <li><span class="highlight">&lt;strong&gt;</span>: Negrita importante</li>
+                                <li><span class="highlight">&lt;em&gt;</span>: Énfasis (cursiva)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Listas Ordenadas &lt;ol&gt;</h3>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;ol&gt;
+  &lt;li&gt;Primer paso&lt;/li&gt;
+  &lt;li&gt;Segundo paso&lt;/li&gt;
+  &lt;li&gt;Tercer paso&lt;/li&gt;
+&lt;/ol&gt;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: ACTIVIDAD 1 -->
+            <div class="slide">
+                <div class="content">
+                    <h1>✏️ Actividad 1: Estructura Semántica</h1>
+                    <div class="activity-grid">
+                        <div class="timer-container">
+                            <h3>Cronómetro</h3>
+                            <div class="timer-display" id="timer1">30:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" onclick="startTimer(1, 30)">Iniciar</button>
+                                <button class="btn btn-accent" onclick="pauseTimer(1)">Pausar</button>
+                                <button class="btn btn-secondary" onclick="resetTimer(1, 30)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status1">Listo para comenzar</div>
+                        </div>
+                        <div class="activity-card">
+                            <h2>Revista Online: Spider-Man</h2>
+                            <h3>Objetivo:</h3>
+                            <p>Crear la estructura de un sitio web de revista usando etiquetas semánticas</p>
+                            <h3>Pasos:</h3>
+                            <ol>
+                                <li>Crear cabecera con <span class="highlight">&lt;header&gt;</span> y navegación <span class="highlight">&lt;nav&gt;</span></li>
+                                <li>Organizar contenido en <span class="highlight">&lt;section&gt;</span> temáticas</li>
+                                <li>Agregar barra lateral con <span class="highlight">&lt;aside&gt;</span></li>
+                                <li>Crear artículos con <span class="highlight">&lt;article&gt;</span></li>
+                                <li>Finalizar con <span class="highlight">&lt;footer&gt;</span></li>
+                            </ol>
+                            <p class="accent-text">💡 Usa comentarios HTML para el contenido: &lt;!-- lorem --&gt;</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: Enlaces y Rutas -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Enlaces e Hipervínculos</h1>
+                    <h3>URLs y Rutas</h3>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Rutas Absolutas</h3>
+                            <p>URL completa con protocolo y dominio</p>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;a href="https://www.ejemplo.com/pagina"&gt;
+  Enlace
+&lt;/a&gt;
+                            </div>
+                            <p style="margin-top: 1rem;"><span class="highlight">https://</span> = protocolo<br>
+                            <span class="highlight">www.ejemplo.com</span> = dominio<br>
+                            <span class="highlight">/pagina</span> = ruta</p>
+                        </div>
+                        <div class="card">
+                            <h3>Rutas Relativas</h3>
+                            <p>Relativas al archivo actual</p>
+                            <div class="code-block" style="font-size: 1rem;">
+./archivo.html
+../carpeta/otro.html
+../imagenes/foto.jpg
+                            </div>
+                            <p style="margin-top: 1rem;"><span class="highlight">./</span> = directorio actual<br>
+                            <span class="highlight">../</span> = subir un nivel</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Atributos de Enlaces -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Atributos de Enlaces</h1>
+                    <div class="two-column">
+                        <div>
+                            <h3>Atributo href</h3>
+                            <p>"Hipertext Reference" - define el destino</p>
+                            <div class="code-block">
+&lt;a href="https://google.cl"&gt;
+  Google
+&lt;/a&gt;
+
+&lt;a href="pagina2.html"&gt;
+  Página 2
+&lt;/a&gt;
+                            </div>
+                        </div>
+                        <div>
+                            <h3>Atributo target</h3>
+                            <p>Controla cómo se abre el enlace</p>
+                            <ul>
+                                <li><span class="highlight">_blank</span>: Nueva pestaña</li>
+                                <li><span class="highlight">_self</span>: Misma ventana (default)</li>
+                                <li><span class="highlight">_parent</span>: Marco principal</li>
+                                <li><span class="highlight">_top</span>: Ventana completa</li>
+                            </ul>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;a href="..." target="_blank"&gt;
+  Abrir en nueva pestaña
+&lt;/a&gt;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12: Imágenes -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Imágenes en HTML</h1>
+                    <div class="two-column">
+                        <div>
+                            <h3>Etiqueta &lt;img&gt;</h3>
+                            <p>Elemento de autocierre (no necesita &lt;/img&gt;)</p>
+                            <div class="code-block">
+&lt;img src="ruta/imagen.jpg" 
+     alt="Descripción"&gt;
+                            </div>
+                            <h3 style="margin-top: 2rem;">Atributos esenciales:</h3>
+                            <ul>
+                                <li><span class="highlight">src</span>: Ruta de la imagen</li>
+                                <li><span class="highlight">alt</span>: Texto alternativo (accesibilidad)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Ejemplos</h3>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;!-- Imagen externa --&gt;
+&lt;img src="https://ejemplo.com/foto.jpg"
+     alt="Paisaje"&gt;
+
+&lt;!-- Imagen local --&gt;
+&lt;img src="./imagenes/logo.png"
+     alt="Logo empresa"&gt;
+
+&lt;!-- Con dimensiones --&gt;
+&lt;img src="foto.jpg"
+     alt="Foto"
+     width="500"&gt;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 13: DEMO EN VIVO 2 -->
+            <div class="slide">
+                <div class="content">
+                    <div class="demo-highlight">
+                        <h1>🎬 DEMO EN VIVO 2</h1>
+                        <h2>Enlaces, Rutas e Imágenes</h2>
+                        <p style="font-size: 1.4rem; margin-top: 1rem;">Crearemos una página con:</p>
+                        <ul style="font-size: 1.3rem; margin-top: 1rem;">
+                            <li>Enlaces externos e internos</li>
+                            <li>Navegación entre páginas</li>
+                            <li>Imágenes locales y externas</li>
+                            <li>Uso de target="_blank"</li>
+                        </ul>
+                        <p class="accent-text" style="font-size: 1.5rem; margin-top: 2rem;">⏱️ Duración: 25 minutos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 14: DESCANSO -->
+            <div class="slide">
+                <div class="content break-slide">
+                    <div class="icon">☕</div>
+                    <h1>Descanso</h1>
+                    <div class="activity-grid" style="margin-top: 3rem;">
+                        <div class="timer-container">
+                            <div class="timer-display" id="timer-break">20:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" onclick="startTimer('break', 20)">Iniciar</button>
+                                <button class="btn btn-accent" onclick="pauseTimer('break')">Pausar</button>
+                                <button class="btn btn-secondary" onclick="resetTimer('break', 20)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status-break">20 minutos</div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <div>
+                                <h2 style="font-size: 3rem;">Toma un respiro</h2>
+                                <p style="font-size: 1.6rem; margin-top: 1rem;">Volvemos en 20 minutos para continuar con Tablas y Formularios</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 15: Tablas en HTML -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Tablas en HTML</h1>
+                    <div class="two-column">
+                        <div>
+                            <h3>Etiquetas Principales</h3>
+                            <ul style="font-size: 1.2rem;">
+                                <li><span class="highlight">&lt;table&gt;</span>: Define la tabla</li>
+                                <li><span class="highlight">&lt;tr&gt;</span>: Fila (table row)</li>
+                                <li><span class="highlight">&lt;th&gt;</span>: Celda de encabezado</li>
+                                <li><span class="highlight">&lt;td&gt;</span>: Celda de datos</li>
+                            </ul>
+                            <h3 style="margin-top: 2rem;">Estructura Opcional</h3>
+                            <ul style="font-size: 1.2rem;">
+                                <li><span class="highlight">&lt;thead&gt;</span>: Cabecera de tabla</li>
+                                <li><span class="highlight">&lt;tbody&gt;</span>: Cuerpo de tabla</li>
+                                <li><span class="highlight">&lt;tfoot&gt;</span>: Pie de tabla</li>
+                            </ul>
+                        </div>
+                        <div class="code-block" style="font-size: 1rem;">
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Nombre&lt;/th&gt;
+    &lt;th&gt;Edad&lt;/th&gt;
+    &lt;th&gt;Ciudad&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Ana&lt;/td&gt;
+    &lt;td&gt;25&lt;/td&gt;
+    &lt;td&gt;Santiago&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Carlos&lt;/td&gt;
+    &lt;td&gt;30&lt;/td&gt;
+    &lt;td&gt;Valparaíso&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 16: DEMO EN VIVO 3 -->
+            <div class="slide">
+                <div class="content">
+                    <div class="demo-highlight">
+                        <h1>🎬 DEMO EN VIVO 3</h1>
+                        <h2>Tabla de Clasificación Deportiva</h2>
+                        <p style="font-size: 1.4rem; margin-top: 1rem;">Crearemos una tabla completa con:</p>
+                        <ul style="font-size: 1.3rem; margin-top: 1rem;">
+                            <li>Encabezados con &lt;th&gt;</li>
+                            <li>Filas y celdas de datos</li>
+                            <li>Al menos 5 equipos</li>
+                            <li>Columnas: Posición, Equipo, PJ, PG, Puntos</li>
+                        </ul>
+                        <p class="accent-text" style="font-size: 1.5rem; margin-top: 2rem;">⏱️ Duración: 20 minutos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 17: Formularios -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Formularios en HTML</h1>
+                    <div class="two-column">
+                        <div>
+                            <h3>¿Para qué sirven?</h3>
+                            <ul>
+                                <li>Recopilar información del usuario</li>
+                                <li>Registros e inicios de sesión</li>
+                                <li>Búsquedas y filtros</li>
+                                <li>Comentarios y contacto</li>
+                                <li>Compras online</li>
+                            </ul>
+                            <h3 style="margin-top: 1.5rem;">Etiqueta &lt;form&gt;</h3>
+                            <div class="code-block" style="font-size: 1rem;">
+&lt;form action="procesar.php" 
+      method="POST"&gt;
+  &lt;!-- campos aquí --&gt;
+&lt;/form&gt;
+                            </div>
+                        </div>
+                        <div>
+                            <h3>Atributos principales</h3>
+                            <ul>
+                                <li><span class="highlight">action</span>: URL donde se envían los datos</li>
+                                <li><span class="highlight">method</span>: GET o POST</li>
+                            </ul>
+                            <h3 style="margin-top: 1.5rem;">Elementos comunes</h3>
+                            <ul>
+                                <li><span class="highlight">&lt;input&gt;</span>: Campo de entrada</li>
+                                <li><span class="highlight">&lt;label&gt;</span>: Etiqueta del campo</li>
+                                <li><span class="highlight">&lt;textarea&gt;</span>: Texto largo</li>
+                                <li><span class="highlight">&lt;select&gt;</span>: Lista desplegable</li>
+                                <li><span class="highlight">&lt;button&gt;</span>: Botón de acción</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 18: Tipos de Input -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Tipos de Input</h1>
+                    <div class="list-two-columns">
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>text</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="text"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>password</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="password"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>email</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="email"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>number</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="number"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>date</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="date"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>checkbox</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="checkbox"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>radio</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="radio"&gt;</div>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem; break-inside: avoid;">
+                            <h3>submit</h3>
+                            <div class="code-block" style="font-size: 0.9rem;">&lt;input type="submit"&gt;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 19: DIV y SPAN -->
+            <div class="slide">
+                <div class="content">
+                    <h1>Elementos de Estructura: DIV y SPAN</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>&lt;div&gt; - Division</h3>
+                            <p><span class="highlight">Contenedor de bloque</span></p>
+                            <ul>
+                                <li>Agrupa elementos en bloques</li>
+                                <li>Ocupa todo el ancho disponible</li>
+                                <li>Inicia en nueva línea</li>
+                                <li>Ideal para layout y secciones</li>
+                            </ul>
+                            <div class="code-block" style="font-size: 0.95rem; margin-top: 1rem;">
+&lt;div&gt;
+  &lt;h2&gt;Título&lt;/h2&gt;
+  &lt;p&gt;Contenido...&lt;/p&gt;
+&lt;/div&gt;
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>&lt;span&gt; - Span</h3>
+                            <p><span class="highlight">Contenedor en línea</span></p>
+                            <ul>
+                                <li>Agrupa texto o elementos pequeños</li>
+                                <li>Solo ocupa el espacio necesario</li>
+                                <li>No inicia nueva línea</li>
+                                <li>Ideal para estilos específicos</li>
+                            </ul>
+                            <div class="code-block" style="font-size: 0.95rem; margin-top: 1rem;">
+&lt;p&gt;Texto con 
+&lt;span style="color: red"&gt;
+  palabra destacada
+&lt;/span&gt; en rojo&lt;/p&gt;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 20: DEMO EN VIVO 4 -->
+            <div class="slide">
+                <div class="content">
+                    <div class="demo-highlight">
+                        <h1>🎬 DEMO EN VIVO 4</h1>
+                        <h2>Página de Producto con Formulario</h2>
+                        <p style="font-size: 1.4rem; margin-top: 1rem;">Crearemos una página completa con:</p>
+                        <ul style="font-size: 1.3rem; margin-top: 1rem;">
+                            <li>Estructura con &lt;div&gt; y &lt;span&gt;</li>
+                            <li>Formulario de contacto/registro</li>
+                            <li>Diferentes tipos de input</li>
+                            <li>Labels y validaciones básicas</li>
+                        </ul>
+                        <p class="accent-text" style="font-size: 1.5rem; margin-top: 2rem;">⏱️ Duración: 25 minutos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 21: ACTIVIDAD FINAL -->
+            <div class="slide">
+                <div class="content">
+                    <h1>✏️ Actividad Final: Página Web Completa</h1>
+                    <div class="activity-grid">
+                        <div class="timer-container">
+                            <h3>Cronómetro</h3>
+                            <div class="timer-display" id="timer2">20:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" onclick="startTimer(2, 20)">Iniciar</button>
+                                <button class="btn btn-accent" onclick="pauseTimer(2)">Pausar</button>
+                                <button class="btn btn-secondary" onclick="resetTimer(2, 20)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status2">Listo para comenzar</div>
+                        </div>
+                        <div class="activity-card">
+                            <h2>Tema: Cambio Climático o COVID-19</h2>
+                            <h3>Requisitos:</h3>
+                            <ol>
+                                <li>Estructura completa: &lt;header&gt;, &lt;nav&gt;, &lt;main&gt;, &lt;footer&gt;</li>
+                                <li>Al menos 2 &lt;section&gt; diferentes</li>
+                                <li>Encabezados jerárquicos (h1, h2, h3)</li>
+                                <li>Párrafos y texto destacado</li>
+                                <li>Una lista ordenada y una desordenada</li>
+                                <li>Enlaces a fuentes externas</li>
+                                <li>Al menos una imagen</li>
+                                <li>Tabla con datos relevantes (opcional)</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 22: Resumen -->
+            <div class="slide">
+                <div class="content">
+                    <h1>🎯 Resumen de la Clase</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>✓ HTML Básico</h3>
+                            <ul>
+                                <li>Estructura de documentos</li>
+                                <li>Etiquetas y atributos</li>
+                                <li>Semántica web</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>✓ Contenido</h3>
+                            <ul>
+                                <li>Encabezados y párrafos</li>
+                                <li>Listas ordenadas/desordenadas</li>
+                                <li>Texto destacado</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>✓ Navegación</h3>
+                            <ul>
+                                <li>Enlaces e hipervínculos</li>
+                                <li>Rutas absolutas y relativas</li>
+                                <li>Imágenes</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>✓ Estructuras</h3>
+                            <ul>
+                                <li>Tablas de datos</li>
+                                <li>Formularios interactivos</li>
+                                <li>DIV y SPAN</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 23: Próximos Pasos -->
+            <div class="slide">
+                <div class="content intro-slide">
+                    <h1>Próximos Pasos</h1>
+                    <div class="card" style="margin: 2rem auto; max-width: 800px; text-align: left;">
+                        <h3>Continúa practicando:</h3>
+                        <ul style="font-size: 1.3rem;">
+                            <li>Completa los ejercicios en la plataforma</li>
+                            <li>Experimenta con diferentes etiquetas</li>
+                            <li>Crea tus propios proyectos personales</li>
+                            <li>Explora la documentación de MDN Web Docs</li>
+                        </ul>
+                        <h3 style="margin-top: 2rem;">Próxima clase:</h3>
+                        <p style="font-size: 1.4rem;"><span class="highlight">CSS y Diseño Web</span> - Aplicaremos estilos a nuestras páginas HTML</p>
+                    </div>
+                    <p style="font-size: 1.8rem; margin-top: 3rem;">¡Excelente trabajo! 🎉</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn prev" id="prev-btn" onclick="prevSlide()">← Anterior</button>
+            <div></div>
+            <button class="nav-btn next" id="next-btn" onclick="nextSlide()">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const timers = {};
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('progress-bar').style.width = 
+                ((currentSlide + 1) / totalSlides * 100) + '%';
+
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Funciones de cronómetro
+        function startTimer(id, minutes) {
+            if (timers[id] && timers[id].interval) {
+                return; // Ya está corriendo
+            }
+
+            if (!timers[id]) {
+                timers[id] = {
+                    totalSeconds: minutes * 60,
+                    remainingSeconds: minutes * 60
+                };
+            }
+
+            const timerDisplay = document.getElementById(`timer${id === 'break' ? '-break' : id}`);
+            const statusDisplay = document.getElementById(`status${id === 'break' ? '-break' : id}`);
+
+            timers[id].interval = setInterval(() => {
+                timers[id].remainingSeconds--;
+
+                const mins = Math.floor(timers[id].remainingSeconds / 60);
+                const secs = timers[id].remainingSeconds % 60;
+                timerDisplay.textContent = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                // Cambiar colores según tiempo
+                timerDisplay.classList.remove('warning', 'danger');
+                if (timers[id].remainingSeconds <= 60) {
+                    timerDisplay.classList.add('danger');
+                    statusDisplay.textContent = '¡Último minuto!';
+                } else if (timers[id].remainingSeconds <= 300) {
+                    timerDisplay.classList.add('warning');
+                    statusDisplay.textContent = 'Quedan menos de 5 minutos';
+                } else {
+                    statusDisplay.textContent = 'En progreso...';
+                }
+
+                if (timers[id].remainingSeconds <= 0) {
+                    clearInterval(timers[id].interval);
+                    timerDisplay.textContent = '00:00';
+                    statusDisplay.textContent = '¡Tiempo completado!';
+                    timerDisplay.classList.add('danger');
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(id) {
+            if (timers[id] && timers[id].interval) {
+                clearInterval(timers[id].interval);
+                timers[id].interval = null;
+                const statusDisplay = document.getElementById(`status${id === 'break' ? '-break' : id}`);
+                statusDisplay.textContent = 'Pausado';
+            }
+        }
+
+        function resetTimer(id, minutes) {
+            if (timers[id] && timers[id].interval) {
+                clearInterval(timers[id].interval);
+            }
+            
+            timers[id] = {
+                totalSeconds: minutes * 60,
+                remainingSeconds: minutes * 60,
+                interval: null
+            };
+
+            const timerDisplay = document.getElementById(`timer${id === 'break' ? '-break' : id}`);
+            const statusDisplay = document.getElementById(`status${id === 'break' ? '-break' : id}`);
+            
+            timerDisplay.textContent = `${minutes}:00`;
+            timerDisplay.classList.remove('warning', 'danger');
+            statusDisplay.textContent = 'Listo para comenzar';
+        }
+
+        function playBeep() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        updateSlide();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Framework - Presentación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0F0F1E 100%);
+            color: var(--light);
+            min-height: 100vh;
+        }
+
+        .presentation {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.3rem;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary), #1E3A8A);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 91, 255, 0.3);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 91, 255, 0.5);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide {
+            width: 100%;
+            animation: slideIn 0.6s ease-out;
+            display: none;
+            padding: 1rem 0;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide.title {
+            text-align: center;
+        }
+
+        .slide.title h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .slide.title h2 {
+            font-size: 2rem;
+            color: var(--light);
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .slide h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.2);
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .card p, .card li {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .card li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            color: var(--secondary);
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-left: 3px solid var(--primary);
+            white-space: pre-wrap;
+        }
+
+        .two-column-list ul {
+            column-count: 2;
+            column-gap: 3rem;
+            list-style: none;
+        }
+
+        .two-column-list li {
+            padding: 0.7rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            break-inside: avoid;
+        }
+
+        .two-column-list li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .activity-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .timer-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            text-shadow: 0 0 20px currentColor;
+            transition: color 0.3s ease;
+        }
+
+        .timer-display.normal {
+            color: var(--secondary);
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+        }
+
+        .timer-display.critical {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        .timer-display.completed {
+            color: var(--primary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            background: linear-gradient(135deg, var(--primary), #1E3A8A);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 91, 255, 0.4);
+        }
+
+        .timer-btn.pause {
+            background: linear-gradient(135deg, var(--warning), #D97706);
+        }
+
+        .timer-btn.reset {
+            background: linear-gradient(135deg, var(--accent), #DC2626);
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .instructions h3 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .instructions h4 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            padding: 0.6rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 1.3rem;
+            line-height: 1.8;
+        }
+
+        .instructions li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .code-preview {
+            margin-top: 1.5rem;
+        }
+
+        .example-data {
+            margin-top: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .break-content {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .break-content h2 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .break-content p {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .break-content ul {
+            list-style: none;
+            font-size: 1.5rem;
+        }
+
+        .break-content li {
+            padding: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .summary-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .summary-content h3 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .next-steps {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .next-steps h3 {
+            color: var(--primary);
+        }
+
+        .next-steps ul {
+            list-style: none;
+        }
+
+        .next-steps li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.4rem;
+            line-height: 1.8;
+        }
+
+        .next-steps li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="header">
+            <div class="slide-counter" id="slideCounter">1 / 19</div>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevBtn">← Anterior</button>
+                <button class="nav-btn" id="nextBtn">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="slide-container">
+            <!-- Slide 0 - Título -->
+            <div class="slide title active">
+                <h1>Bootstrap Framework</h1>
+                <h2>Desarrollo Web Responsivo con CSS y JavaScript</h2>
+            </div>
+
+            <!-- Slide 1 - ¿Qué es Bootstrap? -->
+            <div class="slide">
+                <h1>¿Qué es Bootstrap?</h1>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>Framework de Código Abierto</h3>
+                        <p>Bootstrap es el framework CSS más popular para diseñar sitios web responsivos con HTML, CSS y JavaScript</p>
+                    </div>
+                    <div class="card">
+                        <h3>Componentes Predefinidos</h3>
+                        <p>Conjunto de archivos CSS, JavaScript y componentes listos para usar: botones, navegación, formularios, grillas y más</p>
+                    </div>
+                    <div class="card">
+                        <h3>Diseño Responsivo</h3>
+                        <p>Sistema de grillas flexible que se adapta automáticamente a diferentes tamaños de pantalla</p>
+                    </div>
+                    <div class="card">
+                        <h3>Compatibilidad Total</h3>
+                        <p>Funciona consistentemente en todos los navegadores modernos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 - Beneficios -->
+            <div class="slide">
+                <h1>Beneficios de usar Bootstrap</h1>
+                <div class="two-column-list">
+                    <ul>
+                        <li><strong>Ahorro de tiempo:</strong> Componentes prediseñados y probados</li>
+                        <li><strong>Responsividad garantizada:</strong> Mobile-first por defecto</li>
+                        <li><strong>Consistencia visual:</strong> Sistema de diseño cohesivo</li>
+                        <li><strong>Personalización sencilla:</strong> Clases y variables CSS</li>
+                        <li><strong>Comunidad activa:</strong> Documentación extensa y soporte</li>
+                        <li><strong>Compatibilidad cross-browser:</strong> Menos problemas de CSS</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 3 - DEMO 1 -->
+            <div class="slide">
+                <h1>DEMO 1: Incorporar Bootstrap</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="0">10:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(0)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(0)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(0)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Demo en Vivo - Profesor</h3>
+                        <ul>
+                            <li>Crear archivo HTML básico</li>
+                            <li>Incorporar Bootstrap mediante CDN</li>
+                            <li>Crear un contenedor con título y párrafo</li>
+                            <li>Agregar una card simple</li>
+                            <li>Mostrar responsividad básica</li>
+                        </ul>
+                        
+                        <div class="code-preview">
+                            <h4>CDN de Bootstrap 5.3</h4>
+                            <pre>&lt;link href="https://cdn.jsdelivr.net/npm/
+bootstrap@5.3.3/dist/css/
+bootstrap.min.css" rel="stylesheet"&gt;</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 - PRÁCTICA 1 -->
+            <div class="slide">
+                <h1>PRÁCTICA 1: Tu Primera Página Bootstrap</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="1">15:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(1)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(1)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(1)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Ejercicio - Alumnos</h3>
+                        <ul>
+                            <li>Crear un archivo HTML con Bootstrap</li>
+                            <li>Agregar un contenedor con título "Mi Portfolio"</li>
+                            <li>Crear 2 cards con información personal</li>
+                            <li>Usar clases: <code>.container</code>, <code>.card</code>, <code>.card-body</code></li>
+                            <li>Agregar un botón con <code>.btn .btn-primary</code></li>
+                        </ul>
+                        
+                        <div class="example-data">
+                            <h4>Contenido sugerido:</h4>
+                            <ul>
+                                <li>Card 1: "Sobre Mí" con descripción breve</li>
+                                <li>Card 2: "Habilidades" con lista de skills</li>
+                                <li>Botón: "Contactarme"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5 - Sistema de Grillas -->
+            <div class="slide">
+                <h1>Sistema de Grillas de Bootstrap</h1>
+                <div class="content-grid">
+                    <div class="card full-width">
+                        <h3>Grilla de 12 Columnas</h3>
+                        <p>Bootstrap usa un sistema flexible basado en 12 columnas que se adapta a cualquier dispositivo</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Breakpoints</h3>
+                        <ul>
+                            <li><code>sm</code> - Pequeño (≥576px)</li>
+                            <li><code>md</code> - Mediano (≥768px)</li>
+                            <li><code>lg</code> - Grande (≥992px)</li>
+                            <li><code>xl</code> - Extra grande (≥1200px)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Clases de Columnas</h3>
+                        <pre>.col-{breakpoint}-{número}
+
+.col-12      → 100% ancho
+.col-md-6    → 50% en md+
+.col-lg-4    → 33% en lg+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6 - Contenedores y Tablas -->
+            <div class="slide">
+                <h1>Contenedores y Tablas</h1>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>Tipos de Contenedores</h3>
+                        <ul>
+                            <li><code>.container</code> - Ancho fijo centrado</li>
+                            <li><code>.container-fluid</code> - Ancho 100%</li>
+                        </ul>
+                        <pre>&lt;div class="container"&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-6"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Tablas con Bootstrap</h3>
+                        <ul>
+                            <li><code>.table</code> - Estilo básico</li>
+                            <li><code>.table-striped</code> - Filas alternadas</li>
+                            <li><code>.table-hover</code> - Efecto hover</li>
+                            <li><code>.table-responsive</code> - Scroll horizontal</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7 - DEMO 2 -->
+            <div class="slide">
+                <h1>DEMO 2: Grillas y Tablas</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="2">15:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(2)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(2)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(2)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Demo en Vivo - Profesor</h3>
+                        <ul>
+                            <li>Crear layout con 2 columnas usando <code>.row</code> y <code>.col-md-6</code></li>
+                            <li>Crear tabla simple con 3 productos</li>
+                            <li>Aplicar <code>.table</code>, <code>.table-striped</code></li>
+                            <li>Agregar <code>.table-responsive</code></li>
+                            <li>Mostrar cómo se adapta en mobile</li>
+                        </ul>
+                        
+                        <div class="example-data">
+                            <h4>Datos de ejemplo:</h4>
+                            <ul>
+                                <li>Laptop - $1200 - En stock</li>
+                                <li>Mouse - $25 - Agotado</li>
+                                <li>Teclado - $80 - En stock</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8 - PRÁCTICA 2 -->
+            <div class="slide">
+                <h1>PRÁCTICA 2: Dashboard de Productos</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="3">20:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(3)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(3)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(3)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Ejercicio - Alumnos</h3>
+                        <ul>
+                            <li>Crear un dashboard con 2 columnas</li>
+                            <li>Columna izquierda: Card con resumen (total productos, stock)</li>
+                            <li>Columna derecha: Tabla con al menos 5 productos</li>
+                            <li>Tabla con columnas: Nombre, Precio, Stock, Categoría</li>
+                            <li>Usar <code>.table-hover</code> y <code>.table-striped</code></li>
+                            <li>Agregar colores: <code>.table-success</code>, <code>.table-danger</code></li>
+                        </ul>
+                        
+                        <div class="example-data">
+                            <h4>Tip:</h4>
+                            <p>Usa <code>.col-lg-4</code> y <code>.col-lg-8</code> para las columnas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9 - DESCANSO -->
+            <div class="slide">
+                <h1>DESCANSO</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="4">20:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(4)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(4)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(4)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="break-content">
+                        <h2>☕ Tiempo de Descanso</h2>
+                        <p>Volvemos en 20 minutos</p>
+                        <ul>
+                            <li>Estira las piernas</li>
+                            <li>Toma agua o café</li>
+                            <li>Revisa tus dudas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10 - Componentes Visuales -->
+            <div class="slide">
+                <h1>Componentes Visuales</h1>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>Hero / Bloque Destacado</h3>
+                        <pre>&lt;div class="bg-primary text-white 
+     p-5 rounded-3"&gt;
+  &lt;h1 class="display-5"&gt;Título&lt;/h1&gt;
+  &lt;button class="btn btn-light"&gt;
+    Acción
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Alertas</h3>
+                        <pre>&lt;div class="alert alert-success"&gt;
+  ¡Éxito!
+&lt;/div&gt;
+
+&lt;div class="alert alert-danger"&gt;
+  Error
+&lt;/div&gt;</pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Botones</h3>
+                        <pre>&lt;button class="btn btn-primary"&gt;
+  Primario
+&lt;/button&gt;
+
+&lt;button class="btn btn-outline-danger"&gt;
+  Peligro
+&lt;/button&gt;</pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Imágenes</h3>
+                        <pre>&lt;img src="..." 
+     class="img-fluid rounded"&gt;
+
+&lt;img src="..." 
+     class="img-fluid 
+            rounded-circle"&gt;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11 - Utilidades de Espaciado -->
+            <div class="slide">
+                <h1>Utilidades de Espaciado</h1>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>Margin y Padding</h3>
+                        <ul>
+                            <li><code>m-{tamaño}</code> - Margin en todos los lados</li>
+                            <li><code>mt-3</code> - Margin top</li>
+                            <li><code>mb-4</code> - Margin bottom</li>
+                            <li><code>p-5</code> - Padding grande</li>
+                            <li><code>py-3</code> - Padding vertical</li>
+                            <li><code>mx-auto</code> - Centrar horizontalmente</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Tamaños</h3>
+                        <ul>
+                            <li><code>0</code> - 0px</li>
+                            <li><code>1</code> - 0.25rem (4px)</li>
+                            <li><code>2</code> - 0.5rem (8px)</li>
+                            <li><code>3</code> - 1rem (16px)</li>
+                            <li><code>4</code> - 1.5rem (24px)</li>
+                            <li><code>5</code> - 3rem (48px)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12 - DEMO 3 -->
+            <div class="slide">
+                <h1>DEMO 3: Página de Inicio</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="5">10:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(5)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(5)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(5)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Demo en Vivo - Profesor</h3>
+                        <ul>
+                            <li>Crear Hero section con <code>.bg-primary .text-white .p-5</code></li>
+                            <li>Agregar título con <code>.display-4</code></li>
+                            <li>Agregar 2 alertas (success y warning)</li>
+                            <li>Crear 3 botones con diferentes estilos</li>
+                            <li>Mostrar espaciado con <code>.mt-4</code>, <code>.mb-3</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 13 - PRÁCTICA 3 -->
+            <div class="slide">
+                <h1>PRÁCTICA 3: Landing Page</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="6">15:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(6)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(6)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(6)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Ejercicio - Alumnos</h3>
+                        <ul>
+                            <li>Crear Hero principal para un producto/servicio</li>
+                            <li>Agregar 2 alertas informativas (usa <code>.alert-dismissible</code>)</li>
+                            <li>Crear 3 cards en fila con características del producto</li>
+                            <li>Cada card debe tener botón con estilo diferente</li>
+                            <li>Usar clases de espaciado para separar secciones</li>
+                        </ul>
+                        
+                        <div class="example-data">
+                            <h4>Ideas de contenido:</h4>
+                            <ul>
+                                <li>App de delivery, gimnasio, curso online, etc.</li>
+                                <li>Características: Rápido, Seguro, 24/7</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 14 - Formularios -->
+            <div class="slide">
+                <h1>Formularios en Bootstrap</h1>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>Campos Básicos</h3>
+                        <pre>&lt;div class="mb-3"&gt;
+  &lt;label class="form-label"&gt;
+    Email
+  &lt;/label&gt;
+  &lt;input type="email" 
+         class="form-control" 
+         required&gt;
+&lt;/div&gt;</pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Validación</h3>
+                        <pre>&lt;form class="needs-validation" 
+      novalidate&gt;
+  &lt;input type="text" 
+         class="form-control" 
+         required&gt;
+  &lt;div class="invalid-feedback"&gt;
+    Campo requerido
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 15 - Navbar -->
+            <div class="slide">
+                <h1>Barra de Navegación</h1>
+                <div class="content-grid">
+                    <div class="card full-width">
+                        <h3>Navbar Responsivo</h3>
+                        <pre>&lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+  &lt;div class="container-fluid"&gt;
+    &lt;a class="navbar-brand" href="#"&gt;Logo&lt;/a&gt;
+    
+    &lt;button class="navbar-toggler" data-bs-toggle="collapse" 
+            data-bs-target="#menu"&gt;
+      &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    
+    &lt;div class="collapse navbar-collapse" id="menu"&gt;
+      &lt;ul class="navbar-nav"&gt;
+        &lt;li class="nav-item"&gt;
+          &lt;a class="nav-link" href="#"&gt;Inicio&lt;/a&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 16 - DEMO 4 -->
+            <div class="slide">
+                <h1>DEMO 4: Formulario con Navbar</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="7">15:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(7)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(7)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(7)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Demo en Vivo - Profesor</h3>
+                        <ul>
+                            <li>Crear navbar básico con 3 enlaces</li>
+                            <li>Crear formulario con 3 campos (nombre, email, mensaje)</li>
+                            <li>Agregar validación HTML5 con <code>required</code></li>
+                            <li>Agregar checkbox con <code>.form-check</code></li>
+                            <li>Mostrar alerta de éxito al enviar</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 17 - PRÁCTICA 4 -->
+            <div class="slide">
+                <h1>PRÁCTICA 4: Formulario Completo</h1>
+                <div class="activity-content">
+                    <div class="timer-section">
+                        <h3>⏱️ Cronómetro</h3>
+                        <div class="timer-display normal" data-timer="8">20:00</div>
+                        <div class="timer-status">Listo para comenzar</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="startTimer(8)">▶ Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer(8)">⏸ Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer(8)">↻ Reiniciar</button>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>Ejercicio Final - Alumnos</h3>
+                        <ul>
+                            <li>Crear página completa con navbar</li>
+                            <li>Formulario de registro con: nombre, email, password, confirmar password</li>
+                            <li>Select para país</li>
+                            <li>Checkbox de términos y condiciones (required)</li>
+                            <li>Botón de envío</li>
+                            <li>Validación HTML5 en todos los campos</li>
+                            <li>Alerta de éxito cuando se envía</li>
+                        </ul>
+                        
+                        <div class="example-data">
+                            <h4>Bonus:</h4>
+                            <p>Agrega un footer con información de contacto</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 18 - Cierre -->
+            <div class="slide">
+                <h1>Resumen y Próximos Pasos</h1>
+                <div class="summary-content">
+                    <h3>Lo que aprendimos hoy:</h3>
+                    <div class="two-column-list">
+                        <ul>
+                            <li>Incorporar Bootstrap mediante CDN</li>
+                            <li>Sistema de grillas de 12 columnas</li>
+                            <li>Contenedores y layouts responsivos</li>
+                            <li>Tablas estilizadas y adaptables</li>
+                            <li>Componentes visuales: Hero, alertas, botones</li>
+                            <li>Formularios con validación</li>
+                            <li>Barra de navegación responsiva</li>
+                            <li>Utilidades de espaciado</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="next-steps">
+                        <h3>Recursos adicionales:</h3>
+                        <ul>
+                            <li>📖 Documentación oficial: <code>https://getbootstrap.com/</code></li>
+                            <li>🎨 Ejemplos: <code>https://getbootstrap.com/docs/5.3/examples/</code></li>
+                            <li>🎓 Practica personalizando los componentes con CSS</li>
+                            <li>💡 Explora más componentes: modals, carousels, accordions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio beep cuando termina el tiempo
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBeep() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Timer data
+        const timerData = [
+            { duration: 10 * 60, remaining: 10 * 60, isRunning: false, interval: null },  // Demo 1
+            { duration: 15 * 60, remaining: 15 * 60, isRunning: false, interval: null },  // Práctica 1
+            { duration: 15 * 60, remaining: 15 * 60, isRunning: false, interval: null },  // Demo 2
+            { duration: 20 * 60, remaining: 20 * 60, isRunning: false, interval: null },  // Práctica 2
+            { duration: 20 * 60, remaining: 20 * 60, isRunning: false, interval: null },  // Descanso
+            { duration: 10 * 60, remaining: 10 * 60, isRunning: false, interval: null },  // Demo 3
+            { duration: 15 * 60, remaining: 15 * 60, isRunning: false, interval: null },  // Práctica 3
+            { duration: 15 * 60, remaining: 15 * 60, isRunning: false, interval: null },  // Demo 4
+            { duration: 20 * 60, remaining: 20 * 60, isRunning: false, interval: null }   // Práctica 4
+        ];
+
+        // Slides
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('progressFill').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Timer functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function getTimerStatus(remaining, total) {
+            const percentage = (remaining / total) * 100;
+            if (remaining === 0) return 'completed';
+            if (percentage <= 5) return 'critical';
+            if (percentage <= 15) return 'warning';
+            return 'normal';
+        }
+
+        function getStatusMessage(remaining, total) {
+            if (remaining === 0) return '¡Tiempo completado!';
+            const percentage = (remaining / total) * 100;
+            if (percentage <= 5) return '¡Último minuto!';
+            if (percentage <= 15) return 'Últimos 5 minutos';
+            return 'En progreso';
+        }
+
+        function updateTimerDisplay(timerIndex) {
+            const timer = timerData[timerIndex];
+            const display = document.querySelector(`[data-timer="${timerIndex}"]`);
+            const status = display.nextElementSibling;
+            
+            display.textContent = formatTime(timer.remaining);
+            display.className = 'timer-display ' + getTimerStatus(timer.remaining, timer.duration);
+            status.textContent = timer.isRunning ? getStatusMessage(timer.remaining, timer.duration) : 'Listo para comenzar';
+        }
+
+        function startTimer(timerIndex) {
+            const timer = timerData[timerIndex];
+            if (timer.isRunning) return;
+            
+            timer.isRunning = true;
+            timer.interval = setInterval(() => {
+                if (timer.remaining > 0) {
+                    timer.remaining--;
+                    updateTimerDisplay(timerIndex);
+                    
+                    if (timer.remaining === 0) {
+                        playBeep();
+                        clearInterval(timer.interval);
+                        timer.isRunning = false;
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerIndex) {
+            const timer = timerData[timerIndex];
+            if (timer.interval) {
+                clearInterval(timer.interval);
+                timer.isRunning = false;
+                updateTimerDisplay(timerIndex);
+            }
+        }
+
+        function resetTimer(timerIndex) {
+            const timer = timerData[timerIndex];
+            if (timer.interval) {
+                clearInterval(timer.interval);
+            }
+            timer.remaining = timer.duration;
+            timer.isRunning = false;
+            updateTimerDisplay(timerIndex);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Button events
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>

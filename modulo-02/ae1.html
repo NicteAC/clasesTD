@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarrollo Web - Clase Interactiva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #16213E 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .slide-container::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+
+        .slide-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        h3 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        p, li {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Listas largas en columnas para aprovechar el ancho */
+        ul.multi-column {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            ul.multi-column {
+                column-count: 1;
+            }
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        /* LAYOUT DE ACTIVIDADES */
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .activity-timer-section {
+            text-align: center;
+        }
+
+        .activity-instructions {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @media (max-width: 900px) {
+            .activity-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* CRONÓMETRO - Estilos mejorados */
+        .countdown-container {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .countdown-display {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(3rem, 6vw, 6rem);
+            font-weight: 700;
+            margin: 1.5rem 0;
+            color: var(--secondary);
+            text-shadow: 0 0 30px rgba(0, 212, 170, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-display.warning {
+            color: var(--warning);
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+        }
+
+        .countdown-display.danger {
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .countdown-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .countdown-btn {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            font-weight: 600;
+            padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(1.2rem, 3vw, 1.8rem);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .countdown-btn.start {
+            background: linear-gradient(135deg, var(--secondary), #00A896);
+            color: white;
+        }
+
+        .countdown-btn.start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.4);
+        }
+
+        .countdown-btn.pause {
+            background: linear-gradient(135deg, var(--warning), #FF8C00);
+            color: white;
+        }
+
+        .countdown-btn.pause:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 165, 0, 0.4);
+        }
+
+        .countdown-btn.reset {
+            background: linear-gradient(135deg, var(--accent), #FF4757);
+            color: white;
+        }
+
+        .countdown-btn.reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .countdown-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .countdown-label {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .countdown-status {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.1), rgba(0, 212, 170, 0.1));
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 2px solid var(--accent);
+            margin: 0.5rem 0;
+        }
+
+        /* BLOQUES DE CÓDIGO */
+        .code-example {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-example code {
+            color: #d4d4d4;
+        }
+
+        .code-html { border-left: 4px solid #E34F26; }
+        .code-css { border-left: 4px solid #1572B6; }
+        .code-js { border-left: 4px solid #F7DF1E; }
+
+        .code-comment { color: #6A9955; }
+        .code-tag { color: #569CD6; }
+        .code-attr { color: #9CDCFE; }
+        .code-string { color: #CE9178; }
+        .code-keyword { color: #C586C0; }
+        .code-function { color: #DCDCAA; }
+        .code-number { color: #B5CEA8; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: 600;
+            padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(1.2rem, 3vw, 2rem);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(45, 91, 255, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        /* Tablets y pantallas medianas */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Móviles y pantallas pequeñas */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                margin-bottom: 1rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .countdown-controls {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .countdown-btn {
+                width: 100%;
+            }
+            
+            .activity-card {
+                padding: 1.5rem;
+            }
+            
+            .navigation {
+                margin-top: 1.5rem;
+                padding-top: 0.8rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .progress-bar {
+                order: -1;
+                width: 100%;
+                margin: 0 0 1rem 0 !important;
+            }
+        }
+
+        /* Móviles muy pequeños */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.8rem;
+            }
+            
+            ul li {
+                padding-left: 1.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .activity-card {
+                padding: 1.2rem;
+            }
+        }
+
+        /* Landscape móviles */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .container {
+                padding: 0.8rem;
+            }
+            
+            .header {
+                margin-bottom: 0.8rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .slide-container {
+                padding: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">40</span>
+            </div>
+        </div>
+
+        <div class="slide-container">
+            <!-- Slide 1: Bienvenida -->
+            <div class="slide active">
+                <h1>Desarrollo Web</h1>
+                <p style="font-size: 1.8rem; color: var(--secondary); margin-top: 2rem;">
+                    Bienvenidos a la clase
+                </p>
+                <p style="font-size: 1.4rem; margin-top: 1rem; color: rgba(255, 255, 255, 0.7);">
+                    Duración: 3 horas | Incluye actividades prácticas y descanso
+                </p>
+            </div>
+
+            <!-- Slide 2: Objetivos -->
+            <div class="slide">
+                <h2>Objetivos de la Clase</h2>
+                <ul class="multi-column">
+                    <li>Comprender qué es el desarrollo web</li>
+                    <li>Conocer los componentes principales: cliente, servidor, base de datos</li>
+                    <li>Diferenciar Front-End, Back-End y Fullstack</li>
+                    <li>Entender el papel de Internet, navegadores y buscadores</li>
+                    <li>Conocer W3C y los estándares web</li>
+                    <li>Aprender sobre HTML, CSS y JavaScript</li>
+                    <li>Familiarizarse con herramientas de desarrollo</li>
+                </ul>
+            </div>
+
+            <!-- Slide 3: Roadmap -->
+            <div class="slide">
+                <h2>Roadmap de la Clase</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Primera Parte (90 min)</h3>
+                        <ul>
+                            <li>Fundamentos del desarrollo web</li>
+                            <li>Actividad 1 (15 min)</li>
+                            <li>Front-End, Back-End, Fullstack</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Segunda Parte (90 min)</h3>
+                        <ul>
+                            <li>Descanso (20 min)</li>
+                            <li>W3C y evolución HTML</li>
+                            <li>HTML, CSS, JavaScript</li>
+                            <li>Actividad 2 (15 min)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: ¿Qué es Desarrollo Web? -->
+            <div class="slide">
+                <h2>¿Qué es el Desarrollo Web?</h2>
+                <p>El desarrollo web es el proceso de <strong>crear y mantener sitios web y aplicaciones web</strong> que funcionan en internet.</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Incluye</h3>
+                        <ul>
+                            <li>Diseño de interfaces</li>
+                            <li>Programación funcional</li>
+                            <li>Gestión de bases de datos</li>
+                            <li>Seguridad y rendimiento</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Resultado</h3>
+                        <ul>
+                            <li>Sitios web informativos</li>
+                            <li>Tiendas online</li>
+                            <li>Redes sociales</li>
+                            <li>Aplicaciones web complejas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Componentes Principales -->
+            <div class="slide">
+                <h2>Componentes Principales</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>🖥️ Cliente</h3>
+                        <p>El navegador web que usa el usuario para acceder a sitios web</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚙️ Servidor</h3>
+                        <p>Computadora que almacena y procesa los archivos del sitio web</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>🗄️ Base de Datos</h3>
+                    <p>Sistema que almacena información de forma organizada (usuarios, productos, contenido, etc.)</p>
+                </div>
+                <p style="margin-top: 2rem; text-align: center; font-style: italic;">
+                    💡 <strong>Metáfora del Restaurante:</strong> Cliente = comensal, Servidor = cocina, Base de datos = despensa
+                </p>
+            </div>
+
+            <!-- Slide 6: Front-End -->
+            <div class="slide">
+                <h2>Front-End Development</h2>
+                <p><strong>Todo lo que el usuario VE y con lo que INTERACTÚA</strong></p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Tecnologías</h3>
+                        <ul>
+                            <li>HTML (estructura)</li>
+                            <li>CSS (diseño y estilo)</li>
+                            <li>JavaScript (interactividad)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Responsabilidades</h3>
+                        <ul>
+                            <li>Diseño responsivo (UX/UI)</li>
+                            <li>Integración con APIs</li>
+                            <li>Accesibilidad web</li>
+                            <li>Compatibilidad navegadores</li>
+                            <li>Optimización rendimiento</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Back-End -->
+            <div class="slide">
+                <h2>Back-End Development</h2>
+                <p><strong>Todo lo que sucede "detrás de escena" en el servidor</strong></p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Lenguajes</h3>
+                        <ul>
+                            <li>PHP</li>
+                            <li>Python</li>
+                            <li>Ruby</li>
+                            <li>Java</li>
+                            <li>Node.js</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Responsabilidades</h3>
+                        <ul>
+                            <li>Lógica del negocio</li>
+                            <li>Gestión de bases de datos</li>
+                            <li>APIs y servicios web</li>
+                            <li>Autenticación y seguridad</li>
+                            <li>Escalabilidad</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Fullstack -->
+            <div class="slide">
+                <h2>Fullstack Development</h2>
+                <div class="card" style="background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2));">
+                    <h3 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">
+                        Front-End + Back-End = Fullstack
+                    </h3>
+                    <p style="text-align: center; font-size: 1.4rem;">
+                        Un desarrollador fullstack puede trabajar en <strong>ambos lados</strong> del desarrollo web
+                    </p>
+                </div>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Ventajas</h3>
+                        <ul>
+                            <li>Visión completa del proyecto</li>
+                            <li>Mayor flexibilidad</li>
+                            <li>Mejor comunicación en equipos</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Desafíos</h3>
+                        <ul>
+                            <li>Más tecnologías que dominar</li>
+                            <li>Aprendizaje continuo</li>
+                            <li>Mantenerse actualizado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Comparación Front vs Back -->
+            <div class="slide">
+                <h2>Front-End vs Back-End</h2>
+                <div class="grid-2">
+                    <div class="card" style="border-color: var(--primary);">
+                        <h3>Front-End</h3>
+                        <ul>
+                            <li>Lado del cliente</li>
+                            <li>Visual e interactivo</li>
+                            <li>HTML, CSS, JavaScript</li>
+                            <li>Lo que el usuario ve</li>
+                            <li>Diseño y experiencia</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-color: var(--secondary);">
+                        <h3>Back-End</h3>
+                        <ul>
+                            <li>Lado del servidor</li>
+                            <li>Lógica y datos</li>
+                            <li>PHP, Python, Node.js...</li>
+                            <li>Lo que el usuario no ve</li>
+                            <li>Funcionalidad y seguridad</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: ACTIVIDAD 1 con Cronómetro -->
+            <div class="slide">
+                <div class="activity-card">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem;">🎯 Actividad 1: Ecosistema Digital</h2>
+                    <div class="activity-layout">
+                        <div class="activity-timer-section">
+                            <div class="countdown-label">Tiempo disponible:</div>
+                            <div class="countdown-display" id="activity1Timer">15:00</div>
+                            <div class="countdown-controls">
+                                <button class="countdown-btn start" onclick="startTimer('activity1', 15)">Iniciar</button>
+                                <button class="countdown-btn pause" onclick="pauseTimer('activity1')">Pausar</button>
+                                <button class="countdown-btn reset" onclick="resetTimer('activity1', 15)">Reiniciar</button>
+                            </div>
+                            <div class="countdown-status" id="activity1Status">
+                                Presiona "Iniciar" para comenzar la actividad
+                            </div>
+                        </div>
+                        <div class="activity-instructions">
+                            <h3>Instrucciones:</h3>
+                            <ul>
+                                <li>Piensa en productos digitales creados con tecnologías web</li>
+                                <li>Lista al menos 3 ejemplos (sitios, apps, plataformas)</li>
+                                <li>Prepárate para compartir en voz alta</li>
+                                <li>Objetivo: Ver el desarrollo web más allá de lo obvio</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Internet -->
+            <div class="slide">
+                <h2>¿Qué es Internet?</h2>
+                <p style="font-size: 1.5rem; margin-bottom: 2rem;">
+                    Una <strong>red global</strong> de computadoras interconectadas que se comunican usando protocolos estándar
+                </p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Protocolo TCP/IP</h3>
+                        <p>Sistema de reglas que permite que las computadoras se comuniquen entre sí</p>
+                    </div>
+                    <div class="card">
+                        <h3>Internet ≠ World Wide Web</h3>
+                        <p>Internet es la infraestructura física. La Web es un servicio que funciona sobre Internet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12: Navegadores Web -->
+            <div class="slide">
+                <h2>Navegadores Web</h2>
+                <p>Aplicaciones que permiten acceder y visualizar páginas web</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Principales Navegadores</h3>
+                        <ul>
+                            <li>Google Chrome</li>
+                            <li>Mozilla Firefox</li>
+                            <li>Microsoft Edge</li>
+                            <li>Safari</li>
+                            <li>Opera</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Componentes</h3>
+                        <ul>
+                            <li>Botones de navegación</li>
+                            <li>Barra de dirección (URL)</li>
+                            <li>Área de visualización</li>
+                            <li>Herramientas de desarrollo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 13: Buscadores -->
+            <div class="slide">
+                <h2>Buscadores (Motores de Búsqueda)</h2>
+                <p>Sistemas que indexan páginas web y permiten encontrar información específica</p>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>¿Cómo funcionan?</h3>
+                    <ul>
+                        <li><strong>Rastreo:</strong> "Arañas" recorren la web siguiendo enlaces</li>
+                        <li><strong>Indexación:</strong> Almacenan y organizan la información encontrada</li>
+                        <li><strong>Búsqueda:</strong> Algoritmos encuentran las páginas más relevantes</li>
+                        <li><strong>Ranking:</strong> Ordenan resultados por relevancia</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 2rem; text-align: center;">
+                    Ejemplos: Google, Bing, DuckDuckGo, Yahoo
+                </p>
+            </div>
+
+            <!-- Slide 14: W3C -->
+            <div class="slide">
+                <h2>W3C - World Wide Web Consortium</h2>
+                <p style="font-size: 1.4rem; margin-bottom: 2rem;">
+                    Organización internacional que desarrolla <strong>estándares web</strong>
+                </p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Historia</h3>
+                        <ul>
+                            <li>Fundada en 1994</li>
+                            <li>Por Tim Berners-Lee</li>
+                            <li>Creador de la WWW</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Misión</h3>
+                        <ul>
+                            <li>Desarrollar protocolos</li>
+                            <li>Garantizar compatibilidad</li>
+                            <li>Promover accesibilidad</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 15: Estándares Web -->
+            <div class="slide">
+                <h2>Estándares Web del W3C</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Principales Estándares</h3>
+                        <ul>
+                            <li>HTML - Estructura</li>
+                            <li>CSS - Presentación</li>
+                            <li>XML - Datos</li>
+                            <li>HTTP - Comunicación</li>
+                            <li>SVG - Gráficos vectoriales</li>
+                            <li>WCAG - Accesibilidad</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Principios</h3>
+                        <ul>
+                            <li>Accesibilidad universal</li>
+                            <li>Internacionalización</li>
+                            <li>Privacidad y seguridad</li>
+                            <li>Interoperabilidad</li>
+                            <li>Web semántica</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 16: DESCANSO con Cronómetro -->
+            <div class="slide">
+                <div class="activity-card" style="background: linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 107, 107, 0.2)); border-color: var(--warning);">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem;">☕ Descanso</h2>
+                    <div class="activity-layout">
+                        <div class="activity-timer-section">
+                            <div class="countdown-label">Tiempo de descanso:</div>
+                            <div class="countdown-display" id="breakTimer">20:00</div>
+                            <div class="countdown-controls">
+                                <button class="countdown-btn start" onclick="startTimer('break', 20)">Iniciar</button>
+                                <button class="countdown-btn pause" onclick="pauseTimer('break')">Pausar</button>
+                                <button class="countdown-btn reset" onclick="resetTimer('break', 20)">Reiniciar</button>
+                            </div>
+                            <div class="countdown-status" id="breakStatus">
+                                Toma un descanso bien merecido
+                            </div>
+                        </div>
+                        <div class="activity-instructions">
+                            <h3>Aprovecha para:</h3>
+                            <ul>
+                                <li>Estirar las piernas</li>
+                                <li>Ir al baño</li>
+                                <li>Tomar agua o café</li>
+                                <li>Revisar tus notas</li>
+                            </ul>
+                            <p style="text-align: center; margin-top: 1.5rem; font-size: 1.4rem;">
+                                ⏰ <strong>Volvemos en 20 minutos</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 17: Evolución de HTML -->
+            <div class="slide">
+                <h2>Evolución de HTML</h2>
+                <ul class="multi-column" style="font-size: 1.2rem;">
+                    <li><strong>HTML 1-2 (1991):</strong> Texto básico, imágenes simples, enlaces</li>
+                    <li><strong>HTML 3 (1995):</strong> Tablas, formularios (nunca fue estándar oficial)</li>
+                    <li><strong>HTML 4 (1998):</strong> Primera vez que aparece CSS separado, estándar W3C</li>
+                    <li><strong>XHTML 1.0 (2000):</strong> Basado en XML, versiones Transitional y Strict</li>
+                    <li><strong>HTML5 (2004-2008):</strong> WHATWG inicia desarrollo, W3C se une en 2008</li>
+                </ul>
+                <p style="margin-top: 2rem; text-align: center; font-size: 1.3rem; color: var(--secondary);">
+                    HTML5 es el estándar actual y continúa evolucionando
+                </p>
+            </div>
+
+            <!-- Slide 18: HTML5 -->
+            <div class="slide">
+                <h2>HTML5 - El Estándar Actual</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Características Principales</h3>
+                        <ul>
+                            <li>Etiquetas semánticas</li>
+                            <li>Audio y video nativos</li>
+                            <li>Canvas para gráficos</li>
+                            <li>Formularios mejorados</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>APIs Integradas</h3>
+                        <ul>
+                            <li>Geolocalización</li>
+                            <li>LocalStorage/SessionStorage</li>
+                            <li>Drag and Drop</li>
+                            <li>Web Workers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 19: La Triada HTML/CSS/JS -->
+            <div class="slide">
+                <h2>La Triada del Desarrollo Web</h2>
+                <div class="grid-2">
+                    <div class="card" style="border-color: #E34F26;">
+                        <h3>🏗️ HTML</h3>
+                        <p><strong>Estructura</strong></p>
+                        <p>El esqueleto de la página</p>
+                    </div>
+                    <div class="card" style="border-color: #1572B6;">
+                        <h3>🎨 CSS</h3>
+                        <p><strong>Presentación</strong></p>
+                        <p>La piel, ropa y maquillaje</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 2rem; border-color: #F7DF1E;">
+                    <h3>⚡ JavaScript</h3>
+                    <p><strong>Comportamiento</strong></p>
+                    <p>El cerebro y los músculos</p>
+                </div>
+                <p style="margin-top: 2rem; text-align: center; font-style: italic;">
+                    💡 Analogía de una casa: HTML = ladrillos y vigas, CSS = pintura y decoración, JS = electricidad y plomería
+                </p>
+            </div>
+
+            <!-- Slide 20: HTML en Detalle -->
+            <div class="slide">
+                <h2>HTML - HyperText Markup Language</h2>
+                <p>Lenguaje de <strong>marcado</strong> que define la estructura y contenido de las páginas web</p>
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <div class="card" style="background: rgba(227, 79, 38, 0.1); border-color: #E34F26;">
+                        <h3>Conceptos Clave</h3>
+                        <ul>
+                            <li><strong>Etiquetas:</strong> Definen elementos (&lt;h1&gt;, &lt;p&gt;, &lt;img&gt;)</li>
+                            <li><strong>Atributos:</strong> Información adicional (class, id, src)</li>
+                            <li><strong>Elementos:</strong> Etiqueta + contenido + cierre</li>
+                            <li><strong>Estructura:</strong> Jerarquía anidada</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Ejemplo:</h3>
+                        <div class="code-example code-html">
+                            <code><span class="code-comment">&lt;!-- Estructura básica --&gt;</span>
+<span class="code-tag">&lt;h1</span> <span class="code-attr">class</span>=<span class="code-string">"titulo"</span><span class="code-tag">&gt;</span>Bienvenidos<span class="code-tag">&lt;/h1&gt;</span>
+
+<span class="code-tag">&lt;p</span> <span class="code-attr">id</span>=<span class="code-string">"intro"</span><span class="code-tag">&gt;</span>
+  Este es un párrafo de ejemplo.
+<span class="code-tag">&lt;/p&gt;</span>
+
+<span class="code-tag">&lt;img</span> <span class="code-attr">src</span>=<span class="code-string">"foto.jpg"</span> 
+     <span class="code-attr">alt</span>=<span class="code-string">"Descripción"</span><span class="code-tag">&gt;</span></code>
+                        </div>
+                        <p style="margin-top: 1rem; font-size: 1rem; color: rgba(255, 255, 255, 0.7);">
+                            💡 Analogía: HTML es el <strong>esqueleto</strong> de la página
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 21: CSS en Detalle -->
+            <div class="slide">
+                <h2>CSS - Cascading Style Sheets</h2>
+                <p>Lenguaje que controla la <strong>presentación visual</strong> de las páginas web</p>
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <div class="card" style="background: rgba(21, 114, 182, 0.1); border-color: #1572B6;">
+                        <h3>¿Qué controla CSS?</h3>
+                        <ul>
+                            <li>Colores y fondos</li>
+                            <li>Tipografía (fuentes, tamaños)</li>
+                            <li>Espaciado y márgenes</li>
+                            <li>Posicionamiento</li>
+                            <li>Animaciones y transiciones</li>
+                            <li>Diseño responsive</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Ejemplo:</h3>
+                        <div class="code-example code-css">
+                            <code><span class="code-comment">/* Estilos para el título */</span>
+<span class="code-tag">.titulo</span> {
+  <span class="code-attr">color</span>: <span class="code-string">#2D5BFF</span>;
+  <span class="code-attr">font-size</span>: <span class="code-number">32px</span>;
+  <span class="code-attr">text-align</span>: <span class="code-string">center</span>;
+  <span class="code-attr">margin-bottom</span>: <span class="code-number">20px</span>;
+}
+
+<span class="code-tag">#intro</span> {
+  <span class="code-attr">background</span>: <span class="code-string">#f0f0f0</span>;
+  <span class="code-attr">padding</span>: <span class="code-number">15px</span>;
+  <span class="code-attr">border-radius</span>: <span class="code-number">8px</span>;
+}</code>
+                        </div>
+                        <p style="margin-top: 1rem; font-size: 1rem; color: rgba(255, 255, 255, 0.7);">
+                            💡 Analogía: CSS es la <strong>piel, ropa y maquillaje</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 22: JavaScript en Detalle -->
+            <div class="slide">
+                <h2>JavaScript - El Lenguaje de la Web</h2>
+                <p>Lenguaje de <strong>programación</strong> que añade interactividad y funcionalidad dinámica</p>
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <div class="card" style="background: rgba(247, 223, 30, 0.1); border-color: #F7DF1E;">
+                        <h3>Capacidades</h3>
+                        <ul>
+                            <li>Manipular el contenido (DOM)</li>
+                            <li>Responder a eventos (clicks)</li>
+                            <li>Validar formularios</li>
+                            <li>Comunicarse con servidores</li>
+                            <li>Crear animaciones</li>
+                            <li>Desarrollar aplicaciones</li>
+                        </ul>
+                        <p style="margin-top: 1rem; text-align: center; color: var(--warning); font-size: 1rem;">
+                            ⚠️ JavaScript ≠ Java
+                        </p>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Ejemplo:</h3>
+                        <div class="code-example code-js">
+                            <code><span class="code-comment">// Cambiar contenido al hacer click</span>
+<span class="code-keyword">const</span> boton = <span class="code-keyword">document</span>.<span class="code-function">querySelector</span>(<span class="code-string">'.boton'</span>);
+
+boton.<span class="code-function">addEventListener</span>(<span class="code-string">'click'</span>, () =&gt; {
+  <span class="code-keyword">const</span> titulo = <span class="code-keyword">document</span>.<span class="code-function">querySelector</span>(<span class="code-string">'.titulo'</span>);
+  titulo.textContent = <span class="code-string">'¡Hiciste click!'</span>;
+  titulo.style.color = <span class="code-string">'#00D4AA'</span>;
+});</code>
+                        </div>
+                        <p style="margin-top: 1rem; font-size: 1rem; color: rgba(255, 255, 255, 0.7);">
+                            💡 Analogía: JavaScript es el <strong>cerebro y músculos</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 23: Inspector de Elementos -->
+            <div class="slide">
+                <h2>Inspector de Elementos</h2>
+                <p>Herramienta integrada en los navegadores para <strong>examinar y modificar</strong> el código de páginas web</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Cómo Acceder</h3>
+                        <ul>
+                            <li>Tecla F12</li>
+                            <li>Ctrl + Shift + I</li>
+                            <li>Click derecho → Inspeccionar</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Funciones</h3>
+                        <ul>
+                            <li>Ver código HTML/CSS</li>
+                            <li>Modificar en tiempo real</li>
+                            <li>Depurar JavaScript</li>
+                            <li>Analizar rendimiento</li>
+                            <li>Ver peticiones de red</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 24: Chrome DevTools -->
+            <div class="slide">
+                <h2>Chrome DevTools</h2>
+                <p>Suite completa de herramientas para desarrolladores web</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Elements</h3>
+                        <p>Inspeccionar y editar HTML/CSS</p>
+                    </div>
+                    <div class="card">
+                        <h3>Console</h3>
+                        <p>Ejecutar JavaScript y ver errores</p>
+                    </div>
+                    <div class="card">
+                        <h3>Network</h3>
+                        <p>Monitorear peticiones HTTP</p>
+                    </div>
+                    <div class="card">
+                        <h3>Sources</h3>
+                        <p>Depurar código JavaScript</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 25: Visual Studio Code -->
+            <div class="slide">
+                <h2>Visual Studio Code</h2>
+                <p>Editor de código <strong>gratuito y potente</strong> desarrollado por Microsoft</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Características</h3>
+                        <ul>
+                            <li>IntelliSense (autocompletado)</li>
+                            <li>Resaltado de sintaxis</li>
+                            <li>Depuración integrada</li>
+                            <li>Terminal integrada</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Ventajas</h3>
+                        <ul>
+                            <li>Gratis y open source</li>
+                            <li>Extensiones abundantes</li>
+                            <li>Multi-plataforma</li>
+                            <li>Git integrado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 26: ACTIVIDAD 2 con Cronómetro -->
+            <div class="slide">
+                <div class="activity-card">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem;">🎯 Actividad 2: Análisis de Sitio Web</h2>
+                    <div class="activity-layout">
+                        <div class="activity-timer-section">
+                            <div class="countdown-label">Tiempo disponible:</div>
+                            <div class="countdown-display" id="activity2Timer">15:00</div>
+                            <div class="countdown-controls">
+                                <button class="countdown-btn start" onclick="startTimer('activity2', 15)">Iniciar</button>
+                                <button class="countdown-btn pause" onclick="pauseTimer('activity2')">Pausar</button>
+                                <button class="countdown-btn reset" onclick="resetTimer('activity2', 15)">Reiniciar</button>
+                            </div>
+                            <div class="countdown-status" id="activity2Status">
+                                Presiona "Iniciar" para comenzar la actividad
+                            </div>
+                        </div>
+                        <div class="activity-instructions">
+                            <h3>Instrucciones:</h3>
+                            <ul>
+                                <li>Elige un sitio web que conozcas (Google, Wikipedia, YouTube, etc.)</li>
+                                <li>Responde: ¿Para qué sirve? ¿Cómo está estructurado visualmente?</li>
+                                <li>¿Cómo crees que HTML, CSS y JavaScript ayudan en este sitio?</li>
+                                <li>(Opcional) Usa el inspector de elementos para explorar</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 27: Recursos -->
+            <div class="slide">
+                <h2>Recursos para Aprender</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Documentación</h3>
+                        <ul>
+                            <li>MDN Web Docs</li>
+                            <li>W3Schools</li>
+                            <li>CSS-Tricks</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Práctica</h3>
+                        <ul>
+                            <li>freeCodeCamp</li>
+                            <li>Codecademy</li>
+                            <li>Frontend Mentor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 28: Cierre -->
+            <div class="slide">
+                <h2>¡Excelente Trabajo! 🎉</h2>
+                <h3 style="margin-top: 2rem;">Hoy aprendimos:</h3>
+                <ul>
+                    <li>Qué es el desarrollo web y sus componentes</li>
+                    <li>Front-End, Back-End y Fullstack</li>
+                    <li>Internet, navegadores y buscadores</li>
+                    <li>W3C y estándares web</li>
+                    <li>HTML, CSS y JavaScript</li>
+                    <li>Herramientas de desarrollo</li>
+                </ul>
+                <p style="margin-top: 2rem; text-align: center; font-size: 1.5rem; color: var(--secondary);">
+                    Ahora: Trabajo individual en la plataforma
+                </p>
+            </div>
+
+            <!-- Slides adicionales 29-40 para completar 40 slides -->
+            <div class="slide">
+                <h2>Próximos Pasos</h2>
+                <div class="card">
+                    <h3>Próxima Clase</h3>
+                    <p>Profundizaremos en HTML: sintaxis, etiquetas semánticas y estructura de documentos</p>
+                </div>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>Trabajo Individual</h3>
+                    <ul>
+                        <li>Completar actividades en la plataforma</li>
+                        <li>Explorar recursos adicionales</li>
+                        <li>Practicar con el inspector de elementos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Consejos para Desarrolladores</h2>
+                <ul class="multi-column" style="font-size: 1.3rem;">
+                    <li>🔍 <strong>Curiosidad:</strong> Inspecciona sitios que te gustan</li>
+                    <li>📚 <strong>Aprende constantemente:</strong> La tecnología evoluciona rápido</li>
+                    <li>🛠️ <strong>Practica:</strong> La mejor forma de aprender es haciendo</li>
+                    <li>🤝 <strong>Comunidad:</strong> Participa en foros y grupos</li>
+                    <li>💪 <strong>No te rindas:</strong> Los errores son parte del proceso</li>
+                </ul>
+            </div>
+
+            <div class="slide">
+                <h2>Mitos del Desarrollo Web</h2>
+                <div class="grid-2">
+                    <div class="card" style="border-color: var(--accent);">
+                        <h3>❌ Mito</h3>
+                        <p>"Necesitas ser un genio matemático"</p>
+                    </div>
+                    <div class="card" style="border-color: var(--secondary);">
+                        <h3>✅ Realidad</h3>
+                        <p>La lógica es más importante que las matemáticas avanzadas</p>
+                    </div>
+                    <div class="card" style="border-color: var(--accent);">
+                        <h3>❌ Mito</h3>
+                        <p>"Es demasiado difícil para mí"</p>
+                    </div>
+                    <div class="card" style="border-color: var(--secondary);">
+                        <h3>✅ Realidad</h3>
+                        <p>Con práctica y paciencia, cualquiera puede aprender</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Caminos Profesionales</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Especialización Front-End</h3>
+                        <ul>
+                            <li>UI/UX Developer</li>
+                            <li>React/Vue/Angular Specialist</li>
+                            <li>Mobile Web Developer</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Especialización Back-End</h3>
+                        <ul>
+                            <li>API Developer</li>
+                            <li>Database Administrator</li>
+                            <li>DevOps Engineer</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>Fullstack Developer</h3>
+                    <p>Combina ambas especializaciones para proyectos completos</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Preguntas Frecuentes</h2>
+                <div class="card">
+                    <h3>¿Cuánto tiempo toma aprender?</h3>
+                    <p>Depende de tu dedicación. Con práctica diaria, puedes tener bases sólidas en 3-6 meses</p>
+                </div>
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>¿Necesito una computadora potente?</h3>
+                    <p>No necesariamente. Puedes comenzar con cualquier computadora que ejecute un navegador moderno</p>
+                </div>
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>¿Es necesario estudiar una carrera?</h3>
+                    <p>No es obligatorio. Muchos desarrolladores son autodidactas o han tomado bootcamps</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Comunidad de Desarrolladores</h2>
+                <ul class="multi-column" style="font-size: 1.3rem;">
+                    <li>🌐 <strong>Stack Overflow:</strong> Preguntas y respuestas</li>
+                    <li>💬 <strong>Discord/Slack:</strong> Comunidades en tiempo real</li>
+                    <li>📱 <strong>Twitter/X:</strong> Sigue a desarrolladores influyentes</li>
+                    <li>📝 <strong>Dev.to:</strong> Blog y artículos de la comunidad</li>
+                    <li>🎥 <strong>YouTube:</strong> Tutoriales y conferencias</li>
+                    <li>📚 <strong>GitHub:</strong> Código abierto y colaboración</li>
+                </ul>
+            </div>
+
+            <div class="slide">
+                <h2>Accesibilidad Web</h2>
+                <p>Hacer que la web sea <strong>usable para todos</strong>, incluyendo personas con discapacidades</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Principios</h3>
+                        <ul>
+                            <li>Perceptible</li>
+                            <li>Operable</li>
+                            <li>Comprensible</li>
+                            <li>Robusto</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Prácticas</h3>
+                        <ul>
+                            <li>Texto alternativo en imágenes</li>
+                            <li>Contraste de colores adecuado</li>
+                            <li>Navegación por teclado</li>
+                            <li>Estructura semántica</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Seguridad Web</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Amenazas Comunes</h3>
+                        <ul>
+                            <li>XSS (Cross-Site Scripting)</li>
+                            <li>SQL Injection</li>
+                            <li>CSRF (Cross-Site Request Forgery)</li>
+                            <li>Ataques DDoS</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Buenas Prácticas</h3>
+                        <ul>
+                            <li>Validar todas las entradas</li>
+                            <li>Usar HTTPS</li>
+                            <li>Mantener software actualizado</li>
+                            <li>Implementar autenticación fuerte</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Responsive Design</h2>
+                <p>Diseño que se <strong>adapta a diferentes tamaños de pantalla</strong></p>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>Mobile First</h3>
+                    <p>Diseñar primero para dispositivos móviles y luego escalar hacia pantallas más grandes</p>
+                </div>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Técnicas</h3>
+                        <ul>
+                            <li>Media Queries (CSS)</li>
+                            <li>Flexbox y Grid</li>
+                            <li>Imágenes responsive</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Dispositivos</h3>
+                        <ul>
+                            <li>Móviles (320px+)</li>
+                            <li>Tablets (768px+)</li>
+                            <li>Desktop (1024px+)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Frameworks y Librerías</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>JavaScript</h3>
+                        <ul>
+                            <li>React</li>
+                            <li>Vue.js</li>
+                            <li>Angular</li>
+                            <li>Svelte</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>CSS</h3>
+                        <ul>
+                            <li>Bootstrap</li>
+                            <li>Tailwind CSS</li>
+                            <li>Bulma</li>
+                            <li>Material UI</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 2rem; text-align: center; font-style: italic;">
+                    💡 Aprende las bases primero, luego explora frameworks
+                </p>
+            </div>
+
+            <div class="slide">
+                <h2>Control de Versiones - Git</h2>
+                <p>Sistema para rastrear cambios en el código y colaborar con otros</p>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Conceptos Clave</h3>
+                        <ul>
+                            <li>Repositorio</li>
+                            <li>Commit</li>
+                            <li>Branch</li>
+                            <li>Merge</li>
+                            <li>Pull/Push</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Plataformas</h3>
+                        <ul>
+                            <li>GitHub</li>
+                            <li>GitLab</li>
+                            <li>Bitbucket</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>APIs y Servicios Web</h2>
+                <p>Interfaces que permiten que aplicaciones se comuniquen entre sí</p>
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>REST API</h3>
+                    <p>Estilo arquitectónico común para servicios web que usa HTTP</p>
+                </div>
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Métodos HTTP</h3>
+                        <ul>
+                            <li>GET - Obtener datos</li>
+                            <li>POST - Crear datos</li>
+                            <li>PUT - Actualizar datos</li>
+                            <li>DELETE - Eliminar datos</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Formatos</h3>
+                        <ul>
+                            <li>JSON (más común)</li>
+                            <li>XML</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h2>Reflexión Final</h2>
+                <div class="card" style="background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2)); padding: 3rem;">
+                    <h3 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">
+                        El desarrollo web es un viaje, no un destino
+                    </h3>
+                    <ul style="font-size: 1.4rem;">
+                        <li>Cada proyecto es una oportunidad de aprender</li>
+                        <li>Los errores son tus mejores maestros</li>
+                        <li>La comunidad está aquí para ayudarte</li>
+                        <li>Tu creatividad es tu mayor herramienta</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <h1 style="text-align: center;">¡Gracias!</h1>
+                <p style="font-size: 2rem; text-align: center; margin-top: 3rem; color: var(--secondary);">
+                    ¿Preguntas?
+                </p>
+                <div style="text-align: center; margin-top: 3rem;">
+                    <p style="font-size: 1.3rem; color: rgba(255, 255, 255, 0.7);">
+                        Nos vemos en la próxima clase
+                    </p>
+                    <p style="font-size: 1.5rem; margin-top: 2rem;">
+                        🚀 ¡Ahora a practicar!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+            <div class="progress-bar" style="flex: 1; margin: 0 2rem;">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        // Cronómetros
+        const timers = {
+            activity1: { interval: null, seconds: 15 * 60, initialSeconds: 15 * 60, isRunning: false },
+            activity2: { interval: null, seconds: 15 * 60, initialSeconds: 15 * 60, isRunning: false },
+            break: { interval: null, seconds: 20 * 60, initialSeconds: 20 * 60, isRunning: false }
+        };
+
+        // Funciones de cronómetro
+        function startTimer(timerName, minutes) {
+            const timer = timers[timerName];
+            if (timer.isRunning) return;
+            
+            timer.isRunning = true;
+            updateTimerDisplay(timerName);
+            updateTimerStatus(timerName, 'Cronómetro en marcha...');
+            
+            timer.interval = setInterval(() => {
+                timer.seconds--;
+                updateTimerDisplay(timerName);
+                
+                if (timer.seconds <= 0) {
+                    clearInterval(timer.interval);
+                    timer.isRunning = false;
+                    updateTimerStatus(timerName, '¡Tiempo completado! 🎉');
+                    playBeep();
+                } else if (timer.seconds <= 60) {
+                    updateTimerStatus(timerName, '⚠️ ¡Último minuto!');
+                } else if (timer.seconds <= 300) {
+                    updateTimerStatus(timerName, '⏰ Quedan 5 minutos');
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerName) {
+            const timer = timers[timerName];
+            if (!timer.isRunning) return;
+            
+            clearInterval(timer.interval);
+            timer.isRunning = false;
+            updateTimerStatus(timerName, 'Cronómetro pausado');
+        }
+
+        function resetTimer(timerName, minutes) {
+            const timer = timers[timerName];
+            clearInterval(timer.interval);
+            timer.isRunning = false;
+            timer.seconds = minutes * 60;
+            updateTimerDisplay(timerName);
+            updateTimerStatus(timerName, 'Cronómetro reiniciado');
+        }
+
+        function updateTimerDisplay(timerName) {
+            const timer = timers[timerName];
+            const minutes = Math.floor(timer.seconds / 60);
+            const seconds = timer.seconds % 60;
+            const displayElement = document.getElementById(`${timerName}Timer`);
+            
+            displayElement.textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Cambiar color según tiempo restante
+            displayElement.classList.remove('warning', 'danger');
+            if (timer.seconds <= 60) {
+                displayElement.classList.add('danger');
+            } else if (timer.seconds <= 300) {
+                displayElement.classList.add('warning');
+            }
+        }
+
+        function updateTimerStatus(timerName, message) {
+            document.getElementById(`${timerName}Status`).textContent = message;
+        }
+
+        function playBeep() {
+            // Crear un beep simple con Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Navegación de slides
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (currentSlide < totalSlides - 1) changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) changeSlide(-1);
+            }
+        });
+
+        // Inicializar
+        showSlide(0);
+    </script>
+</body>
+</html>

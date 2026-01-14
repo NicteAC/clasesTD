@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bases de JavaScript - Clase Interactiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0F0F1E 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        .progress-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 3rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        p, li {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 0.6rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        ul li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        ol {
+            padding-left: 1.5rem;
+        }
+
+        ol li {
+            padding-left: 0.3rem;
+        }
+
+        .two-column-list {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(45, 91, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .code-block code {
+            color: var(--light);
+            white-space: pre;
+            display: block;
+            line-height: 1.5;
+        }
+
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .timer-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.6);
+            color: var(--secondary);
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .timer-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.start {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .timer-btn.pause {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .timer-btn.reset {
+            background: var(--accent);
+            color: white;
+        }
+
+        .timer-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: var(--light);
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .activity-card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .activity-card ul, .activity-card ol {
+            margin-top: 0.8rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 91, 255, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .break-slide {
+            text-align: center;
+        }
+
+        .break-slide h1 {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .break-timer {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            color: var(--secondary);
+            text-shadow: 0 0 30px rgba(0, 212, 170, 0.8);
+            margin: 2rem 0;
+        }
+
+        .objective-list {
+            text-align: left;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .inline-code {
+            background: rgba(45, 91, 255, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .comment {
+            color: #6A9955;
+        }
+
+        .keyword {
+            color: #569CD6;
+        }
+
+        .string {
+            color: #CE9178;
+        }
+
+        .function {
+            color: #DCDCAA;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-wrapper">
+        <div class="header">
+            <div class="logo">JavaScript Fundamentals</div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">28</span>
+            </div>
+        </div>
+
+        <div class="slides-container" id="slidesContainer">
+            <!-- Los slides se cargarán aquí -->
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        // Definir todos los slides
+        const slidesData = [
+            // Slide 1: Portada
+            {
+                content: `
+                    <h1>Bases del Lenguaje JavaScript</h1>
+                    <h2>Programa Intensivo de 3 Horas</h2>
+                    <div class="grid-2" style="margin-top: 3rem;">
+                        <div class="card">
+                            <h3>📚 Parte I</h3>
+                            <ul>
+                                <li>Variables y tipos de datos</li>
+                                <li>Operadores y expresiones</li>
+                                <li>Estructuras de control</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>🚀 Parte II</h3>
+                            <ul>
+                                <li>Funciones y scope</li>
+                                <li>Manipulación del DOM</li>
+                                <li>Eventos interactivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 2: Agenda
+            {
+                content: `
+                    <h1>Agenda de la Clase</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>🕐 Primera Hora</h3>
+                            <ul>
+                                <li>Introducción a JavaScript (10 min)</li>
+                                <li>Variables y operadores (30 min)</li>
+                                <li>Demo: Calculadora básica</li>
+                                <li>Actividad práctica 1 (15 min)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>🕑 Segunda Hora</h3>
+                            <ul>
+                                <li>Estructuras de control (25 min)</li>
+                                <li>Demo: Sistema de login</li>
+                                <li>☕ Descanso (20 min)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>🕒 Tercera Hora</h3>
+                            <ul>
+                                <li>Funciones y scope (25 min)</li>
+                                <li>Demo: Funciones interactivas</li>
+                                <li>Actividad práctica 2 (15 min)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>🎯 Final</h3>
+                            <ul>
+                                <li>DOM y eventos (25 min)</li>
+                                <li>Demo: Página interactiva</li>
+                                <li>Actividad práctica 3 (15 min)</li>
+                                <li>Cierre y preguntas</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 3: Intro JavaScript
+            {
+                content: `
+                    <h1>¿Qué es JavaScript?</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Historia Rápida</h3>
+                            <ul>
+                                <li>Creado en 1995 por Brendan Eich</li>
+                                <li>Originalmente llamado "LiveScript"</li>
+                                <li>Lenguaje fundamental para la web</li>
+                                <li>Agrega interactividad y dinamismo</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>¿Por qué es importante?</h3>
+                            <ul>
+                                <li>Único lenguaje en navegadores</li>
+                                <li>También servidores (Node.js)</li>
+                                <li>Frameworks: React, Angular, Vue</li>
+                                <li>Comunidad enorme y activa</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 4: Demo 1 - Variables
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #1: Variables</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Tres formas de declarar</h3>
+                            <div class="code-block"><code><span class="keyword">var</span> edad = <span class="string">25</span>;  <span class="comment">// Antigua forma</span>
+<span class="keyword">let</span> nombre = <span class="string">"Juan"</span>;  <span class="comment">// Moderna, puede cambiar</span>
+<span class="keyword">const</span> PI = <span class="string">3.1416</span>;  <span class="comment">// Constante, no cambia</span></code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Buenas prácticas</h3>
+                            <ul>
+                                <li>Usa <span class="inline-code">const</span> por defecto</li>
+                                <li>Usa <span class="inline-code">let</span> si cambiará</li>
+                                <li>Evita <span class="inline-code">var</span> (scope confuso)</li>
+                                <li>Nombres descriptivos: nombreUsuario</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 5: Demo Variables - Código
+            {
+                content: `
+                    <h2>🎬 DEMO #1 - Continuación</h2>
+                    <h3 style="text-align: center; color: var(--light);">Ejemplo: Programa de Bienvenida</h3>
+                    <div class="code-block"><code><span class="comment">// Solicitar datos al usuario</span>
+<span class="keyword">const</span> nombre = <span class="function">prompt</span>(<span class="string">"¿Cuál es tu nombre?"</span>);
+<span class="keyword">let</span> edad = <span class="function">prompt</span>(<span class="string">"¿Cuántos años tienes?"</span>);
+
+<span class="comment">// Convertir edad a número</span>
+edad = <span class="function">parseInt</span>(edad);
+
+<span class="comment">// Mostrar mensaje personalizado</span>
+<span class="function">console.log</span>(<span class="string">\`Hola \${nombre}, tienes \${edad} años\`</span>);
+<span class="function">console.log</span>(<span class="string">\`El próximo año tendrás \${edad + 1} años\`</span>);
+
+<span class="comment">// Usar alert para mostrar en pantalla</span>
+<span class="function">alert</span>(<span class="string">\`¡Bienvenido \${nombre}!\`</span>);</code></div>
+                    <p style="margin-top: 2rem; text-align: center;"><strong>Tip:</strong> Abre la consola del navegador (F12) para ver los mensajes de <span class="inline-code">console.log()</span></p>
+                `
+            },
+            // Slide 6: Operadores
+            {
+                content: `
+                    <h1>Operadores en JavaScript</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Operadores Aritméticos</h3>
+                            <div class="code-block"><code><span class="highlight">+</span>  suma
+<span class="highlight">-</span>  resta
+<span class="highlight">*</span>  multiplicación
+<span class="highlight">/</span>  división
+<span class="highlight">%</span>  módulo (resto)
+<span class="highlight">**</span> exponente</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Operadores de Comparación</h3>
+                            <div class="code-block"><code><span class="highlight">==</span>   igual (valor)
+<span class="highlight">===</span>  igual estricto (valor y tipo)
+<span class="highlight">!=</span>   diferente
+<span class="highlight">!==</span>  diferente estricto
+<span class="highlight">></span>    mayor que
+<span class="highlight"><</span>    menor que
+<span class="highlight">>=</span>   mayor o igual
+<span class="highlight"><=</span>   menor o igual</code></div>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 7: Demo 2 - Calculadora
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #2: Calculadora Básica</h2>
+                    <div class="code-block"><code><span class="comment">// Solicitar dos números</span>
+<span class="keyword">const</span> num1 = <span class="function">parseFloat</span>(<span class="function">prompt</span>(<span class="string">"Ingresa el primer número:"</span>));
+<span class="keyword">const</span> num2 = <span class="function">parseFloat</span>(<span class="function">prompt</span>(<span class="string">"Ingresa el segundo número:"</span>));
+
+<span class="comment">// Realizar operaciones</span>
+<span class="function">console.log</span>(<span class="string">"--- RESULTADOS ---"</span>);
+<span class="function">console.log</span>(<span class="string">\`Suma: \${num1} + \${num2} = \${num1 + num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`Resta: \${num1} - \${num2} = \${num1 - num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`Multiplicación: \${num1} * \${num2} = \${num1 * num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`División: \${num1} / \${num2} = \${num1 / num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`Resto: \${num1} % \${num2} = \${num1 % num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`Potencia: \${num1} ** \${num2} = \${num1 ** num2}\`</span>);
+
+<span class="comment">// Comparaciones</span>
+<span class="function">console.log</span>(<span class="string">\`¿\${num1} es mayor que \${num2}? \${num1 > num2}\`</span>);
+<span class="function">console.log</span>(<span class="string">\`¿Son iguales? \${num1 === num2}\`</span>);</code></div>
+                `
+            },
+            // Slide 8: Actividad 1
+            {
+                content: `
+                    <h2>💻 ACTIVIDAD PRÁCTICA #1</h2>
+                    <div class="activity-layout">
+                        <div class="timer-container">
+                            <h3>Cronómetro</h3>
+                            <div class="timer-display" id="timer1">15:00</div>
+                            <div class="timer-controls">
+                                <button class="timer-btn start" onclick="startTimer(1, 15)">Iniciar</button>
+                                <button class="timer-btn pause" onclick="pauseTimer(1)">Pausar</button>
+                                <button class="timer-btn reset" onclick="resetTimer(1, 15)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status1">Listo para comenzar</div>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Calculadora de Propinas</h3>
+                            <p><strong>Objetivo:</strong> Crear un programa que calcule la propina de un restaurante.</p>
+                            <h3 style="margin-top: 1rem;">Requisitos:</h3>
+                            <ol>
+                                <li>Solicitar monto de cuenta con <span class="inline-code">prompt()</span></li>
+                                <li>Solicitar porcentaje de propina (10%, 15%, 20%)</li>
+                                <li>Calcular el monto de la propina</li>
+                                <li>Calcular total a pagar (cuenta + propina)</li>
+                                <li>Mostrar resultados con <span class="inline-code">console.log()</span></li>
+                            </ol>
+                            <h3 style="margin-top: 1rem;">Bonus:</h3>
+                            <ul>
+                                <li>Dividir total entre número de personas</li>
+                                <li>Validar que números sean positivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 9: Estructuras de Control
+            {
+                content: `
+                    <h1>Estructuras de Control</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>if / else</h3>
+                            <div class="code-block"><code><span class="keyword">if</span> (condicion) {
+  <span class="comment">// código si es verdadero</span>
+} <span class="keyword">else if</span> (otraCondicion) {
+  <span class="comment">// otra opción</span>
+} <span class="keyword">else</span> {
+  <span class="comment">// código si todo es falso</span>
+}</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Operadores Lógicos</h3>
+                            <div class="code-block"><code><span class="highlight">&&</span>  AND (y)
+<span class="highlight">||</span>  OR (o)
+<span class="highlight">!</span>   NOT (negación)
+
+<span class="comment">// Ejemplo</span>
+<span class="keyword">if</span> (edad >= <span class="string">18</span> <span class="highlight">&&</span> tieneLicencia) {
+  <span class="function">console.log</span>(<span class="string">"Puede conducir"</span>);
+}</code></div>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 10: Demo 3 - Sistema Login
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #3: Sistema de Login</h2>
+                    <div class="code-block"><code><span class="comment">// Credenciales válidas</span>
+<span class="keyword">const</span> USUARIO_VALIDO = <span class="string">"admin"</span>;
+<span class="keyword">const</span> PASSWORD_VALIDA = <span class="string">"1234"</span>;
+
+<span class="comment">// Solicitar credenciales</span>
+<span class="keyword">const</span> usuario = <span class="function">prompt</span>(<span class="string">"Usuario:"</span>);
+<span class="keyword">const</span> password = <span class="function">prompt</span>(<span class="string">"Contraseña:"</span>);
+
+<span class="comment">// Verificar</span>
+<span class="keyword">if</span> (usuario === USUARIO_VALIDO <span class="highlight">&&</span> password === PASSWORD_VALIDA) {
+  <span class="function">console.log</span>(<span class="string">"✅ Acceso concedido"</span>);
+  <span class="function">alert</span>(<span class="string">"Bienvenido al sistema!"</span>);
+} <span class="keyword">else if</span> (usuario !== USUARIO_VALIDO) {
+  <span class="function">console.log</span>(<span class="string">"❌ Usuario incorrecto"</span>);
+  <span class="function">alert</span>(<span class="string">"Usuario no encontrado"</span>);
+} <span class="keyword">else</span> {
+  <span class="function">console.log</span>(<span class="string">"❌ Contraseña incorrecta"</span>);
+  <span class="function">alert</span>(<span class="string">"Contraseña incorrecta"</span>);
+}</code></div>
+                `
+            },
+            // Slide 11: Switch
+            {
+                content: `
+                    <h1>Sentencia Switch</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Sintaxis</h3>
+                            <div class="code-block"><code><span class="keyword">switch</span> (expresion) {
+  <span class="keyword">case</span> valor1:
+    <span class="comment">// código</span>
+    <span class="keyword">break</span>;
+  <span class="keyword">case</span> valor2:
+    <span class="comment">// código</span>
+    <span class="keyword">break</span>;
+  <span class="keyword">default</span>:
+    <span class="comment">// código por defecto</span>
+}</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Ejemplo: Menú</h3>
+                            <div class="code-block"><code><span class="keyword">const</span> opcion = <span class="function">prompt</span>(<span class="string">"Menú: 1, 2 o 3"</span>);
+
+<span class="keyword">switch</span> (opcion) {
+  <span class="keyword">case</span> <span class="string">"1"</span>:
+    <span class="function">console.log</span>(<span class="string">"Opción 1"</span>);
+    <span class="keyword">break</span>;
+  <span class="keyword">case</span> <span class="string">"2"</span>:
+    <span class="function">console.log</span>(<span class="string">"Opción 2"</span>);
+    <span class="keyword">break</span>;
+  <span class="keyword">default</span>:
+    <span class="function">console.log</span>(<span class="string">"No válida"</span>);
+}</code></div>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 12: DESCANSO
+            {
+                content: `
+                    <div class="break-slide">
+                        <h1>☕ DESCANSO</h1>
+                        <div class="break-timer" id="breakTimer">20:00</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="startBreak()">Iniciar Descanso</button>
+                            <button class="timer-btn reset" onclick="resetBreak()">Reiniciar</button>
+                        </div>
+                        <p style="font-size: 1.5rem; margin-top: 2rem;">
+                            Estira las piernas, toma agua y regresa recargado 🚀
+                        </p>
+                    </div>
+                `
+            },
+            // Slide 13: Funciones
+            {
+                content: `
+                    <h1>Funciones en JavaScript</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Función Declarada</h3>
+                            <div class="code-block"><code><span class="keyword">function</span> <span class="function">saludar</span>(nombre) {
+  <span class="keyword">return</span> <span class="string">\`Hola \${nombre}\`</span>;
+}
+
+<span class="comment">// Llamar la función</span>
+<span class="function">console.log</span>(<span class="function">saludar</span>(<span class="string">"Ana"</span>));</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Función Anónima</h3>
+                            <div class="code-block"><code><span class="keyword">const</span> saludar = <span class="keyword">function</span>(nombre) {
+  <span class="keyword">return</span> <span class="string">\`Hola \${nombre}\`</span>;
+};
+
+<span class="function">console.log</span>(<span class="function">saludar</span>(<span class="string">"Ana"</span>));</code></div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3>Función Flecha (Arrow Function)</h3>
+                        <div class="code-block"><code><span class="keyword">const</span> saludar = (nombre) => <span class="string">\`Hola \${nombre}\`</span>;
+
+<span class="comment">// Si tiene una sola línea, el return es implícito</span>
+<span class="function">console.log</span>(<span class="function">saludar</span>(<span class="string">"Ana"</span>));</code></div>
+                    </div>
+                `
+            },
+            // Slide 14: Scope
+            {
+                content: `
+                    <h1>Scope (Alcance de Variables)</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Scope Global</h3>
+                            <div class="code-block"><code><span class="keyword">let</span> nombre = <span class="string">"Juan"</span>; <span class="comment">// Global</span>
+
+<span class="keyword">function</span> <span class="function">mostrar</span>() {
+  <span class="function">console.log</span>(nombre); <span class="comment">// Accede</span>
+}
+
+<span class="function">mostrar</span>(); <span class="comment">// "Juan"</span>
+<span class="function">console.log</span>(nombre); <span class="comment">// "Juan"</span></code></div>
+                            <p style="margin-top: 1rem;">✅ Accesible desde cualquier parte</p>
+                        </div>
+                        <div class="card">
+                            <h3>Scope Local</h3>
+                            <div class="code-block"><code><span class="keyword">function</span> <span class="function">mostrar</span>() {
+  <span class="keyword">let</span> mensaje = <span class="string">"Hola"</span>; <span class="comment">// Local</span>
+  <span class="function">console.log</span>(mensaje); <span class="comment">// "Hola"</span>
+}
+
+<span class="function">mostrar</span>();
+<span class="function">console.log</span>(mensaje); <span class="comment">// ❌ Error</span></code></div>
+                            <p style="margin-top: 1rem;">✅ Solo accesible dentro de la función</p>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 15: Demo 4 - Funciones
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #4: Calculadora con Funciones</h2>
+                    <div class="code-block"><code><span class="comment">// Definir funciones para cada operación</span>
+<span class="keyword">const</span> sumar = (a, b) => a + b;
+<span class="keyword">const</span> restar = (a, b) => a - b;
+<span class="keyword">const</span> multiplicar = (a, b) => a * b;
+<span class="keyword">const</span> dividir = (a, b) => a / b;
+
+<span class="comment">// Función principal que usa las otras</span>
+<span class="keyword">function</span> <span class="function">calculadora</span>() {
+  <span class="keyword">const</span> num1 = <span class="function">parseFloat</span>(<span class="function">prompt</span>(<span class="string">"Número 1:"</span>));
+  <span class="keyword">const</span> num2 = <span class="function">parseFloat</span>(<span class="function">prompt</span>(<span class="string">"Número 2:"</span>));
+  <span class="keyword">const</span> operacion = <span class="function">prompt</span>(<span class="string">"Operación (+, -, *, /):"</span>);
+  
+  <span class="keyword">let</span> resultado;
+  
+  <span class="keyword">switch</span> (operacion) {
+    <span class="keyword">case</span> <span class="string">"+"</span>: resultado = <span class="function">sumar</span>(num1, num2); <span class="keyword">break</span>;
+    <span class="keyword">case</span> <span class="string">"-"</span>: resultado = <span class="function">restar</span>(num1, num2); <span class="keyword">break</span>;
+    <span class="keyword">case</span> <span class="string">"*"</span>: resultado = <span class="function">multiplicar</span>(num1, num2); <span class="keyword">break</span>;
+    <span class="keyword">case</span> <span class="string">"/"</span>: resultado = <span class="function">dividir</span>(num1, num2); <span class="keyword">break</span>;
+    <span class="keyword">default</span>: resultado = <span class="string">"Operación no válida"</span>;
+  }
+  
+  <span class="function">console.log</span>(<span class="string">\`Resultado: \${resultado}\`</span>);
+  <span class="function">alert</span>(<span class="string">\`El resultado es: \${resultado}\`</span>);
+}
+
+<span class="comment">// Ejecutar</span>
+<span class="function">calculadora</span>();</code></div>
+                `
+            },
+            // Slide 16: Actividad 2
+            {
+                content: `
+                    <h2>💻 ACTIVIDAD PRÁCTICA #2</h2>
+                    <div class="activity-layout">
+                        <div class="timer-container">
+                            <h3>Cronómetro</h3>
+                            <div class="timer-display" id="timer2">15:00</div>
+                            <div class="timer-controls">
+                                <button class="timer-btn start" onclick="startTimer(2, 15)">Iniciar</button>
+                                <button class="timer-btn pause" onclick="pauseTimer(2)">Pausar</button>
+                                <button class="timer-btn reset" onclick="resetTimer(2, 15)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status2">Listo para comenzar</div>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Conversor de Temperatura</h3>
+                            <p><strong>Objetivo:</strong> Crear funciones para convertir entre Celsius, Fahrenheit y Kelvin.</p>
+                            <h3 style="margin-top: 1rem;">Requisitos:</h3>
+                            <ol>
+                                <li>Crear función <span class="inline-code">celsiusAFahrenheit(c)</span></li>
+                                <li>Crear función <span class="inline-code">celsiusAKelvin(c)</span></li>
+                                <li>Crear función <span class="inline-code">fahrenheitACelsius(f)</span></li>
+                                <li>Solicitar temperatura y unidad al usuario</li>
+                                <li>Mostrar conversiones a todas las unidades</li>
+                            </ol>
+                            <h3 style="margin-top: 1rem;">Fórmulas:</h3>
+                            <ul>
+                                <li>F = (C × 9/5) + 32</li>
+                                <li>K = C + 273.15</li>
+                                <li>C = (F - 32) × 5/9</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 17: DOM Intro
+            {
+                content: `
+                    <h1>Document Object Model (DOM)</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>¿Qué es el DOM?</h3>
+                            <ul>
+                                <li>Representación en árbol del HTML</li>
+                                <li>JavaScript puede acceder y modificarlo</li>
+                                <li>Permite crear páginas dinámicas</li>
+                                <li>Cada elemento es un "nodo"</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Selectores Principales</h3>
+                            <div class="code-block"><code><span class="comment">// Por ID</span>
+document.<span class="function">getElementById</span>(<span class="string">"miId"</span>);
+
+<span class="comment">// Por clase</span>
+document.<span class="function">getElementsByClassName</span>(<span class="string">"clase"</span>);
+
+<span class="comment">// Por etiqueta</span>
+document.<span class="function">getElementsByTagName</span>(<span class="string">"p"</span>);
+
+<span class="comment">// Query selector (CSS)</span>
+document.<span class="function">querySelector</span>(<span class="string">".clase"</span>);
+document.<span class="function">querySelectorAll</span>(<span class="string">"p"</span>);</code></div>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 18: Manipulación DOM
+            {
+                content: `
+                    <h1>Manipular el DOM</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Modificar Contenido</h3>
+                            <div class="code-block"><code><span class="keyword">const</span> elemento = document.<span class="function">getElementById</span>(<span class="string">"titulo"</span>);
+
+<span class="comment">// Cambiar texto</span>
+elemento.innerText = <span class="string">"Nuevo texto"</span>;
+
+<span class="comment">// Cambiar HTML</span>
+elemento.innerHTML = <span class="string">"&lt;strong&gt;Negrita&lt;/strong&gt;"</span>;</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Modificar Estilos</h3>
+                            <div class="code-block"><code><span class="keyword">const</span> elemento = document.<span class="function">getElementById</span>(<span class="string">"caja"</span>);
+
+<span class="comment">// Cambiar estilo</span>
+elemento.style.color = <span class="string">"red"</span>;
+elemento.style.fontSize = <span class="string">"20px"</span>;
+
+<span class="comment">// Agregar clase</span>
+elemento.className += <span class="string">" nueva-clase"</span>;</code></div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3>Crear y Eliminar Elementos</h3>
+                        <div class="code-block"><code><span class="comment">// Crear</span>
+<span class="keyword">const</span> nuevoParrafo = document.<span class="function">createElement</span>(<span class="string">"p"</span>);
+nuevoParrafo.innerText = <span class="string">"Nuevo párrafo"</span>;
+document.body.<span class="function">appendChild</span>(nuevoParrafo);
+
+<span class="comment">// Eliminar</span>
+<span class="keyword">const</span> elemento = document.<span class="function">getElementById</span>(<span class="string">"borrar"</span>);
+elemento.<span class="function">remove</span>();</code></div>
+                    </div>
+                `
+            },
+            // Slide 19: Demo 5 - DOM
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #5: Manipulación del DOM</h2>
+                    <div class="code-block" style="font-size: 0.85rem;"><code><span class="comment">&lt;!-- HTML --&gt;</span>
+&lt;h1 id=<span class="string">"titulo"</span>&gt;Título Original&lt;/h1&gt;
+&lt;p id=<span class="string">"parrafo"</span>&gt;Texto original&lt;/p&gt;
+&lt;button onclick=<span class="string">"cambiarContenido()"</span>&gt;Cambiar&lt;/button&gt;
+
+&lt;script&gt;
+<span class="keyword">function</span> <span class="function">cambiarContenido</span>() {
+  <span class="comment">// Cambiar el título</span>
+  <span class="keyword">const</span> titulo = document.<span class="function">getElementById</span>(<span class="string">"titulo"</span>);
+  titulo.innerText = <span class="string">"¡Título Modificado!"</span>;
+  titulo.style.color = <span class="string">"blue"</span>;
+  titulo.style.fontSize = <span class="string">"50px"</span>;
+  
+  <span class="comment">// Cambiar el párrafo</span>
+  <span class="keyword">const</span> parrafo = document.<span class="function">getElementById</span>(<span class="string">"parrafo"</span>);
+  parrafo.innerHTML = <span class="string">"&lt;strong&gt;Texto en negrita&lt;/strong&gt;"</span>;
+  parrafo.style.backgroundColor = <span class="string">"yellow"</span>;
+  
+  <span class="comment">// Crear elemento nuevo</span>
+  <span class="keyword">const</span> nuevoElemento = document.<span class="function">createElement</span>(<span class="string">"p"</span>);
+  nuevoElemento.innerText = <span class="string">"Elemento creado con JavaScript"</span>;
+  nuevoElemento.style.color = <span class="string">"green"</span>;
+  document.body.<span class="function">appendChild</span>(nuevoElemento);
+  
+  <span class="function">console.log</span>(<span class="string">"✅ DOM modificado exitosamente"</span>);
+}
+&lt;/script&gt;</code></div>
+                `
+            },
+            // Slide 20: Eventos
+            {
+                content: `
+                    <h1>Eventos en JavaScript</h1>
+                    <div class="two-column-list">
+                        <div>
+                            <h3>Eventos del Mouse</h3>
+                            <ul>
+                                <li><span class="inline-code">click</span> - Clic en el elemento</li>
+                                <li><span class="inline-code">dblclick</span> - Doble clic</li>
+                                <li><span class="inline-code">mouseover</span> - Mouse sobre elemento</li>
+                                <li><span class="inline-code">mouseout</span> - Mouse sale del elemento</li>
+                                <li><span class="inline-code">mousemove</span> - Mouse se mueve</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3>Eventos del Teclado</h3>
+                            <ul>
+                                <li><span class="inline-code">keydown</span> - Tecla presionada</li>
+                                <li><span class="inline-code">keyup</span> - Tecla liberada</li>
+                            </ul>
+                            <h3 style="margin-top: 1.5rem;">Eventos de Formulario</h3>
+                            <ul>
+                                <li><span class="inline-code">submit</span> - Envío de formulario</li>
+                                <li><span class="inline-code">change</span> - Cambio en input/select</li>
+                                <li><span class="inline-code">input</span> - Input en tiempo real</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 21: addEventListener
+            {
+                content: `
+                    <h1>addEventListener()</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Sintaxis</h3>
+                            <div class="code-block"><code>elemento.<span class="function">addEventListener</span>(evento, funcion);
+
+<span class="comment">// Ejemplo básico</span>
+<span class="keyword">const</span> boton = document.<span class="function">getElementById</span>(<span class="string">"btn"</span>);
+
+boton.<span class="function">addEventListener</span>(<span class="string">"click"</span>, <span class="keyword">function</span>() {
+  <span class="function">alert</span>(<span class="string">"¡Click!"</span>);
+});
+
+<span class="comment">// Con arrow function</span>
+boton.<span class="function">addEventListener</span>(<span class="string">"click"</span>, () => {
+  <span class="function">console.log</span>(<span class="string">"Evento click"</span>);
+});</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Ventajas</h3>
+                            <ul>
+                                <li>Múltiples eventos en el mismo elemento</li>
+                                <li>Separa HTML de JavaScript</li>
+                                <li>Más control sobre los eventos</li>
+                                <li>Puede remover eventos después</li>
+                            </ul>
+                            <div class="code-block" style="margin-top: 1rem;"><code><span class="comment">// Remover evento</span>
+<span class="keyword">const</span> miFuncion = () => <span class="function">alert</span>(<span class="string">"Click"</span>);
+boton.<span class="function">addEventListener</span>(<span class="string">"click"</span>, miFuncion);
+boton.<span class="function">removeEventListener</span>(<span class="string">"click"</span>, miFuncion);</code></div>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 22: Demo 6 - Eventos
+            {
+                content: `
+                    <h2>🎬 DEMO EN VIVO #6: Formulario Interactivo</h2>
+                    <div class="code-block" style="font-size: 0.8rem;"><code><span class="comment">&lt;!-- HTML --&gt;</span>
+&lt;form id=<span class="string">"miFormulario"</span>&gt;
+  &lt;input type=<span class="string">"text"</span> id=<span class="string">"nombre"</span> placeholder=<span class="string">"Nombre"</span>&gt;
+  &lt;input type=<span class="string">"email"</span> id=<span class="string">"email"</span> placeholder=<span class="string">"Email"</span>&gt;
+  &lt;button type=<span class="string">"submit"</span>&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;
+&lt;div id=<span class="string">"resultado"</span>&gt;&lt;/div&gt;
+
+&lt;script&gt;
+<span class="keyword">const</span> formulario = document.<span class="function">getElementById</span>(<span class="string">"miFormulario"</span>);
+<span class="keyword">const</span> resultado = document.<span class="function">getElementById</span>(<span class="string">"resultado"</span>);
+
+<span class="comment">// Evento submit</span>
+formulario.<span class="function">addEventListener</span>(<span class="string">"submit"</span>, (event) => {
+  event.<span class="function">preventDefault</span>(); <span class="comment">// Prevenir envío por defecto</span>
+  
+  <span class="keyword">const</span> nombre = document.<span class="function">getElementById</span>(<span class="string">"nombre"</span>).value;
+  <span class="keyword">const</span> email = document.<span class="function">getElementById</span>(<span class="string">"email"</span>).value;
+  
+  <span class="comment">// Validación simple</span>
+  <span class="keyword">if</span> (nombre === <span class="string">""</span> || email === <span class="string">""</span>) {
+    resultado.innerHTML = <span class="string">"&lt;p style='color:red'&gt;Completa todos los campos&lt;/p&gt;"</span>;
+    <span class="keyword">return</span>;
+  }
+  
+  <span class="comment">// Mostrar datos</span>
+  resultado.innerHTML = <span class="string">\`
+    &lt;h2&gt;Datos recibidos:&lt;/h2&gt;
+    &lt;p&gt;Nombre: \${nombre}&lt;/p&gt;
+    &lt;p&gt;Email: \${email}&lt;/p&gt;
+  \`</span>;
+  
+  <span class="function">console.log</span>(<span class="string">"Formulario enviado:"</span>, { nombre, email });
+  formulario.<span class="function">reset</span>(); <span class="comment">// Limpiar formulario</span>
+});
+&lt;/script&gt;</code></div>
+                `
+            },
+            // Slide 23: Actividad 3
+            {
+                content: `
+                    <h2>💻 ACTIVIDAD PRÁCTICA #3</h2>
+                    <div class="activity-layout">
+                        <div class="timer-container">
+                            <h3>Cronómetro</h3>
+                            <div class="timer-display" id="timer3">15:00</div>
+                            <div class="timer-controls">
+                                <button class="timer-btn start" onclick="startTimer(3, 15)">Iniciar</button>
+                                <button class="timer-btn pause" onclick="pauseTimer(3)">Pausar</button>
+                                <button class="timer-btn reset" onclick="resetTimer(3, 15)">Reiniciar</button>
+                            </div>
+                            <div class="timer-status" id="status3">Listo para comenzar</div>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Lista de Tareas Interactiva</h3>
+                            <p><strong>Objetivo:</strong> Crear una app de lista de tareas con agregar, mostrar y eliminar.</p>
+                            <h3 style="margin-top: 1rem;">Requisitos HTML:</h3>
+                            <ol>
+                                <li>Input para ingresar tarea</li>
+                                <li>Botón para agregar</li>
+                                <li>Div/ul para mostrar las tareas</li>
+                            </ol>
+                            <h3 style="margin-top: 1rem;">Requisitos JavaScript:</h3>
+                            <ol>
+                                <li>Capturar valor del input con evento click</li>
+                                <li>Crear elemento con <span class="inline-code">createElement()</span></li>
+                                <li>Agregar la tarea al contenedor</li>
+                                <li>Limpiar input después de agregar</li>
+                            </ol>
+                            <h3 style="margin-top: 1rem;">Bonus:</h3>
+                            <ul>
+                                <li>Botón para eliminar cada tarea</li>
+                                <li>Contador de tareas totales</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 24: Consola de Desarrollo
+            {
+                content: `
+                    <h1>Depuración con la Consola</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Métodos de Console</h3>
+                            <div class="code-block"><code><span class="comment">// Mensaje normal</span>
+<span class="function">console.log</span>(<span class="string">"Mensaje"</span>);
+
+<span class="comment">// Advertencia</span>
+<span class="function">console.warn</span>(<span class="string">"Advertencia"</span>);
+
+<span class="comment">// Error</span>
+<span class="function">console.error</span>(<span class="string">"Error"</span>);
+
+<span class="comment">// Tabla</span>
+<span class="function">console.table</span>([{a:<span class="string">1</span>}, {a:<span class="string">2</span>}]);
+
+<span class="comment">// Traza</span>
+<span class="function">console.trace</span>();
+
+<span class="comment">// Limpiar consola</span>
+<span class="function">console.clear</span>();</code></div>
+                        </div>
+                        <div class="card">
+                            <h3>Debugger</h3>
+                            <div class="code-block"><code><span class="keyword">function</span> <span class="function">calcular</span>(a, b) {
+  <span class="keyword">debugger</span>; <span class="comment">// Pausa aquí</span>
+  <span class="keyword">const</span> resultado = a + b;
+  <span class="keyword">return</span> resultado;
+}
+
+<span class="function">calcular</span>(<span class="string">5</span>, <span class="string">10</span>);</code></div>
+                            <h3 style="margin-top: 1.5rem;">Atajos de Consola</h3>
+                            <ul style="font-size: 1.1rem;">
+                                <li><strong>F12</strong> - Abrir DevTools</li>
+                                <li><strong>Ctrl+L</strong> - Limpiar consola</li>
+                                <li><strong>↑/↓</strong> - Historial</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 25: Resumen
+            {
+                content: `
+                    <h1>🎯 Resumen de la Clase</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>✅ Parte I - Fundamentos</h3>
+                            <ul>
+                                <li>Variables: var, let, const</li>
+                                <li>Operadores aritméticos y lógicos</li>
+                                <li>Estructuras: if/else, switch</li>
+                                <li>Comparaciones y concatenación</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>✅ Parte II - Avanzado</h3>
+                            <ul>
+                                <li>Funciones: declaradas, anónimas, flecha</li>
+                                <li>Scope: global vs local</li>
+                                <li>Manipulación del DOM</li>
+                                <li>Eventos interactivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3>🚀 Próximos Pasos</h3>
+                        <div class="two-column-list">
+                            <ul>
+                                <li>Practicar con proyectos personales</li>
+                                <li>Explorar jQuery (próxima clase)</li>
+                                <li>Estudiar APIs del navegador</li>
+                                <li>Aprender AJAX y Fetch</li>
+                                <li>Investigar frameworks (React, Vue)</li>
+                                <li>Ejercicios en FreeCodeCamp</li>
+                                <li>Leer documentación MDN</li>
+                                <li>Unirse a comunidades de JS</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 26: Recursos
+            {
+                content: `
+                    <h1>📚 Recursos Recomendados</h1>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Documentación</h3>
+                            <ul>
+                                <li>MDN Web Docs</li>
+                                <li>JavaScript.info</li>
+                                <li>W3Schools</li>
+                                <li>Eloquent JavaScript (libro)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Práctica</h3>
+                            <ul>
+                                <li>FreeCodeCamp</li>
+                                <li>Codecademy</li>
+                                <li>LeetCode (algoritmos)</li>
+                                <li>HackerRank</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Comunidad</h3>
+                            <ul>
+                                <li>Stack Overflow</li>
+                                <li>Reddit r/javascript</li>
+                                <li>Discord de programación</li>
+                                <li>Meetups locales</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>YouTube</h3>
+                            <ul>
+                                <li>Traversy Media</li>
+                                <li>Fazt Code</li>
+                                <li>midudev</li>
+                                <li>The Net Ninja</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 27: Preguntas
+            {
+                content: `
+                    <div style="text-align: center; padding: 3rem 0;">
+                        <h1 style="font-size: 4rem; margin-bottom: 2rem;">❓ Preguntas</h1>
+                        <h2 style="margin-bottom: 3rem;">¿Dudas sobre los temas vistos?</h2>
+                        <div class="card" style="max-width: 800px; margin: 0 auto;">
+                            <h3>Recordatorio</h3>
+                            <p style="font-size: 1.4rem;">
+                                Pueden contactarme por email o el foro del curso para consultas adicionales.
+                                ¡La práctica hace al maestro! 💪
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            // Slide 28: Fin
+            {
+                content: `
+                    <div style="text-align: center; padding: 3rem 0;">
+                        <h1 style="font-size: 5rem; margin-bottom: 2rem;">¡Gracias!</h1>
+                        <h2 style="margin-bottom: 3rem;">Bases de JavaScript - Completado ✅</h2>
+                        <div class="grid-2" style="max-width: 900px; margin: 0 auto;">
+                            <div class="card">
+                                <h3>📌 Siguiente Clase</h3>
+                                <p style="font-size: 1.3rem;">Conociendo la librería jQuery</p>
+                            </div>
+                            <div class="card">
+                                <h3>🏠 Tarea</h3>
+                                <p style="font-size: 1.3rem;">Completar los ejercicios propuestos y practicar los conceptos vistos</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // Render slides
+        const slidesContainer = document.getElementById('slidesContainer');
+        slidesData.forEach((slideData, index) => {
+            const slideDiv = document.createElement('div');
+            slideDiv.className = 'slide' + (index === 0 ? ' active' : '');
+            slideDiv.innerHTML = `<div class="slide-content">${slideData.content}</div>`;
+            slidesContainer.appendChild(slideDiv);
+        });
+
+        // JavaScript
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        const timers = {};
+        const timerIntervals = {};
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        updateSlideCounter();
+        updateProgress();
+        updateNavButtons();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            }
+        });
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide += direction;
+            
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            
+            slides[currentSlide].classList.add('active');
+            updateSlideCounter();
+            updateProgress();
+            updateNavButtons();
+        }
+
+        function updateSlideCounter() {
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+        }
+
+        function updateProgress() {
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function startTimer(timerId, minutes) {
+            if (timerIntervals[timerId]) return;
+            
+            if (!timers[timerId]) {
+                timers[timerId] = minutes * 60;
+            }
+            
+            timerIntervals[timerId] = setInterval(() => {
+                timers[timerId]--;
+                updateTimerDisplay(timerId);
+                
+                if (timers[timerId] <= 0) {
+                    clearInterval(timerIntervals[timerId]);
+                    timerIntervals[timerId] = null;
+                    document.getElementById(`status${timerId}`).textContent = '¡Tiempo completado!';
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerId) {
+            if (timerIntervals[timerId]) {
+                clearInterval(timerIntervals[timerId]);
+                timerIntervals[timerId] = null;
+                document.getElementById(`status${timerId}`).textContent = 'Pausado';
+            }
+        }
+
+        function resetTimer(timerId, minutes) {
+            clearInterval(timerIntervals[timerId]);
+            timerIntervals[timerId] = null;
+            timers[timerId] = minutes * 60;
+            updateTimerDisplay(timerId);
+            document.getElementById(`status${timerId}`).textContent = 'Listo para comenzar';
+        }
+
+        function updateTimerDisplay(timerId) {
+            const minutes = Math.floor(timers[timerId] / 60);
+            const seconds = timers[timerId] % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const timerElement = document.getElementById(`timer${timerId}`);
+            timerElement.textContent = display;
+            
+            if (timers[timerId] <= 60) {
+                timerElement.className = 'timer-display danger';
+                document.getElementById(`status${timerId}`).textContent = '¡Último minuto!';
+            } else if (timers[timerId] <= 300) {
+                timerElement.className = 'timer-display warning';
+                document.getElementById(`status${timerId}`).textContent = 'Menos de 5 minutos';
+            } else {
+                timerElement.className = 'timer-display';
+                document.getElementById(`status${timerId}`).textContent = 'En progreso...';
+            }
+        }
+
+        let breakTimer = 20 * 60;
+        let breakInterval = null;
+
+        function startBreak() {
+            if (breakInterval) return;
+            
+            breakInterval = setInterval(() => {
+                breakTimer--;
+                updateBreakDisplay();
+                
+                if (breakTimer <= 0) {
+                    clearInterval(breakInterval);
+                    breakInterval = null;
+                }
+            }, 1000);
+        }
+
+        function resetBreak() {
+            clearInterval(breakInterval);
+            breakInterval = null;
+            breakTimer = 20 * 60;
+            updateBreakDisplay();
+        }
+
+        function updateBreakDisplay() {
+            const minutes = Math.floor(breakTimer / 60);
+            const seconds = breakTimer % 60;
+            document.getElementById('breakTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>

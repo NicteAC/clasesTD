@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery - Clase Interactiva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0F0F1E 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 3rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        p, li {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 0.6rem;
+        }
+
+        ul { list-style: none; }
+        ul li {
+            padding-left: 2rem;
+            position: relative;
+        }
+        ul li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        ol { padding-left: 1.5rem; }
+        ol li { padding-left: 0.3rem; }
+
+        .two-column-list {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(45, 91, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 0.8rem 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            max-width: 100%;
+            text-align: left;
+            width: 100%;
+        }
+
+        .code-block code {
+            color: var(--light);
+            white-space: pre;
+            display: block;
+        }
+
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .comment { color: #6A9955; }
+        .function { color: #DCDCAA; }
+        .highlight { color: var(--secondary); font-weight: 600; }
+        .tag { color: #4EC9B0; }
+        .attr { color: #9CDCFE; }
+
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 3rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .timer-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.6);
+            color: var(--secondary);
+        }
+
+        .timer-display.warning { color: var(--warning); }
+        .timer-display.danger {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .timer-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.start { background: var(--secondary); color: var(--dark); }
+        .timer-btn.pause { background: var(--warning); color: var(--dark); }
+        .timer-btn.reset { background: var(--accent); color: white; }
+        .timer-btn:hover { transform: scale(1.05); }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: var(--light);
+            opacity: 0.8;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .activity-card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .activity-card li {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-left: 1rem;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.8); }
+        }
+
+        .inline-code {
+            background: rgba(45, 91, 255, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .break-slide {
+            text-align: center;
+        }
+
+        .break-slide h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .break-timer {
+            font-family: 'Space Mono', monospace;
+            font-size: 8rem;
+            color: var(--secondary);
+            text-shadow: 0 0 40px rgba(0, 212, 170, 0.8);
+            margin: 1.5rem 0;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--light);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2));
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .highlight-box p {
+            font-size: 1.4rem;
+            margin: 0;
+        }
+
+        .icon-large {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .comparison-table td {
+            font-size: 1.1rem;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-right: 0.8rem;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+
+        .objectives-list li {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-left: 2.5rem;
+        }
+
+        .objectives-list li:before {
+            content: "✓";
+            color: var(--secondary);
+            font-size: 1.3rem;
+        }
+
+        .warning-box {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box h3 {
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-wrapper">
+        <header class="header">
+            <div class="logo">jQuery - Parte I</div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+            </div>
+        </header>
+
+        <div class="slides-container" id="slidesContainer"></div>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+        </nav>
+    </div>
+
+    <script>
+        const slidesData = [
+            // SLIDE 1: Título
+            {
+                content: `
+                    <div class="slide-content text-center">
+                        <div class="icon-large">⚡</div>
+                        <h1>Conociendo la Librería jQuery</h1>
+                        <p class="subtitle">Simplifica tu JavaScript y domina la manipulación del DOM</p>
+                        <div class="highlight-box">
+                            <p>Duración: 3 horas | 2 Demos en vivo | 2 Actividades prácticas</p>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 2: Objetivos
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🎯 Objetivos de Aprendizaje</h2>
+                        <div class="grid-2 mt-2">
+                            <div class="card">
+                                <h3>📚 Conceptos</h3>
+                                <ul class="objectives-list">
+                                    <li>Comprender qué es jQuery y por qué usarlo</li>
+                                    <li>Entender el DOM y su manipulación</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>💻 Práctica</h3>
+                                <ul class="objectives-list">
+                                    <li>Incluir y usar jQuery en proyectos</li>
+                                    <li>Integrar jQuery con Bootstrap</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 3: Repaso
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🔄 Repaso Clase Anterior</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>Funciones JS</h3>
+                                <p>Declaradas, anónimas y de flecha</p>
+                            </div>
+                            <div class="card">
+                                <h3>Scope</h3>
+                                <p>var, let y const en diferentes contextos</p>
+                            </div>
+                            <div class="card">
+                                <h3>Manipulación DOM</h3>
+                                <p>getElementById, querySelector</p>
+                            </div>
+                            <div class="card">
+                                <h3>Eventos</h3>
+                                <p>addEventListener, click, keydown</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 4: Aclaración Bootstrap
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>⚠️ Aclaración Importante</h2>
+                        <div class="warning-box mt-2">
+                            <h3>Bootstrap 4 vs Bootstrap 5</h3>
+                            <p class="mt-1">Usaremos <span class="inline-code">Bootstrap 4</span> porque en Bootstrap 5 la API basada en jQuery ya no existe.</p>
+                        </div>
+                        <div class="highlight-box mt-2">
+                            <p>Aprender jQuery es esencial para mantener proyectos legacy, plantillas y plugins que aún lo usan.</p>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 5: ¿Qué es jQuery?
+            {
+                content: `
+                    <div class="slide-content">
+                        <h1>¿Qué es jQuery?</h1>
+                        <div class="highlight-box mt-2">
+                            <p>Una <strong>biblioteca de JavaScript</strong> que simplifica la interacción con el DOM y proporciona funciones para manipular HTML, CSS y eventos.</p>
+                        </div>
+                        <p class="subtitle mt-2">🎯 Escribir menos código para lograr más</p>
+                    </div>
+                `
+            },
+            // SLIDE 6: Ventajas de jQuery
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>✨ ¿Por qué usar jQuery?</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>🚀 Facilidad de uso</h3>
+                                <p>Sintaxis intuitiva similar a CSS. Menos código, más resultados.</p>
+                            </div>
+                            <div class="card">
+                                <h3>🌐 Compatibilidad</h3>
+                                <p>Funciona igual en todos los navegadores.</p>
+                            </div>
+                            <div class="card">
+                                <h3>👥 Comunidad</h3>
+                                <p>Miles de plugins y documentación extensa.</p>
+                            </div>
+                            <div class="card">
+                                <h3>🔄 Retrocompatibilidad</h3>
+                                <p>Código heredado sigue funcionando.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 7: Incluir jQuery
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>📦 Incluir jQuery en tu Proyecto</h2>
+                        <p class="subtitle">Via CDN de Google (método más simple)</p>
+                        <div class="code-block full-width">
+<code><span class="comment">&lt;!-- Incluir ANTES de cerrar &lt;/body&gt; --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="string">"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="comment">&lt;!-- Tu código jQuery va DESPUÉS --&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+  <span class="comment">// Aquí tu código</span>
+<span class="tag">&lt;/script&gt;</span></code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 8: Sintaxis básica
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>📝 Sintaxis Básica de jQuery</h2>
+                        <div class="code-block full-width">
+<code><span class="comment">// Sintaxis general</span>
+<span class="highlight">$(selector).acción()</span>
+
+<span class="comment">// $ = acceso a jQuery</span>
+<span class="comment">// selector = elemento(s) HTML (como CSS)</span>
+<span class="comment">// acción = qué hacer con el elemento</span>
+
+<span class="comment">// Ejemplos:</span>
+<span class="function">$</span>(<span class="string">"p"</span>).<span class="function">hide</span>();        <span class="comment">// Todos los &lt;p&gt;</span>
+<span class="function">$</span>(<span class="string">".clase"</span>).<span class="function">show</span>();    <span class="comment">// Por clase</span>
+<span class="function">$</span>(<span class="string">"#id"</span>).<span class="function">fadeIn</span>();      <span class="comment">// Por ID</span></code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 9: Document Ready
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>⏳ Document Ready</h2>
+                        <p class="subtitle">Esperar a que el DOM esté listo</p>
+                        <div class="code-block full-width">
+<code><span class="comment">// Forma clásica</span>
+<span class="function">$</span>(<span class="keyword">document</span>).<span class="function">ready</span>(<span class="keyword">function</span>() {
+    <span class="comment">// Tu código aquí</span>
+});
+
+<span class="comment">// Forma corta (más usada)</span>
+<span class="function">$</span>(<span class="keyword">function</span>() {
+    <span class="comment">// Tu código aquí</span>
+});</code>
+                        </div>
+                        <div class="highlight-box mt-1">
+                            <p>Garantiza que el código se ejecute cuando el HTML esté completamente cargado</p>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 10: DEMO 1
+            {
+                content: `
+                    <div class="slide-content">
+                        <h1>Demo: Cambiar Texto <span class="demo-badge">🎬 LIVE</span></h1>
+                        <p class="subtitle">Aprenderemos a modificar contenido con jQuery</p>
+                        <div class="grid-2 mt-2">
+                            <div class="card">
+                                <h3>📋 Objetivos</h3>
+                                <ul>
+                                    <li>Crear estructura HTML básica</li>
+                                    <li>Incluir jQuery via CDN</li>
+                                    <li>Capturar evento click</li>
+                                    <li>Modificar texto dinámicamente</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>⏱️ Duración</h3>
+                                <p style="font-size: 3rem; text-align: center; color: var(--secondary);">15 min</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 11: Bootstrap + jQuery
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🤝 Bootstrap + jQuery</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>Bootstrap aporta</h3>
+                                <ul>
+                                    <li>Diseño responsivo</li>
+                                    <li>Componentes reutilizables</li>
+                                    <li>Flexibilidad visual</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>jQuery aporta</h3>
+                                <ul>
+                                    <li>Manipulación del DOM</li>
+                                    <li>Eventos simplificados</li>
+                                    <li>Animaciones y AJAX</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="highlight-box mt-2">
+                            <p>Bootstrap 4 usa jQuery internamente para modales, carruseles, tooltips, etc.</p>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 12: ¿Qué es el DOM?
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🌳 ¿Qué es el DOM?</h2>
+                        <p class="subtitle">Document Object Model</p>
+                        <div class="highlight-box mt-1">
+                            <p>Una representación en forma de <strong>árbol</strong> del documento HTML que permite acceder y manipular elementos desde JavaScript.</p>
+                        </div>
+                        <div class="code-block full-width mt-1">
+<code><span class="comment">/* Estructura de árbol */</span>
+document
+  └── html
+       ├── head
+       │    └── title
+       └── body
+            ├── header
+            ├── main
+            │    ├── h1
+            │    └── p
+            └── footer</code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 13: Seleccionar elementos
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🎯 Seleccionar Elementos con jQuery</h2>
+                        <div class="code-block full-width">
+<code><span class="comment">// Por etiqueta</span>
+<span class="function">$</span>(<span class="string">"p"</span>)              <span class="comment">// Todos los párrafos</span>
+<span class="function">$</span>(<span class="string">"div"</span>)            <span class="comment">// Todos los divs</span>
+
+<span class="comment">// Por clase</span>
+<span class="function">$</span>(<span class="string">".mi-clase"</span>)      <span class="comment">// Elementos con clase "mi-clase"</span>
+
+<span class="comment">// Por ID</span>
+<span class="function">$</span>(<span class="string">"#mi-id"</span>)         <span class="comment">// Elemento con id "mi-id"</span>
+
+<span class="comment">// Combinados (como CSS)</span>
+<span class="function">$</span>(<span class="string">"div.container p"</span>) <span class="comment">// Párrafos dentro de div.container</span></code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 14: show() y hide()
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>👁️ Mostrar y Ocultar: show() / hide()</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3 style="color: var(--secondary);">show()</h3>
+                                <p>Muestra un elemento oculto</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"#elemento"</span>).<span class="function">show</span>();</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 style="color: var(--accent);">hide()</h3>
+                                <p>Oculta un elemento visible</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"#elemento"</span>).<span class="function">hide</span>();</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block full-width mt-1">
+<code><span class="comment">// Ejemplo con evento click</span>
+<span class="function">$</span>(<span class="string">"button"</span>).<span class="function">on</span>(<span class="string">"click"</span>, <span class="keyword">function</span>() {
+    <span class="function">$</span>(<span class="string">"p.texto"</span>).<span class="function">hide</span>();
+});</code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 15: fadeIn() y fadeOut()
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>✨ Transiciones: fadeIn() / fadeOut()</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3 style="color: var(--secondary);">fadeIn()</h3>
+                                <p>Aparece con transición suave</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeIn</span>();
+<span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeIn</span>(<span class="string">"slow"</span>);
+<span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeIn</span>(<span class="highlight">2000</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 style="color: var(--accent);">fadeOut()</h3>
+                                <p>Desaparece con transición</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeOut</span>();
+<span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeOut</span>(<span class="string">"fast"</span>);
+<span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeOut</span>(<span class="highlight">1000</span>);</code>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center mt-1">Velocidad: <span class="inline-code">"slow"</span> | <span class="inline-code">"fast"</span> | <span class="inline-code">milisegundos</span></p>
+                    </div>
+                `
+            },
+            // SLIDE 16: slideDown() y slideUp()
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>📐 Deslizar: slideDown() / slideUp()</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3 style="color: var(--secondary);">slideDown()</h3>
+                                <p>Aparece deslizándose hacia abajo</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">".menu"</span>).<span class="function">slideDown</span>(<span class="highlight">1000</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 style="color: var(--accent);">slideUp()</h3>
+                                <p>Desaparece deslizándose hacia arriba</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">".menu"</span>).<span class="function">slideUp</span>(<span class="highlight">1000</span>);</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block full-width mt-1">
+<code><span class="comment">// slideToggle: alterna entre slideUp y slideDown</span>
+<span class="function">$</span>(<span class="string">"button"</span>).<span class="function">click</span>(<span class="keyword">function</span>() {
+    <span class="function">$</span>(<span class="string">".contenido"</span>).<span class="function">slideToggle</span>(<span class="highlight">500</span>);
+});</code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 17: Callbacks
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🔗 Callbacks: Ejecutar al Terminar</h2>
+                        <p class="subtitle">Segundo parámetro opcional: función que se ejecuta al completar la animación</p>
+                        <div class="code-block full-width mt-1">
+<code><span class="comment">// Sintaxis con callback</span>
+<span class="function">$</span>(<span class="string">".texto"</span>).<span class="function">fadeOut</span>(<span class="highlight">2000</span>, <span class="keyword">function</span>() {
+    <span class="function">alert</span>(<span class="string">'¡Animación terminada!'</span>);
+});
+
+<span class="comment">// Encadenar animaciones</span>
+<span class="function">$</span>(<span class="string">".caja"</span>).<span class="function">slideUp</span>(<span class="highlight">500</span>, <span class="keyword">function</span>() {
+    <span class="function">$</span>(<span class="keyword">this</span>).<span class="function">slideDown</span>(<span class="highlight">500</span>);
+});</code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 18: DESCANSO
+            {
+                content: `
+                    <div class="slide-content break-slide">
+                        <h1>☕ Descanso</h1>
+                        <div class="break-timer" id="breakTimer">20:00</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="startBreak()">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseBreak()">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetBreak()">Reiniciar</button>
+                        </div>
+                        <p class="subtitle mt-2">Estira las piernas, toma agua 💧</p>
+                    </div>
+                `
+            },
+            // SLIDE 19: Scroll animado
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>📜 Scroll Animado</h2>
+                        <p class="subtitle">Navegación suave entre secciones</p>
+                        <div class="code-block full-width">
+<code><span class="comment">// HTML: Elemento destino con ID</span>
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"btnContacto"</span><span class="tag">&gt;</span>Ir a contacto<span class="tag">&lt;/a&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="string">"seccionContacto"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
+
+<span class="comment">// jQuery: Animación de scroll</span>
+<span class="function">$</span>(<span class="string">'#btnContacto'</span>).<span class="function">click</span>(<span class="keyword">function</span>(e) {
+    e.<span class="function">preventDefault</span>();
+    <span class="function">$</span>(<span class="string">'html, body'</span>).<span class="function">animate</span>({
+        <span class="attr">scrollTop</span>: <span class="function">$</span>(<span class="string">"#seccionContacto"</span>).<span class="function">offset</span>().top
+    }, <span class="highlight">2000</span>);
+});</code>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 20: Métodos útiles
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>🛠️ Métodos Útiles de jQuery</h2>
+                        <div class="grid-3 mt-1">
+                            <div class="card">
+                                <h3>.text()</h3>
+                                <p>Obtener/cambiar texto</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"h1"</span>).<span class="function">text</span>(<span class="string">"Nuevo"</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>.html()</h3>
+                                <p>Obtener/cambiar HTML</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"div"</span>).<span class="function">html</span>(<span class="string">"&lt;b&gt;Hola&lt;/b&gt;"</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>.val()</h3>
+                                <p>Valor de inputs</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"input"</span>).<span class="function">val</span>();</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>.css()</h3>
+                                <p>Modificar estilos</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"p"</span>).<span class="function">css</span>(<span class="string">"color"</span>,<span class="string">"red"</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>.addClass()</h3>
+                                <p>Agregar clase CSS</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"div"</span>).<span class="function">addClass</span>(<span class="string">"activo"</span>);</code>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>.append()</h3>
+                                <p>Agregar contenido</p>
+                                <div class="code-block">
+<code><span class="function">$</span>(<span class="string">"ul"</span>).<span class="function">append</span>(<span class="string">"&lt;li&gt;Nuevo&lt;/li&gt;"</span>);</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 21: DEMO 2 Intro
+            {
+                content: `
+                    <div class="slide-content">
+                        <h1>Demo: Calculadora de Préstamos <span class="demo-badge">🎬 LIVE</span></h1>
+                        <p class="subtitle">Aplicación interactiva con HTML, Bootstrap y jQuery</p>
+                        <div class="grid-2 mt-2">
+                            <div class="card">
+                                <h3>📋 Funcionalidades</h3>
+                                <ul>
+                                    <li>Campos: monto, tasa, plazo</li>
+                                    <li>Botón calcular con evento</li>
+                                    <li>Mostrar resultado dinámico</li>
+                                    <li>Estilos con Bootstrap</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>⏱️ Duración</h3>
+                                <p style="font-size: 3rem; text-align: center; color: var(--secondary);">20 min</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 22: Actividad 1 Intro
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>💼 Actividad 1: Gestor de Tareas</h2>
+                        <p class="subtitle">Contexto: Sistema para empleados de empresa de software</p>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>🎯 Objetivo</h3>
+                                <p>Crear una app donde los empleados puedan agregar tareas y eliminarlas al completarlas, sin recargar la página.</p>
+                            </div>
+                            <div class="card">
+                                <h3>🛠️ Tecnologías</h3>
+                                <ul>
+                                    <li>HTML (input, button, ul)</li>
+                                    <li>jQuery CDN</li>
+                                    <li>Eventos click y append</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 23: Actividad 1 - Timer
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>💼 Actividad 1: Gestor de Tareas</h2>
+                        <div class="activity-layout">
+                            <div class="timer-container">
+                                <h3>⏱️ Tiempo</h3>
+                                <div class="timer-display" id="timer1">25:00</div>
+                                <div class="timer-controls">
+                                    <button class="timer-btn start" onclick="startTimer('1', 25)">Iniciar</button>
+                                    <button class="timer-btn pause" onclick="pauseTimer('1')">Pausar</button>
+                                    <button class="timer-btn reset" onclick="resetTimer('1', 25)">Reiniciar</button>
+                                </div>
+                                <p class="timer-status" id="status1">Listo para comenzar</p>
+                            </div>
+                            <div class="activity-card">
+                                <h3>📝 Pasos a seguir</h3>
+                                <ol>
+                                    <li><strong>HTML:</strong> input + botón "Agregar" + lista ul vacía</li>
+                                    <li><strong>jQuery:</strong> Incluir CDN de Google</li>
+                                    <li><strong>Agregar:</strong> Capturar valor y crear li con append()</li>
+                                    <li><strong>Eliminar:</strong> Click en tarea para removerla</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 24: Actividad 2 Intro
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>👥 Actividad 2: Sistema de Usuarios</h2>
+                        <p class="subtitle">Gestión CRUD de usuarios en tabla dinámica</p>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>🎯 Funcionalidades</h3>
+                                <ul>
+                                    <li>Tabla para mostrar usuarios</li>
+                                    <li>Formulario: nombre y edad</li>
+                                    <li>Botón eliminar en cada fila</li>
+                                    <li>Efectos visuales con jQuery</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>💡 Conceptos</h3>
+                                <ul>
+                                    <li>Evento submit del form</li>
+                                    <li>Delegación de eventos</li>
+                                    <li>Manipulación de tablas</li>
+                                    <li>Animaciones al agregar/eliminar</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 25: Actividad 2 - Timer
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>👥 Actividad 2: Sistema de Usuarios</h2>
+                        <div class="activity-layout">
+                            <div class="timer-container">
+                                <h3>⏱️ Tiempo</h3>
+                                <div class="timer-display" id="timer2">35:00</div>
+                                <div class="timer-controls">
+                                    <button class="timer-btn start" onclick="startTimer('2', 35)">Iniciar</button>
+                                    <button class="timer-btn pause" onclick="pauseTimer('2')">Pausar</button>
+                                    <button class="timer-btn reset" onclick="resetTimer('2', 35)">Reiniciar</button>
+                                </div>
+                                <p class="timer-status" id="status2">Listo para comenzar</p>
+                            </div>
+                            <div class="activity-card">
+                                <h3>📝 Pasos a seguir</h3>
+                                <ol>
+                                    <li><strong>HTML:</strong> Tabla + formulario con inputs</li>
+                                    <li><strong>Submit:</strong> Prevenir recarga, obtener valores</li>
+                                    <li><strong>Agregar:</strong> Nueva fila con fadeIn()</li>
+                                    <li><strong>Eliminar:</strong> Delegación con on() + fadeOut()</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 26: Resumen
+            {
+                content: `
+                    <div class="slide-content">
+                        <h2>📋 Resumen de la Clase</h2>
+                        <div class="grid-2 mt-1">
+                            <div class="card">
+                                <h3>✅ Aprendimos</h3>
+                                <ul>
+                                    <li>Qué es jQuery y por qué usarlo</li>
+                                    <li>Incluir jQuery via CDN</li>
+                                    <li>Sintaxis básica: $(selector).acción()</li>
+                                    <li>Manipulación del DOM</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>✅ Practicamos</h3>
+                                <ul>
+                                    <li>show(), hide(), fadeIn(), fadeOut()</li>
+                                    <li>slideDown(), slideUp(), slideToggle()</li>
+                                    <li>Callbacks y animaciones</li>
+                                    <li>Scroll animado</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // SLIDE 27: Próxima clase
+            {
+                content: `
+                    <div class="slide-content text-center">
+                        <div class="icon-large">🚀</div>
+                        <h1>¡Excelente trabajo!</h1>
+                        <p class="subtitle">Próxima clase: Eventos avanzados y AJAX con jQuery</p>
+                        <div class="highlight-box mt-2">
+                            <p>¿Preguntas? 🙋‍♂️</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // SISTEMA DE RENDERIZADO
+        const slidesContainer = document.getElementById('slidesContainer');
+        slidesData.forEach((slideData, index) => {
+            const slideDiv = document.createElement('div');
+            slideDiv.className = 'slide' + (index === 0 ? ' active' : '');
+            slideDiv.innerHTML = `<div class="slide-content">${slideData.content}</div>`;
+            slidesContainer.appendChild(slideDiv);
+        });
+
+        // NAVEGACIÓN
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        updateSlideCounter();
+        updateProgress();
+        updateNavButtons();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            }
+        });
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide += direction;
+            
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            
+            slides[currentSlide].classList.add('active');
+            updateSlideCounter();
+            updateProgress();
+            updateNavButtons();
+        }
+
+        function updateSlideCounter() {
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+        }
+
+        function updateProgress() {
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        // SISTEMA DE CRONÓMETROS
+        const timers = {};
+        const timerIntervals = {};
+
+        function startTimer(timerId, minutes) {
+            if (timerIntervals[timerId]) return;
+            if (!timers[timerId]) timers[timerId] = minutes * 60;
+            
+            timerIntervals[timerId] = setInterval(() => {
+                timers[timerId]--;
+                updateTimerDisplay(timerId);
+                
+                if (timers[timerId] <= 0) {
+                    clearInterval(timerIntervals[timerId]);
+                    timerIntervals[timerId] = null;
+                    document.getElementById(`status${timerId}`).textContent = '¡Tiempo completado!';
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerId) {
+            if (timerIntervals[timerId]) {
+                clearInterval(timerIntervals[timerId]);
+                timerIntervals[timerId] = null;
+                document.getElementById(`status${timerId}`).textContent = 'Pausado';
+            }
+        }
+
+        function resetTimer(timerId, minutes) {
+            clearInterval(timerIntervals[timerId]);
+            timerIntervals[timerId] = null;
+            timers[timerId] = minutes * 60;
+            updateTimerDisplay(timerId);
+            document.getElementById(`status${timerId}`).textContent = 'Listo para comenzar';
+        }
+
+        function updateTimerDisplay(timerId) {
+            const minutes = Math.floor(timers[timerId] / 60);
+            const seconds = timers[timerId] % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const timerElement = document.getElementById(`timer${timerId}`);
+            timerElement.textContent = display;
+            
+            if (timers[timerId] <= 60) {
+                timerElement.className = 'timer-display danger';
+                document.getElementById(`status${timerId}`).textContent = '¡Último minuto!';
+            } else if (timers[timerId] <= 300) {
+                timerElement.className = 'timer-display warning';
+                document.getElementById(`status${timerId}`).textContent = 'Menos de 5 minutos';
+            } else {
+                timerElement.className = 'timer-display';
+                document.getElementById(`status${timerId}`).textContent = 'En progreso...';
+            }
+        }
+
+        // CRONÓMETRO DE DESCANSO
+        let breakTimer = 20 * 60;
+        let breakInterval = null;
+
+        function startBreak() {
+            if (breakInterval) return;
+            breakInterval = setInterval(() => {
+                breakTimer--;
+                updateBreakDisplay();
+                if (breakTimer <= 0) {
+                    clearInterval(breakInterval);
+                    breakInterval = null;
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function pauseBreak() {
+            if (breakInterval) {
+                clearInterval(breakInterval);
+                breakInterval = null;
+            }
+        }
+
+        function resetBreak() {
+            clearInterval(breakInterval);
+            breakInterval = null;
+            breakTimer = 20 * 60;
+            updateBreakDisplay();
+        }
+
+        function updateBreakDisplay() {
+            const minutes = Math.floor(breakTimer / 60);
+            const seconds = breakTimer % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const timerElement = document.getElementById('breakTimer');
+            if (timerElement) {
+                timerElement.textContent = display;
+                if (breakTimer <= 60) {
+                    timerElement.style.color = 'var(--accent)';
+                    timerElement.style.animation = 'pulse 1s infinite';
+                } else if (breakTimer <= 300) {
+                    timerElement.style.color = 'var(--warning)';
+                } else {
+                    timerElement.style.color = 'var(--secondary)';
+                }
+            }
+        }
+
+        // SONIDO DE ALERTA
+        function playBeep() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 500);
+        }
+    </script>
+</body>
+</html>

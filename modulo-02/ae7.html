@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fundamentos de Git y GitHub</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #2d5bff;
+        --secondary: #00d4aa;
+        --accent: #ff6b6b;
+        --dark: #1a1a2e;
+        --light: #f8f9fa;
+        --warning: #ffa500;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Sora", sans-serif;
+        background: var(--dark);
+        color: var(--light);
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      .presentation-container {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 2rem;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .slide-counter {
+        font-family: "Space Mono", monospace;
+        font-size: 1.2rem;
+        color: var(--secondary);
+      }
+
+      /* Progress Bar */
+      .progress-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s ease;
+      }
+
+      /* Main Content */
+      .slide-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      .slide {
+        display: none;
+        max-width: 1200px;
+        width: 100%;
+        animation: slideIn 0.6s ease-out;
+      }
+
+      .slide.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Typography */
+      h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--light);
+      }
+
+      h3 {
+        font-size: 1.8rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        color: var(--secondary);
+      }
+
+      p,
+      li {
+        font-size: 1.3rem;
+        line-height: 1.8;
+      }
+
+      /* Cards Grid */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        width: 100%;
+        margin-top: 1.5rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        text-align: left;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(45, 91, 255, 0.2);
+      }
+
+      .card h3 {
+        margin-bottom: 0.8rem;
+      }
+
+      .card p {
+        font-size: 1.1rem;
+        color: rgba(248, 249, 250, 0.8);
+      }
+
+      /* Code Blocks */
+      .code-block {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(45, 91, 255, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        font-family: "Space Mono", monospace;
+        font-size: 1.1rem;
+        text-align: left;
+        width: 100%;
+        margin: 1rem 0;
+      }
+
+      .code-block code {
+        color: var(--secondary);
+      }
+
+      .code-comment {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* Lists */
+      ul {
+        list-style: none;
+        text-align: left;
+        width: 100%;
+      }
+
+      ul li {
+        padding: 0.5rem 0;
+        padding-left: 2rem;
+        position: relative;
+      }
+
+      ul li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--secondary);
+      }
+
+      .two-columns {
+        column-count: 2;
+        column-gap: 3rem;
+      }
+
+      /* Activity Layout */
+      .activity-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 3rem;
+        width: 100%;
+        align-items: start;
+      }
+
+      .timer-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .timer-display {
+        font-family: "Space Mono", monospace;
+        font-size: 6rem;
+        font-weight: 700;
+        text-shadow: 0 0 30px rgba(0, 212, 170, 0.5);
+        margin: 1rem 0;
+      }
+
+      .timer-green {
+        color: var(--secondary);
+      }
+      .timer-orange {
+        color: var(--warning);
+      }
+      .timer-red {
+        color: var(--accent);
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .timer-controls {
+        display: flex;
+        justify-content: center;
+        gap: 0.8rem;
+        margin-top: 1rem;
+      }
+
+      .timer-btn {
+        font-family: "Sora", sans-serif;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .timer-btn.start {
+        background: var(--secondary);
+        color: var(--dark);
+      }
+      .timer-btn.pause {
+        background: var(--warning);
+        color: var(--dark);
+      }
+      .timer-btn.reset {
+        background: var(--accent);
+        color: var(--light);
+      }
+
+      .timer-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .timer-status {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .activity-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: left;
+      }
+
+      .activity-card h3 {
+        margin-bottom: 1rem;
+        color: var(--accent);
+      }
+
+      /* Navigation */
+      .navigation {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-btn {
+        font-family: "Sora", sans-serif;
+        padding: 1rem 2rem;
+        border: 2px solid var(--primary);
+        background: transparent;
+        color: var(--light);
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .nav-btn:hover {
+        background: var(--primary);
+        transform: translateY(-2px);
+      }
+
+      .nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      /* Special Slides */
+      .title-slide h1 {
+        font-size: 4rem;
+      }
+
+      .subtitle {
+        font-size: 1.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 2rem;
+      }
+
+      .highlight {
+        color: var(--secondary);
+      }
+
+      .warning-text {
+        color: var(--warning);
+      }
+
+      .accent-text {
+        color: var(--accent);
+      }
+
+      .break-slide {
+        background: linear-gradient(
+          135deg,
+          rgba(45, 91, 255, 0.2),
+          rgba(0, 212, 170, 0.2)
+        );
+        border-radius: 20px;
+        padding: 3rem;
+      }
+
+      .emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Demo slide */
+      .demo-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--accent), var(--warning));
+        color: var(--dark);
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .steps-list {
+        counter-reset: step;
+      }
+
+      .steps-list li {
+        counter-increment: step;
+        padding-left: 3rem;
+      }
+
+      .steps-list li::before {
+        content: counter(step);
+        background: var(--primary);
+        color: var(--light);
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        font-weight: 600;
+      }
+
+      .icon-grid {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin: 2rem 0;
+      }
+
+      .icon-item {
+        text-align: center;
+      }
+
+      .icon-item .icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="presentation-container">
+      <header class="header">
+        <span class="slide-counter"
+          >Slide <span id="currentSlide">1</span> /
+          <span id="totalSlides">25</span></span
+        >
+      </header>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <main class="slide-container">
+        <!-- Slide 1: Título -->
+        <section class="slide active title-slide" data-slide="1">
+          <h1>Fundamentos de Git y GitHub</h1>
+          <p class="subtitle">Control de versiones y trabajo colaborativo</p>
+          <div class="icon-grid">
+            <div class="icon-item">
+              <div class="icon">🔀</div>
+              <p>Control de Versiones</p>
+            </div>
+            <div class="icon-item">
+              <div class="icon">👥</div>
+              <p>Colaboración</p>
+            </div>
+            <div class="icon-item">
+              <div class="icon">☁️</div>
+              <p>Repositorios Remotos</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 2: Objetivos -->
+        <section class="slide" data-slide="2">
+          <h2>Objetivos de la Clase</h2>
+          <div class="cards-grid">
+            <div class="card">
+              <h3>🎯 Comprender</h3>
+              <p>
+                La importancia del control de versiones y por qué necesitamos
+                Git
+              </p>
+            </div>
+            <div class="card">
+              <h3>⚙️ Configurar</h3>
+              <p>Instalar y configurar Git correctamente en tu entorno</p>
+            </div>
+            <div class="card">
+              <h3>💻 Dominar</h3>
+              <p>Los comandos básicos para crear y gestionar repositorios</p>
+            </div>
+            <div class="card">
+              <h3>🤝 Colaborar</h3>
+              <p>Trabajar con repositorios remotos y Pull Requests en GitHub</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: ¿Qué es Git? -->
+        <section class="slide" data-slide="3">
+          <h2>¿Qué es <span class="highlight">Git</span>?</h2>
+          <p style="max-width: 900px; margin-bottom: 2rem">
+            Sistema de control de versiones distribuido que permite gestionar y
+            colaborar en proyectos manteniendo un
+            <span class="highlight">historial completo de cambios</span>.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <h3>📜 Historial Completo</h3>
+              <p>Cada cambio queda registrado con fecha, autor y descripción</p>
+            </div>
+            <div class="card">
+              <h3>🔄 Reversible</h3>
+              <p>Puedes volver a cualquier versión anterior del proyecto</p>
+            </div>
+            <div class="card">
+              <h3>🌿 Ramas</h3>
+              <p>
+                Trabaja en funciones paralelas sin afectar el código principal
+              </p>
+            </div>
+            <div class="card">
+              <h3>💻 Local</h3>
+              <p>Funciona en tu máquina sin necesidad de conexión a internet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: ¿Qué es GitHub? -->
+        <section class="slide" data-slide="4">
+          <h2>¿Qué es <span class="highlight">GitHub</span>?</h2>
+          <p style="max-width: 900px; margin-bottom: 2rem">
+            Plataforma web que aloja repositorios Git y proporciona herramientas
+            para <span class="highlight">colaboración en equipo</span>.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <h3>☁️ Almacenamiento</h3>
+              <p>
+                Tu código seguro en la nube, accesible desde cualquier lugar
+              </p>
+            </div>
+            <div class="card">
+              <h3>👥 Pull Requests</h3>
+              <p>Revisión de código antes de fusionar cambios</p>
+            </div>
+            <div class="card">
+              <h3>📋 Issues</h3>
+              <p>Seguimiento de bugs y tareas del proyecto</p>
+            </div>
+            <div class="card">
+              <h3>🚀 GitHub Actions</h3>
+              <p>Automatización de pruebas y despliegue</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 5: Git vs GitHub -->
+        <section class="slide" data-slide="5">
+          <h2>Git <span class="accent-text">vs</span> GitHub</h2>
+          <div class="cards-grid">
+            <div class="card" style="border-color: var(--secondary)">
+              <h3 style="color: var(--secondary)">Git</h3>
+              <ul>
+                <li>Software instalado en tu computadora</li>
+                <li>Funciona localmente sin internet</li>
+                <li>Línea de comandos (terminal)</li>
+                <li>Control de versiones</li>
+              </ul>
+            </div>
+            <div class="card" style="border-color: var(--primary)">
+              <h3 style="color: var(--primary)">GitHub</h3>
+              <ul>
+                <li>Plataforma web en la nube</li>
+                <li>Requiere conexión a internet</li>
+                <li>Interfaz gráfica amigable</li>
+                <li>Colaboración y almacenamiento</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 6: Demo Instalación -->
+        <section class="slide" data-slide="6">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Instalación y Configuración</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Verificar instalación</span><br />
+              git --version<br /><br />
+              <span class="code-comment"># Configurar usuario</span><br />
+              git config --global user.name "Tu Nombre"<br />
+              git config --global user.email "tu@email.com"<br /><br />
+              <span class="code-comment"># Verificar configuración</span><br />
+              git config --list</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 7: Demo Primer Repositorio -->
+        <section class="slide" data-slide="7">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Creando tu Primer Repositorio</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Crear carpeta del proyecto</span
+              ><br />
+              mkdir mi-proyecto && cd mi-proyecto<br /><br />
+              <span class="code-comment"># Inicializar repositorio Git</span
+              ><br />
+              git init<br /><br />
+              <span class="code-comment"># Crear archivo inicial</span><br />
+              echo "&lt;h1&gt;Hola Mundo&lt;/h1&gt;" > index.html<br /><br />
+              <span class="code-comment"># Ver estado del repositorio</span
+              ><br />
+              git status</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 8: Flujo de Git -->
+        <section class="slide" data-slide="8">
+          <h2>El Flujo de <span class="highlight">Git</span></h2>
+          <div class="icon-grid" style="margin: 2rem 0">
+            <div class="icon-item">
+              <div class="icon">📁</div>
+              <p>Working Directory</p>
+              <small style="color: rgba(255, 255, 255, 0.5)"
+                >Tus archivos</small
+              >
+            </div>
+            <div class="icon-item">
+              <div class="icon" style="color: var(--warning)">→</div>
+              <p style="color: var(--warning)">git add</p>
+            </div>
+            <div class="icon-item">
+              <div class="icon">📦</div>
+              <p>Staging Area</p>
+              <small style="color: rgba(255, 255, 255, 0.5)">Preparación</small>
+            </div>
+            <div class="icon-item">
+              <div class="icon" style="color: var(--warning)">→</div>
+              <p style="color: var(--warning)">git commit</p>
+            </div>
+            <div class="icon-item">
+              <div class="icon">💾</div>
+              <p>Repository</p>
+              <small style="color: rgba(255, 255, 255, 0.5)">Historial</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 9: Demo Commits -->
+        <section class="slide" data-slide="9">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Realizando Commits</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Agregar archivo al staging</span
+              ><br />
+              git add index.html<br /><br />
+              <span class="code-comment"># Agregar TODOS los archivos</span
+              ><br />
+              git add .<br /><br />
+              <span class="code-comment"># Crear commit con mensaje</span><br />
+              git commit -m "Crear página inicial"<br /><br />
+              <span class="code-comment"># Ver historial de commits</span><br />
+              git log --oneline</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 10: Actividad 1 -->
+        <section class="slide" data-slide="10">
+          <h2>
+            Actividad 1: <span class="highlight">Mi Primer Repositorio</span>
+          </h2>
+          <div class="activity-layout">
+            <div class="timer-section">
+              <h3>⏱️ Tiempo</h3>
+              <div class="timer-display timer-green" id="timer1">15:00</div>
+              <div class="timer-controls">
+                <button class="timer-btn start" onclick="startTimer(1)">
+                  Iniciar
+                </button>
+                <button class="timer-btn pause" onclick="pauseTimer(1)">
+                  Pausar
+                </button>
+                <button class="timer-btn reset" onclick="resetTimer(1, 15)">
+                  Reiniciar
+                </button>
+              </div>
+              <p class="timer-status" id="status1">Listo para comenzar</p>
+            </div>
+            <div class="activity-card">
+              <h3>📝 Instrucciones</h3>
+              <ul class="steps-list">
+                <li>Abrir Git Bash o terminal</li>
+                <li>Verificar instalación: <code>git --version</code></li>
+                <li>Configurar nombre y email</li>
+                <li>Crear carpeta y ejecutar <code>git init</code></li>
+                <li>Crear archivo index.html básico</li>
+                <li>Realizar primer commit</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 11: Restaurar Archivos -->
+        <section class="slide" data-slide="11">
+          <h2>Restaurar y <span class="highlight">Deshacer</span> Cambios</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"
+                ># Deshacer cambios en archivo (antes de add)</span
+              ><br />
+              git checkout -- nombre_archivo<br /><br />
+              <span class="code-comment"
+                ># Quitar archivo del staging (después de add)</span
+              ><br />
+              git reset HEAD nombre_archivo<br /><br />
+              <span class="code-comment"># Revertir un commit específico</span
+              ><br />
+              git revert hash_del_commit</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 12: .gitignore -->
+        <section class="slide" data-slide="12">
+          <h2>Ignorando Archivos: <span class="highlight">.gitignore</span></h2>
+          <p style="margin-bottom: 1.5rem">
+            Archivo que indica a Git qué archivos o carpetas NO debe rastrear
+          </p>
+          <div class="cards-grid">
+            <div class="code-block">
+              <code
+                ><span class="code-comment"># Archivo .gitignore</span
+                ><br /><br />
+                <span class="code-comment"># Ignorar todos los .txt</span><br />
+                *.txt<br /><br />
+                <span class="code-comment"># Ignorar carpeta node_modules</span
+                ><br />
+                node_modules/<br /><br />
+                <span class="code-comment"># Ignorar archivos de sistema</span
+                ><br />
+                .DS_Store<br />
+                Thumbs.db</code
+              >
+            </div>
+            <div class="card">
+              <h3>¿Qué ignorar?</h3>
+              <ul>
+                <li>Dependencias (node_modules)</li>
+                <li>Archivos de configuración local</li>
+                <li>Archivos compilados</li>
+                <li>Credenciales y API keys</li>
+                <li>Archivos del sistema operativo</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 13: Ramas -->
+        <section class="slide" data-slide="13">
+          <h2>Trabajando con <span class="highlight">Ramas</span></h2>
+          <p style="margin-bottom: 1.5rem">
+            Las ramas permiten desarrollar funciones de forma aislada sin
+            afectar el código principal
+          </p>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Crear nueva rama</span><br />
+              git branch nombre-rama<br /><br />
+              <span class="code-comment"># Cambiar a la rama</span><br />
+              git checkout nombre-rama<br /><br />
+              <span class="code-comment"># Crear y cambiar en un paso</span
+              ><br />
+              git checkout -b nombre-rama<br /><br />
+              <span class="code-comment"># Ver todas las ramas</span><br />
+              git branch</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 14: Demo Ramas -->
+        <section class="slide" data-slide="14">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Demo: Ramas y Fusiones</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Crear y moverse a nueva rama</span
+              ><br />
+              git checkout -b feature-estilos<br /><br />
+              <span class="code-comment"># Hacer cambios y commit</span><br />
+              git add . && git commit -m "Agregar estilos CSS"<br /><br />
+              <span class="code-comment"># Volver a master</span><br />
+              git checkout master<br /><br />
+              <span class="code-comment"># Fusionar rama</span><br />
+              git merge feature-estilos</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 15: Tags -->
+        <section class="slide" data-slide="15">
+          <h2>Etiquetas <span class="highlight">(Tags)</span></h2>
+          <p style="margin-bottom: 1.5rem">
+            Marcadores inmutables para versiones importantes del proyecto
+          </p>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Ver historial de commits</span
+              ><br />
+              git log --oneline<br /><br />
+              <span class="code-comment"># Crear tag en commit específico</span
+              ><br />
+              git tag v1.0 abc123<br /><br />
+              <span class="code-comment"># Crear tag con mensaje</span><br />
+              git tag -a v1.0 -m "Primera versión estable"<br /><br />
+              <span class="code-comment"># Ver tags existentes</span><br />
+              git tag</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 16: Descanso -->
+        <section class="slide" data-slide="16">
+          <div class="break-slide">
+            <div class="emoji">☕</div>
+            <h1>Descanso</h1>
+            <p class="subtitle">Volvemos en 20 minutos</p>
+            <div
+              class="timer-section"
+              style="margin-top: 2rem; background: transparent"
+            >
+              <div class="timer-display timer-green" id="timerBreak">20:00</div>
+              <div class="timer-controls">
+                <button class="timer-btn start" onclick="startTimer('Break')">
+                  Iniciar
+                </button>
+                <button class="timer-btn pause" onclick="pauseTimer('Break')">
+                  Pausar
+                </button>
+                <button
+                  class="timer-btn reset"
+                  onclick="resetTimer('Break', 20)"
+                >
+                  Reiniciar
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 17: Repositorios Remotos -->
+        <section class="slide" data-slide="17">
+          <h2>Repositorios <span class="highlight">Remotos</span></h2>
+          <p style="margin-bottom: 1.5rem">
+            Copia del repositorio en un servidor (GitHub, GitLab, Bitbucket)
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <h3>⬆️ Push</h3>
+              <p>Enviar commits locales al repositorio remoto</p>
+              <code style="color: var(--secondary)"
+                >git push origin master</code
+              >
+            </div>
+            <div class="card">
+              <h3>⬇️ Pull</h3>
+              <p>Descargar y fusionar cambios del remoto</p>
+              <code style="color: var(--secondary)"
+                >git pull origin master</code
+              >
+            </div>
+            <div class="card">
+              <h3>📥 Clone</h3>
+              <p>Crear copia local de un repositorio remoto</p>
+              <code style="color: var(--secondary)">git clone URL</code>
+            </div>
+            <div class="card">
+              <h3>🔍 Fetch</h3>
+              <p>Descargar cambios SIN fusionar automáticamente</p>
+              <code style="color: var(--secondary)">git fetch origin</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 18: Fetch vs Pull -->
+        <section class="slide" data-slide="18">
+          <h2>Fetch <span class="accent-text">vs</span> Pull</h2>
+          <div class="cards-grid">
+            <div class="card" style="border-color: var(--warning)">
+              <h3 style="color: var(--warning)">git fetch</h3>
+              <ul>
+                <li>Descarga cambios del remoto</li>
+                <li>NO fusiona automáticamente</li>
+                <li>Puedes revisar antes de integrar</li>
+                <li>Más seguro y controlado</li>
+              </ul>
+            </div>
+            <div class="card" style="border-color: var(--secondary)">
+              <h3 style="color: var(--secondary)">git pull</h3>
+              <ul>
+                <li>Descarga cambios del remoto</li>
+                <li>Fusiona automáticamente</li>
+                <li>Más rápido y conveniente</li>
+                <li>Puede generar conflictos</li>
+              </ul>
+            </div>
+          </div>
+          <p style="margin-top: 1.5rem; color: rgba(255, 255, 255, 0.7)">
+            <code>git pull</code> = <code>git fetch</code> +
+            <code>git merge</code>
+          </p>
+        </section>
+
+        <!-- Slide 19: Demo GitHub -->
+        <section class="slide" data-slide="19">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Conectando con GitHub</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Crear repo en GitHub, luego...</span
+              ><br /><br />
+              <span class="code-comment"
+                ># Conectar repositorio local con remoto</span
+              ><br />
+              git remote add origin https://github.com/usuario/repo.git<br /><br />
+              <span class="code-comment"># Subir cambios por primera vez</span
+              ><br />
+              git push -u origin master<br /><br />
+              <span class="code-comment"># Verificar conexión remota</span
+              ><br />
+              git remote -v</code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 20: Pull Requests -->
+        <section class="slide" data-slide="20">
+          <h2>Pull <span class="highlight">Requests</span></h2>
+          <p style="margin-bottom: 1.5rem">
+            Solicitud para fusionar cambios de una rama a otra con revisión de
+            código
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <h3>1️⃣ Crear Rama</h3>
+              <p>Desarrolla tu funcionalidad en una rama separada</p>
+            </div>
+            <div class="card">
+              <h3>2️⃣ Push a GitHub</h3>
+              <p>Sube tu rama al repositorio remoto</p>
+            </div>
+            <div class="card">
+              <h3>3️⃣ Crear PR</h3>
+              <p>Abre el Pull Request desde GitHub</p>
+            </div>
+            <div class="card">
+              <h3>4️⃣ Revisar y Merge</h3>
+              <p>Revisión de código y fusión final</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 21: Demo PR -->
+        <section class="slide" data-slide="21">
+          <span class="demo-badge">🖥️ DEMO EN VIVO</span>
+          <h2>Flujo Completo de Pull Request</h2>
+          <div class="code-block">
+            <code
+              ><span class="code-comment"># Crear rama para nueva función</span
+              ><br />
+              git checkout -b feature-navbar<br /><br />
+              <span class="code-comment"># Hacer cambios, add y commit</span
+              ><br />
+              git add . && git commit -m "Agregar navbar"<br /><br />
+              <span class="code-comment"># Subir rama a GitHub</span><br />
+              git push -u origin feature-navbar<br /><br />
+              <span class="code-comment"
+                ># Ir a GitHub → New Pull Request → Merge</span
+              ></code
+            >
+          </div>
+        </section>
+
+        <!-- Slide 22: Markdown -->
+        <section class="slide" data-slide="22">
+          <h2>Markdown para <span class="highlight">README.md</span></h2>
+          <div class="cards-grid">
+            <div class="code-block">
+              <code
+                ># Título Principal<br />
+                ## Subtítulo<br /><br />
+                **Texto en negrita**<br />
+                *Texto en cursiva*<br /><br />
+                - Elemento de lista<br />
+                - Otro elemento<br /><br />
+                [Enlace](https://url.com)<br /><br />
+                `código inline`</code
+              >
+            </div>
+            <div class="card">
+              <h3>¿Qué incluir en README?</h3>
+              <ul>
+                <li>Nombre del proyecto</li>
+                <li>Descripción breve</li>
+                <li>Instrucciones de instalación</li>
+                <li>Cómo usar el proyecto</li>
+                <li>Cómo contribuir</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 23: Actividad Final -->
+        <section class="slide" data-slide="23">
+          <h2>
+            Actividad Final: <span class="highlight">Proyecto Completo</span>
+          </h2>
+          <div class="activity-layout">
+            <div class="timer-section">
+              <h3>⏱️ Tiempo</h3>
+              <div class="timer-display timer-green" id="timer2">25:00</div>
+              <div class="timer-controls">
+                <button class="timer-btn start" onclick="startTimer(2)">
+                  Iniciar
+                </button>
+                <button class="timer-btn pause" onclick="pauseTimer(2)">
+                  Pausar
+                </button>
+                <button class="timer-btn reset" onclick="resetTimer(2, 25)">
+                  Reiniciar
+                </button>
+              </div>
+              <p class="timer-status" id="status2">Listo para comenzar</p>
+            </div>
+            <div class="activity-card">
+              <h3>📝 Instrucciones</h3>
+              <ul class="steps-list">
+                <li>Crear repositorio en GitHub</li>
+                <li>Clonar a tu máquina local</li>
+                <li>Crear archivo index.html y README.md</li>
+                <li>Crear rama para nueva funcionalidad</li>
+                <li>Hacer push de ambas ramas</li>
+                <li>Crear Pull Request y fusionar</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 24: Comandos Resumen -->
+        <section class="slide" data-slide="24">
+          <h2>Comandos <span class="highlight">Esenciales</span></h2>
+          <div class="cards-grid">
+            <div class="code-block">
+              <code
+                ><span class="code-comment"># Configuración</span><br />
+                git config --global user.name "Nombre"<br />
+                git config --global user.email "email"<br /><br />
+                <span class="code-comment"># Básicos</span><br />
+                git init | git clone URL<br />
+                git status | git log --oneline<br />
+                git add . | git commit -m "msg"</code
+              >
+            </div>
+            <div class="code-block">
+              <code
+                ><span class="code-comment"># Ramas</span><br />
+                git branch nombre<br />
+                git checkout -b nombre<br />
+                git merge nombre<br /><br />
+                <span class="code-comment"># Remotos</span><br />
+                git push origin master<br />
+                git pull origin master<br />
+                git fetch origin</code
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 25: Cierre -->
+        <section class="slide" data-slide="25">
+          <h1>¡Felicitaciones! 🎉</h1>
+          <p class="subtitle">
+            Ya tienes las bases para trabajar con Git y GitHub
+          </p>
+          <div class="cards-grid" style="margin-top: 2rem">
+            <div class="card">
+              <h3>✅ Lo que lograste</h3>
+              <ul>
+                <li>Configurar Git en tu entorno</li>
+                <li>Crear y gestionar repositorios</li>
+                <li>Trabajar con ramas</li>
+                <li>Colaborar con Pull Requests</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>📚 Próximos pasos</h3>
+              <ul>
+                <li>Practicar el flujo diariamente</li>
+                <li>Explorar GitHub Actions</li>
+                <li>Aprender resolución de conflictos</li>
+                <li>Contribuir a proyectos open source</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">
+          ← Anterior
+        </button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+          Siguiente →
+        </button>
+      </nav>
+    </div>
+
+    <audio id="beepSound" preload="auto">
+      <source
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleUcaTYmTcFhISFl7j5KPhXFiW2Jucnd0cWtlXV5jaXB8iZKZoaSmop2XkYuLjZOZoKezusLGx8bDv7q1r6uoqKmssLW5vsLGycvNzs7NzMrJyMfHx8jJy83P0dPU1dbW1tbV1NTT0tHQ0M/Oz87Nzc3Nzc3Ozs/P0NHR0tPT1NXV1tbX19fX19fX19fW1tbV1dTU09PS0tHR0NDPz87Ozc3MzMvLysrJycjIx8fGxsXFxMTDw8LCwcHAwL+/vr69vby8u7u6urm5uLi3t7a2tbW0tLOzsrKxsbCwr6+urq2trKyrq6qqqamoqKenpqalpaSkpKOjo6Kiop2Nhm1cPSYlQmqTwODfx6OBeV9fOg=="
+        type="audio/wav"
+      />
+    </audio>
+
+    <script>
+      let currentSlide = 1;
+      const totalSlides = 25;
+      let timers = {};
+      let intervals = {};
+
+      function updateSlide() {
+        document.querySelectorAll(".slide").forEach((slide) => {
+          slide.classList.remove("active");
+        });
+        document
+          .querySelector(`[data-slide="${currentSlide}"]`)
+          .classList.add("active");
+        document.getElementById("currentSlide").textContent = currentSlide;
+        document.getElementById("progressFill").style.width = `${
+          (currentSlide / totalSlides) * 100
+        }%`;
+
+        document.getElementById("prevBtn").disabled = currentSlide === 1;
+        document.getElementById("nextBtn").disabled =
+          currentSlide === totalSlides;
+      }
+
+      function nextSlide() {
+        if (currentSlide < totalSlides) {
+          currentSlide++;
+          updateSlide();
+        }
+      }
+
+      function prevSlide() {
+        if (currentSlide > 1) {
+          currentSlide--;
+          updateSlide();
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          nextSlide();
+        } else if (e.key === "ArrowLeft") {
+          prevSlide();
+        }
+      });
+
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, "0")}:${secs
+          .toString()
+          .padStart(2, "0")}`;
+      }
+
+      function updateTimerDisplay(id) {
+        const display = document.getElementById(`timer${id}`);
+        const status = document.getElementById(`status${id}`);
+        const seconds = timers[id];
+
+        display.textContent = formatTime(seconds);
+
+        if (seconds <= 60) {
+          display.className = "timer-display timer-red";
+          if (status) status.textContent = "⚠️ ¡Menos de 1 minuto!";
+        } else if (seconds <= 300) {
+          display.className = "timer-display timer-orange";
+          if (status) status.textContent = "⏰ Menos de 5 minutos";
+        } else {
+          display.className = "timer-display timer-green";
+          if (status) status.textContent = "✅ En progreso";
+        }
+      }
+
+      function startTimer(id) {
+        if (intervals[id]) return;
+
+        if (!timers[id]) {
+          const defaultMinutes = id === 1 ? 15 : id === 2 ? 25 : 20;
+          timers[id] = defaultMinutes * 60;
+        }
+
+        intervals[id] = setInterval(() => {
+          if (timers[id] > 0) {
+            timers[id]--;
+            updateTimerDisplay(id);
+          } else {
+            clearInterval(intervals[id]);
+            intervals[id] = null;
+            document.getElementById("beepSound").play();
+            const status = document.getElementById(`status${id}`);
+            if (status) status.textContent = "🎉 ¡Tiempo completado!";
+          }
+        }, 1000);
+
+        const status = document.getElementById(`status${id}`);
+        if (status) status.textContent = "✅ En progreso";
+      }
+
+      function pauseTimer(id) {
+        if (intervals[id]) {
+          clearInterval(intervals[id]);
+          intervals[id] = null;
+          const status = document.getElementById(`status${id}`);
+          if (status) status.textContent = "⏸️ Pausado";
+        }
+      }
+
+      function resetTimer(id, minutes) {
+        pauseTimer(id);
+        timers[id] = minutes * 60;
+        updateTimerDisplay(id);
+        const status = document.getElementById(`status${id}`);
+        if (status) status.textContent = "Listo para comenzar";
+      }
+
+      // Initialize timers
+      resetTimer(1, 15);
+      resetTimer(2, 25);
+      resetTimer("Break", 20);
+    </script>
+  </body>
+</html>

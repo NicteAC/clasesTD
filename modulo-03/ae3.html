@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Preprocesador SASS - Clase Interactiva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--dark), #16213E);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--gradient-dark);
+            color: var(--light);
+            min-height: 100vh;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+            z-index: 999;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            font-family: 'Sora', sans-serif;
+            padding: 0.8rem 2rem;
+            border: 2px solid var(--primary);
+            background: rgba(45, 91, 255, 0.1);
+            color: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slides-container {
+            height: 100vh;
+            padding-top: 64px;
+            padding-bottom: 100px;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            padding: 2rem;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--light);
+            margin-bottom: 1rem;
+        }
+
+        p, li { font-size: 1.3rem; line-height: 1.8; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .cards-grid.three-cols { grid-template-columns: repeat(3, 1fr); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(45, 91, 255, 0.2);
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(45, 91, 255, 0.2);
+        }
+
+        .card h3 { color: var(--secondary); font-size: 1.4rem; margin-bottom: 0.8rem; }
+        .card p { font-size: 1.1rem; color: rgba(248, 249, 250, 0.8); }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: left;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border: 1px solid rgba(45, 91, 255, 0.3);
+            margin: 1rem 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+            line-height: 1.5;
+        }
+
+        .code-block code { color: var(--light); }
+        .ck { color: var(--accent); }
+        .cv { color: var(--secondary); }
+        .cs { color: #FFD93D; }
+        .cc { color: #6c757d; }
+        .cp { color: #9D84FF; }
+
+        .list-two-cols {
+            column-count: 2;
+            column-gap: 3rem;
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+
+        .list-two-cols li {
+            break-inside: avoid;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .list-two-cols li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+
+        ul { list-style: none; }
+
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            width: 100%;
+            text-align: left;
+        }
+
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(45, 91, 255, 0.2);
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            text-shadow: 0 0 30px rgba(0, 212, 170, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .timer-btn {
+            font-family: 'Sora', sans-serif;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.start { background: var(--secondary); color: var(--dark); }
+        .timer-btn.pause { background: var(--warning); color: var(--dark); }
+        .timer-btn.reset { background: rgba(255,255,255,0.1); color: var(--light); border: 1px solid rgba(255,255,255,0.2); }
+        .timer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: rgba(248, 249, 250, 0.7);
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .activity-card h3 { color: var(--secondary); margin-bottom: 1rem; }
+        .activity-card ol { padding-left: 1.5rem; }
+        .activity-card li { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .activity-card code { background: rgba(0,0,0,0.3); padding: 0.1rem 0.4rem; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 0.95rem; }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            text-align: left;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2));
+            border-left: 4px solid var(--secondary);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .folder-structure {
+            font-family: 'Space Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre;
+        }
+
+        .folder-structure .folder { color: var(--secondary); }
+        .folder-structure .file { color: var(--light); }
+
+        .break-slide { text-align: center; }
+        .break-slide h1 { font-size: 4rem; }
+        .break-emoji { font-size: 5rem; margin: 2rem 0; }
+
+        .subtitle { font-size: 1.5rem; color: rgba(248, 249, 250, 0.7); margin-bottom: 2rem; }
+
+        .icon-card { text-align: center; }
+        .icon-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+        .keyboard-hints {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 0.85rem;
+            color: rgba(248, 249, 250, 0.4);
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">25</span>
+        </div>
+    </header>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slides-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-content">
+                <h1>El Preprocesador SASS</h1>
+                <p class="subtitle">Organización y modularización de estilos en interfaces web</p>
+                <div class="cards-grid" style="margin-top: 3rem;">
+                    <div class="card">
+                        <h3>🎯 Objetivo</h3>
+                        <p>Dominar SASS para escribir CSS más limpio, escalable y mantenible</p>
+                    </div>
+                    <div class="card">
+                        <h3>⏱️ Duración</h3>
+                        <p>3 horas con actividades prácticas y demos en vivo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: ¿Qué es SASS? -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <h2>¿Qué es SASS?</h2>
+                <p style="font-size: 1.4rem; margin-bottom: 2rem;">
+                    <strong style="color: var(--secondary);">Syntactically Awesome Stylesheets</strong> - Un preprocesador CSS que compila a CSS estándar
+                </p>
+                <div class="cards-grid three-cols">
+                    <div class="card icon-card">
+                        <div class="icon">📦</div>
+                        <h3>Variables</h3>
+                        <p>Almacena valores reutilizables</p>
+                    </div>
+                    <div class="card icon-card">
+                        <div class="icon">🔄</div>
+                        <h3>Anidamiento</h3>
+                        <p>Estructura jerárquica intuitiva</p>
+                    </div>
+                    <div class="card icon-card">
+                        <div class="icon">🧩</div>
+                        <h3>Mixins</h3>
+                        <p>Bloques de código reutilizable</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: ¿Por qué usar SASS? -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content">
+                <h2>¿Por qué usar SASS?</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3 style="color: var(--accent); margin-bottom: 1rem;">❌ CSS Tradicional</h3>
+                        <ul class="list-two-cols" style="column-count: 1;">
+                            <li>Repetición constante de valores</li>
+                            <li>Difícil de mantener en proyectos grandes</li>
+                            <li>Sin lógica ni cálculos</li>
+                            <li>Archivos monolíticos</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--secondary); margin-bottom: 1rem;">✅ Con SASS</h3>
+                        <ul class="list-two-cols" style="column-count: 1;">
+                            <li>Variables centralizadas</li>
+                            <li>Código modular y organizado</li>
+                            <li>Funciones y operaciones</li>
+                            <li>Parciales importables</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Instalación -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <h2>Instalación de SASS</h2>
+                <div class="code-block">
+                    <pre><code><span class="cc"># Instalar SASS globalmente</span>
+npm install -g sass
+
+<span class="cc"># Verificar instalación</span>
+sass --version
+
+<span class="cc"># Compilar un archivo</span>
+sass input.scss output.css
+
+<span class="cc"># Modo watch (compilación automática)</span>
+sass --watch input.scss output.css</code></pre>
+                </div>
+                <div class="highlight-box">
+                    <strong>💡 Recomendación:</strong> Instala la extensión <span style="color: var(--secondary);">Live Sass Compiler</span> en VS Code para compilación automática
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Demo Variables -->
+        <div class="slide" data-slide="5">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Variables en SASS</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>SCSS</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// _variables.scss</span>
+<span class="cv">$primary</span>: <span class="cs">#2D5BFF</span>;
+<span class="cv">$secondary</span>: <span class="cs">#00D4AA</span>;
+<span class="cv">$font-base</span>: <span class="cs">16px</span>;
+<span class="cv">$spacing</span>: <span class="cs">1rem</span>;
+
+<span class="cp">.button</span> {
+    <span class="ck">background</span>: <span class="cv">$primary</span>;
+    <span class="ck">padding</span>: <span class="cv">$spacing</span>;
+    <span class="ck">font-size</span>: <span class="cv">$font-base</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>CSS Compilado</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.button</span> {
+    <span class="ck">background</span>: <span class="cs">#2D5BFF</span>;
+    <span class="ck">padding</span>: <span class="cs">1rem</span>;
+    <span class="ck">font-size</span>: <span class="cs">16px</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Demo Anidamiento -->
+        <div class="slide" data-slide="6">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Anidamiento (Nesting)</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>SCSS</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.nav</span> {
+    <span class="ck">background</span>: <span class="cv">$dark</span>;
+
+    <span class="cp">ul</span> {
+        <span class="ck">display</span>: flex;
+        <span class="ck">list-style</span>: none;
+    }
+
+    <span class="cp">a</span> {
+        <span class="ck">color</span>: white;
+
+        <span class="cp">&amp;:hover</span> {
+            <span class="ck">color</span>: <span class="cv">$secondary</span>;
+        }
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>CSS Compilado</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.nav</span> {
+    <span class="ck">background</span>: <span class="cs">#1A1A2E</span>;
+}
+
+<span class="cp">.nav ul</span> {
+    <span class="ck">display</span>: flex;
+    <span class="ck">list-style</span>: none;
+}
+
+<span class="cp">.nav a</span> {
+    <span class="ck">color</span>: white;
+}
+
+<span class="cp">.nav a:hover</span> {
+    <span class="ck">color</span>: <span class="cs">#00D4AA</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <strong>⚠️ Buena práctica:</strong> No anidar más de 3 niveles para evitar selectores muy específicos
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Actividad 1 -->
+        <div class="slide" data-slide="7">
+            <div class="slide-content">
+                <h2>Actividad 1: Variables y Anidamiento</h2>
+                <div class="activity-layout">
+                    <div class="timer-section">
+                        <div class="timer-display" id="timer1">15:00</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="startTimer('timer1', 15)">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer('timer1', 15)">Reiniciar</button>
+                        </div>
+                        <div class="timer-status" id="timer1-status">Listo para comenzar</div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>📝 Instrucciones</h3>
+                        <ol>
+                            <li>Crea un archivo <code>styles.scss</code></li>
+                            <li>Define 4 variables: color primario, secundario, fuente y espaciado</li>
+                            <li>Crea un componente <code>.card</code> con anidamiento</li>
+                            <li>Incluye: <code>.card__header</code>, <code>.card__body</code>, <code>.card__footer</code></li>
+                            <li>Usa las variables en los estilos</li>
+                            <li>Compila y verifica el CSS generado</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Patrón 7-1 -->
+        <div class="slide" data-slide="8">
+            <div class="slide-content">
+                <h2>El Patrón 7-1</h2>
+                <p style="margin-bottom: 1.5rem;">7 carpetas + 1 archivo principal para proyectos escalables</p>
+                <div class="split-layout">
+                    <div class="folder-structure"><span class="folder">sass/</span>
+├── <span class="folder">abstracts/</span>
+│   ├── <span class="file">_variables.scss</span>
+│   ├── <span class="file">_mixins.scss</span>
+│   └── <span class="file">_functions.scss</span>
+├── <span class="folder">base/</span>
+│   ├── <span class="file">_reset.scss</span>
+│   └── <span class="file">_typography.scss</span>
+├── <span class="folder">components/</span>
+│   ├── <span class="file">_buttons.scss</span>
+│   └── <span class="file">_cards.scss</span>
+├── <span class="folder">layout/</span>
+│   ├── <span class="file">_header.scss</span>
+│   └── <span class="file">_footer.scss</span>
+└── <span class="file">main.scss</span></div>
+                    <div>
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3>📁 abstracts/</h3>
+                            <p>Variables, mixins, funciones</p>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3>📁 base/</h3>
+                            <p>Reset, tipografía, utilidades</p>
+                        </div>
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3>📁 components/</h3>
+                            <p>Botones, cards, formularios</p>
+                        </div>
+                        <div class="card">
+                            <h3>📁 layout/</h3>
+                            <p>Header, footer, grid, sidebar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Parciales e Imports -->
+        <div class="slide" data-slide="9">
+            <div class="slide-content">
+                <h2>Parciales e Imports</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>Parciales (_archivo.scss)</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// _variables.scss</span>
+<span class="cv">$primary</span>: <span class="cs">#2D5BFF</span>;
+<span class="cv">$secondary</span>: <span class="cs">#00D4AA</span>;
+
+<span class="cc">// _buttons.scss</span>
+<span class="cp">.btn</span> {
+    <span class="ck">padding</span>: <span class="cs">0.8rem 1.5rem</span>;
+    <span class="ck">border-radius</span>: <span class="cs">8px</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>main.scss</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// Importar parciales</span>
+<span class="ck">@import</span> <span class="cs">'abstracts/variables'</span>;
+<span class="ck">@import</span> <span class="cs">'abstracts/mixins'</span>;
+<span class="ck">@import</span> <span class="cs">'base/reset'</span>;
+<span class="ck">@import</span> <span class="cs">'components/buttons'</span>;
+<span class="ck">@import</span> <span class="cs">'layout/header'</span>;</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <strong>💡 Nota:</strong> Los archivos que comienzan con <code>_</code> no se compilan individualmente
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Demo Mixins -->
+        <div class="slide" data-slide="10">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Mixins: Código Reutilizable</h2>
+                <div class="code-block">
+                    <pre><code><span class="cc">// Definir mixin</span>
+<span class="ck">@mixin</span> <span class="cv">flex-center</span> {
+    <span class="ck">display</span>: flex;
+    <span class="ck">justify-content</span>: center;
+    <span class="ck">align-items</span>: center;
+}
+
+<span class="cc">// Mixin con parámetros</span>
+<span class="ck">@mixin</span> <span class="cv">button-variant</span>(<span class="cv">$bg-color</span>, <span class="cv">$text-color</span>: white) {
+    <span class="ck">background</span>: <span class="cv">$bg-color</span>;
+    <span class="ck">color</span>: <span class="cv">$text-color</span>;
+    <span class="cp">&amp;:hover</span> { <span class="ck">background</span>: <span class="ck">darken</span>(<span class="cv">$bg-color</span>, <span class="cs">10%</span>); }
+}
+
+<span class="cc">// Usar mixins</span>
+<span class="cp">.container</span> { <span class="ck">@include</span> flex-center; }
+<span class="cp">.btn-primary</span> { <span class="ck">@include</span> button-variant(<span class="cv">$primary</span>); }
+<span class="cp">.btn-danger</span> { <span class="ck">@include</span> button-variant(<span class="cs">#dc3545</span>); }</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Mixin Media Queries -->
+        <div class="slide" data-slide="11">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Mixin para Media Queries</h2>
+                <div class="code-block">
+                    <pre><code><span class="ck">@mixin</span> <span class="cv">respond-to</span>(<span class="cv">$breakpoint</span>) {
+    <span class="ck">@if</span> <span class="cv">$breakpoint</span> == mobile {
+        <span class="ck">@media</span> (max-width: <span class="cs">480px</span>) { <span class="ck">@content</span>; }
+    } <span class="ck">@else if</span> <span class="cv">$breakpoint</span> == tablet {
+        <span class="ck">@media</span> (max-width: <span class="cs">768px</span>) { <span class="ck">@content</span>; }
+    } <span class="ck">@else if</span> <span class="cv">$breakpoint</span> == desktop {
+        <span class="ck">@media</span> (max-width: <span class="cs">1200px</span>) { <span class="ck">@content</span>; }
+    }
+}
+
+<span class="cp">.header</span> {
+    <span class="ck">padding</span>: <span class="cs">2rem</span>;
+    <span class="ck">@include</span> respond-to(mobile) { <span class="ck">padding</span>: <span class="cs">1rem</span>; }
+    <span class="ck">@include</span> respond-to(tablet) { <span class="ck">padding</span>: <span class="cs">1.5rem</span>; }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Actividad 2 -->
+        <div class="slide" data-slide="12">
+            <div class="slide-content">
+                <h2>Actividad 2: Estructura 7-1 y Mixins</h2>
+                <div class="activity-layout">
+                    <div class="timer-section">
+                        <div class="timer-display" id="timer2">20:00</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="startTimer('timer2', 20)">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer('timer2')">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer('timer2', 20)">Reiniciar</button>
+                        </div>
+                        <div class="timer-status" id="timer2-status">Listo para comenzar</div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>📝 Instrucciones</h3>
+                        <ol>
+                            <li>Crea la estructura de carpetas del patrón 7-1</li>
+                            <li>En <code>abstracts/_variables.scss</code>: define colores, fuentes y espaciados</li>
+                            <li>En <code>abstracts/_mixins.scss</code>: crea <code>flex-center</code> y <code>respond-to</code></li>
+                            <li>En <code>components/_card.scss</code>: diseña una tarjeta usando mixins</li>
+                            <li>Importa todo en <code>main.scss</code></li>
+                            <li>Compila y prueba en el navegador</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Break -->
+        <div class="slide" data-slide="13">
+            <div class="slide-content break-slide">
+                <div class="break-emoji">☕</div>
+                <h1>Descanso</h1>
+                <div class="timer-display" id="timerBreak" style="margin: 2rem 0;">20:00</div>
+                <div class="timer-controls" style="justify-content: center;">
+                    <button class="timer-btn start" onclick="startTimer('timerBreak', 20)">Iniciar</button>
+                    <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+                    <button class="timer-btn reset" onclick="resetTimer('timerBreak', 20)">Reiniciar</button>
+                </div>
+                <p style="margin-top: 2rem; color: rgba(248, 249, 250, 0.6);">Estira las piernas, toma agua, descansa la vista 👀</p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Funciones en SASS -->
+        <div class="slide" data-slide="14">
+            <div class="slide-content">
+                <h2>Funciones Personalizadas</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>Crear funciones</h3>
+                        <div class="code-block">
+                            <pre><code><span class="ck">@function</span> <span class="cv">rem</span>(<span class="cv">$pixels</span>) {
+    <span class="ck">@return</span> <span class="cv">$pixels</span> / 16 * 1rem;
+}
+
+<span class="ck">@function</span> <span class="cv">col-width</span>(<span class="cv">$cols</span>, <span class="cv">$total</span>: 12) {
+    <span class="ck">@return</span> percentage(<span class="cv">$cols</span> / <span class="cv">$total</span>);
+}
+
+<span class="cp">.title</span> {
+    <span class="ck">font-size</span>: <span class="cv">rem</span>(24);
+}
+
+<span class="cp">.col-4</span> {
+    <span class="ck">width</span>: <span class="cv">col-width</span>(4);
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Funciones de color</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cv">$base</span>: <span class="cs">#2D5BFF</span>;
+
+<span class="cc">// Aclarar/Oscurecer</span>
+<span class="ck">lighten</span>(<span class="cv">$base</span>, 20%);
+<span class="ck">darken</span>(<span class="cv">$base</span>, 20%);
+
+<span class="cc">// Transparencia</span>
+<span class="ck">rgba</span>(<span class="cv">$base</span>, 0.5);
+<span class="ck">transparentize</span>(<span class="cv">$base</span>, 0.3);
+
+<span class="cc">// Saturación</span>
+<span class="ck">saturate</span>(<span class="cv">$base</span>, 20%);
+<span class="ck">desaturate</span>(<span class="cv">$base</span>, 20%);</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: @extend -->
+        <div class="slide" data-slide="15">
+            <div class="slide-content">
+                <h2>Herencia con @extend</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>SCSS</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// Placeholder (no compila solo)</span>
+<span class="cv">%btn-base</span> {
+    <span class="ck">padding</span>: <span class="cs">0.8rem 1.5rem</span>;
+    <span class="ck">border-radius</span>: <span class="cs">8px</span>;
+    <span class="ck">cursor</span>: pointer;
+    <span class="ck">border</span>: none;
+}
+
+<span class="cp">.btn-primary</span> {
+    <span class="ck">@extend</span> <span class="cv">%btn-base</span>;
+    <span class="ck">background</span>: <span class="cv">$primary</span>;
+}
+
+<span class="cp">.btn-secondary</span> {
+    <span class="ck">@extend</span> <span class="cv">%btn-base</span>;
+    <span class="ck">background</span>: <span class="cv">$secondary</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>CSS Compilado</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.btn-primary, .btn-secondary</span> {
+    <span class="ck">padding</span>: <span class="cs">0.8rem 1.5rem</span>;
+    <span class="ck">border-radius</span>: <span class="cs">8px</span>;
+    <span class="ck">cursor</span>: pointer;
+    <span class="ck">border</span>: none;
+}
+
+<span class="cp">.btn-primary</span> {
+    <span class="ck">background</span>: <span class="cs">#2D5BFF</span>;
+}
+
+<span class="cp">.btn-secondary</span> {
+    <span class="ck">background</span>: <span class="cs">#00D4AA</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Demo Sistema de Grillas -->
+        <div class="slide" data-slide="16">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Sistema de Grillas con SASS</h2>
+                <div class="code-block">
+                    <pre><code><span class="cc">// Variables</span>
+<span class="cv">$grid-columns</span>: 12;
+<span class="cv">$gutter</span>: 1.5rem;
+
+<span class="cc">// Función para calcular ancho</span>
+<span class="ck">@function</span> <span class="cv">col-width</span>(<span class="cv">$cols</span>) {
+    <span class="ck">@return</span> percentage(<span class="cv">$cols</span> / <span class="cv">$grid-columns</span>);
+}
+
+<span class="cc">// Generar clases con bucle</span>
+<span class="ck">@for</span> <span class="cv">$i</span> from 1 through <span class="cv">$grid-columns</span> {
+    <span class="cp">.col-#{$i}</span> {
+        <span class="ck">width</span>: <span class="cv">col-width</span>(<span class="cv">$i</span>);
+        <span class="ck">padding</span>: 0 <span class="cv">$gutter</span> / 2;
+    }
+}
+
+<span class="cp">.row</span> {
+    <span class="ck">display</span>: flex;
+    <span class="ck">flex-wrap</span>: wrap;
+    <span class="ck">margin</span>: 0 -<span class="cv">$gutter</span> / 2;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: BEM con SASS -->
+        <div class="slide" data-slide="17">
+            <div class="slide-content">
+                <h2>BEM + SASS = 💪</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>SCSS con BEM</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.card</span> {
+    <span class="ck">background</span>: white;
+    <span class="ck">border-radius</span>: <span class="cs">12px</span>;
+
+    <span class="cp">&amp;__header</span> {
+        <span class="ck">padding</span>: <span class="cs">1rem</span>;
+        <span class="ck">border-bottom</span>: <span class="cs">1px solid #eee</span>;
+
+        <span class="cp">&amp;--highlighted</span> {
+            <span class="ck">background</span>: <span class="cs">#f8f9fa</span>;
+        }
+    }
+
+    <span class="cp">&amp;__body</span> { <span class="ck">padding</span>: <span class="cs">1.5rem</span>; }
+
+    <span class="cp">&amp;--featured</span> {
+        <span class="ck">border</span>: <span class="cs">2px solid</span> <span class="cv">$primary</span>;
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>CSS Compilado</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cp">.card</span> { ... }
+
+<span class="cp">.card__header</span> { ... }
+
+<span class="cp">.card__header--highlighted</span> { ... }
+
+<span class="cp">.card__body</span> { ... }
+
+<span class="cp">.card--featured</span> { ... }</code></pre>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <strong>El operador &amp;</strong> referencia al selector padre, perfecto para BEM
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Sistema de Tokens -->
+        <div class="slide" data-slide="18">
+            <div class="slide-content">
+                <span class="demo-badge">🔴 DEMO EN VIVO</span>
+                <h2>Sistema de Design Tokens</h2>
+                <div class="code-block">
+                    <pre><code><span class="cc">// _tokens.scss - Mapas de tokens</span>
+<span class="cv">$colors</span>: (
+    'primary': (<span class="cs">'base'</span>: #2D5BFF, <span class="cs">'light'</span>: #5C82FF, <span class="cs">'dark'</span>: #1A3DB8),
+    'secondary': (<span class="cs">'base'</span>: #00D4AA, <span class="cs">'light'</span>: #33DFBB, <span class="cs">'dark'</span>: #00A385)
+);
+
+<span class="cv">$spacing</span>: (<span class="cs">'xs'</span>: 0.25rem, <span class="cs">'sm'</span>: 0.5rem, <span class="cs">'md'</span>: 1rem, <span class="cs">'lg'</span>: 1.5rem, <span class="cs">'xl'</span>: 2rem);
+
+<span class="cc">// Función de acceso</span>
+<span class="ck">@function</span> <span class="cv">color</span>(<span class="cv">$name</span>, <span class="cv">$shade</span>: 'base') {
+    <span class="ck">@return</span> map-get(map-get(<span class="cv">$colors</span>, <span class="cv">$name</span>), <span class="cv">$shade</span>);
+}
+
+<span class="ck">@function</span> <span class="cv">space</span>(<span class="cv">$size</span>) {
+    <span class="ck">@return</span> map-get(<span class="cv">$spacing</span>, <span class="cv">$size</span>);
+}
+
+<span class="cc">// Uso</span>
+<span class="cp">.btn</span> { <span class="ck">background</span>: <span class="cv">color</span>('primary'); <span class="ck">padding</span>: <span class="cv">space</span>('sm') <span class="cv">space</span>('md'); }</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Actividad 3 -->
+        <div class="slide" data-slide="19">
+            <div class="slide-content">
+                <h2>Actividad 3: Sistema de Estilos Completo</h2>
+                <div class="activity-layout">
+                    <div class="timer-section">
+                        <div class="timer-display" id="timer3">25:00</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="startTimer('timer3', 25)">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer('timer3')">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer('timer3', 25)">Reiniciar</button>
+                        </div>
+                        <div class="timer-status" id="timer3-status">Listo para comenzar</div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>📝 Instrucciones</h3>
+                        <ol>
+                            <li>Crea un mapa de colores con variantes (base, light, dark)</li>
+                            <li>Crea funciones <code>color()</code> y <code>space()</code> para acceder a tokens</li>
+                            <li>Genera un sistema de grillas con <code>@for</code></li>
+                            <li>Crea un <code>%placeholder</code> para estilos base de botón</li>
+                            <li>Implementa un componente card usando BEM + SASS</li>
+                            <li>Usa <code>@extend</code> y <code>@include</code> en el componente</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: @use y @forward -->
+        <div class="slide" data-slide="20">
+            <div class="slide-content">
+                <h2>SASS Moderno: @use y @forward</h2>
+                <div class="split-layout">
+                    <div>
+                        <h3>Forma antigua (@import)</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// Problemas:</span>
+<span class="cc">// - Variables globales</span>
+<span class="cc">// - Colisiones de nombres</span>
+<span class="cc">// - Importaciones duplicadas</span>
+
+<span class="ck">@import</span> <span class="cs">'variables'</span>;
+<span class="ck">@import</span> <span class="cs">'mixins'</span>;</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Forma moderna (@use)</h3>
+                        <div class="code-block">
+                            <pre><code><span class="cc">// Beneficios:</span>
+<span class="cc">// - Namespace automático</span>
+<span class="cc">// - Sin colisiones</span>
+<span class="cc">// - Importación única</span>
+
+<span class="ck">@use</span> <span class="cs">'variables'</span> as v;
+<span class="ck">@use</span> <span class="cs">'mixins'</span> as m;
+
+<span class="cp">.btn</span> {
+    <span class="ck">color</span>: v.<span class="cv">$primary</span>;
+    <span class="ck">@include</span> m.flex-center;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Depuración -->
+        <div class="slide" data-slide="21">
+            <div class="slide-content">
+                <h2>Depuración en SASS</h2>
+                <div class="cards-grid three-cols">
+                    <div class="card">
+                        <h3>@debug</h3>
+                        <p>Imprime en consola durante compilación</p>
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <pre><code><span class="ck">@debug</span> <span class="cs">"Valor: #{$var}"</span>;</code></pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>@warn</h3>
+                        <p>Muestra advertencia sin detener</p>
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <pre><code><span class="ck">@warn</span> <span class="cs">"Deprecado!"</span>;</code></pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>@error</h3>
+                        <p>Detiene compilación con error</p>
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <pre><code><span class="ck">@error</span> <span class="cs">"Valor inválido"</span>;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Optimización -->
+        <div class="slide" data-slide="22">
+            <div class="slide-content">
+                <h2>Buenas Prácticas y Optimización</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎯 Anidamiento Controlado</h3>
+                        <p>Máximo 3 niveles para evitar selectores complejos y CSS muy específico</p>
+                    </div>
+                    <div class="card">
+                        <h3>📁 Organización Modular</h3>
+                        <p>Un archivo por componente, nomenclatura consistente, patrón 7-1</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔄 @extend vs @mixin</h3>
+                        <p>@extend para estilos idénticos, @mixin para estilos con parámetros</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚡ Producción</h3>
+                        <p>Compilar con <code style="background: rgba(0,0,0,0.3); padding: 0.1rem 0.4rem; border-radius: 4px;">--style=compressed</code> para minimizar el CSS final</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Herramientas -->
+        <div class="slide" data-slide="23">
+            <div class="slide-content">
+                <h2>Herramientas Complementarias</h2>
+                <div class="cards-grid three-cols">
+                    <div class="card icon-card">
+                        <div class="icon">🔍</div>
+                        <h3>Stylelint</h3>
+                        <p>Linter para detectar errores y aplicar convenciones</p>
+                    </div>
+                    <div class="card icon-card">
+                        <div class="icon">🔧</div>
+                        <h3>PostCSS</h3>
+                        <p>Autoprefixer y transformaciones adicionales</p>
+                    </div>
+                    <div class="card icon-card">
+                        <div class="icon">🧹</div>
+                        <h3>PurgeCSS</h3>
+                        <p>Elimina CSS no utilizado</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <strong>💡 Integración:</strong> Webpack, Gulp, Vite pueden automatizar todo el flujo de compilación
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Resumen -->
+        <div class="slide" data-slide="24">
+            <div class="slide-content">
+                <h2>Lo que Aprendimos Hoy</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>✅ Variables y Anidamiento</h3>
+                        <p>Centralizar valores y reflejar estructura HTML</p>
+                    </div>
+                    <div class="card">
+                        <h3>✅ Mixins y Funciones</h3>
+                        <p>Código reutilizable con parámetros y lógica</p>
+                    </div>
+                    <div class="card">
+                        <h3>✅ Patrón 7-1</h3>
+                        <p>Organización escalable de proyectos</p>
+                    </div>
+                    <div class="card">
+                        <h3>✅ Sistema de Tokens</h3>
+                        <p>Design systems profesionales con mapas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Cierre -->
+        <div class="slide" data-slide="25">
+            <div class="slide-content">
+                <h1>¡Gracias!</h1>
+                <p class="subtitle">SASS te da superpoderes para escribir CSS profesional 🦸‍♂️</p>
+                <div class="cards-grid" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>📚 Recursos</h3>
+                        <p><a href="https://sass-lang.com" style="color: var(--secondary);">sass-lang.com</a> - Documentación oficial</p>
+                    </div>
+                    <div class="card">
+                        <h3>🎯 Próximo Paso</h3>
+                        <p>Practica creando tu propio sistema de estilos con SASS</p>
+                    </div>
+                </div>
+                <p style="margin-top: 3rem; color: rgba(248, 249, 250, 0.5);">¿Preguntas? 🙋‍♂️</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Siguiente →</button>
+    </nav>
+
+    <div class="keyboard-hints">
+        <kbd>←</kbd> <kbd>→</kbd> o <kbd>Espacio</kbd> para navegar
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide;
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+        }
+
+        function nextSlide() { currentSlide++; showSlide(currentSlide); }
+        function prevSlide() { currentSlide--; showSlide(currentSlide); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { prevSlide(); }
+        });
+
+        const timers = {};
+
+        function startTimer(timerId, minutes) {
+            if (timers[timerId] && timers[timerId].running) return;
+            const display = document.getElementById(timerId);
+            const status = document.getElementById(timerId + '-status');
+            if (!timers[timerId]) {
+                timers[timerId] = { remaining: minutes * 60, running: false, interval: null };
+            }
+            timers[timerId].running = true;
+            if (status) status.textContent = '⏱️ Tiempo corriendo...';
+            timers[timerId].interval = setInterval(() => {
+                if (timers[timerId].remaining <= 0) {
+                    clearInterval(timers[timerId].interval);
+                    timers[timerId].running = false;
+                    display.textContent = '00:00';
+                    display.classList.remove('warning');
+                    display.classList.add('danger');
+                    if (status) status.textContent = '🔔 ¡Tiempo terminado!';
+                    playBeep();
+                    return;
+                }
+                timers[timerId].remaining--;
+                const mins = Math.floor(timers[timerId].remaining / 60);
+                const secs = timers[timerId].remaining % 60;
+                display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                if (timers[timerId].remaining <= 60) {
+                    display.classList.remove('warning');
+                    display.classList.add('danger');
+                    if (status) status.textContent = '⚠️ ¡Menos de 1 minuto!';
+                } else if (timers[timerId].remaining <= 300) {
+                    display.classList.add('warning');
+                    display.classList.remove('danger');
+                    if (status) status.textContent = '⏰ Quedan menos de 5 minutos';
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerId) {
+            if (timers[timerId]) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId].running = false;
+                const status = document.getElementById(timerId + '-status');
+                if (status) status.textContent = '⏸️ Pausado';
+            }
+        }
+
+        function resetTimer(timerId, minutes) {
+            if (timers[timerId]) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId].running = false;
+                timers[timerId].remaining = minutes * 60;
+            }
+            const display = document.getElementById(timerId);
+            const status = document.getElementById(timerId + '-status');
+            display.textContent = `${minutes.toString().padStart(2, '0')}:00`;
+            display.classList.remove('warning', 'danger');
+            if (status) status.textContent = 'Listo para comenzar';
+        }
+
+        function playBeep() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.5;
+            oscillator.start();
+            setTimeout(() => { oscillator.stop(); }, 500);
+        }
+
+        showSlide(1);
+    </script>
+</body>
+</html>

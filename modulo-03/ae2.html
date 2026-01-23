@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodologías CSS: BEM, OOCSS y SMACSS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-accent: linear-gradient(135deg, var(--accent), var(--warning));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.8;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            letter-spacing: 2px;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .presentation {
+            height: 100vh;
+            padding-top: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(100vh - 140px);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        p, li { font-size: 1.3rem; line-height: 1.8; }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: rgba(248, 249, 250, 0.8);
+            margin-bottom: 2rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .cards-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(45, 91, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(45, 91, 255, 0.2);
+        }
+
+        .card h3 { font-size: 1.4rem; margin-bottom: 0.8rem; }
+        .card p { font-size: 1.1rem; color: rgba(248, 249, 250, 0.7); }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            overflow-x: auto;
+            border: 1px solid rgba(45, 91, 255, 0.3);
+            margin: 1rem 0;
+        }
+
+        .code-block code { color: var(--light); line-height: 1.6; }
+        .code-block pre { margin: 0; padding: 0; font-family: inherit; font-size: inherit; }
+
+        .code-comment { color: #6a9955; }
+        .code-selector { color: var(--secondary); }
+        .code-property { color: var(--accent); }
+        .code-value { color: #ce9178; }
+        .code-tag { color: var(--primary); }
+
+        .activity-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .timer-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--secondary);
+            text-shadow: 0 0 30px rgba(0, 212, 170, 0.5);
+            margin: 1rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .timer-btn {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.start { background: var(--secondary); color: var(--dark); }
+        .timer-btn.pause { background: var(--warning); color: var(--dark); }
+        .timer-btn.reset { background: rgba(255, 255, 255, 0.1); color: var(--light); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .timer-btn:hover { transform: scale(1.05); }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: rgba(248, 249, 250, 0.7);
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .activity-card h3 { color: var(--secondary); margin-bottom: 1rem; }
+        .activity-card ol, .activity-card ul { padding-left: 1.5rem; }
+        .activity-card li { font-size: 1.2rem; margin-bottom: 0.5rem; }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(0, 212, 170, 0.2));
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            margin: 1.5rem 0;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .method-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .method-card.bem { border-top-color: var(--primary); }
+        .method-card.oocss { border-top-color: var(--secondary); }
+        .method-card.smacss { border-top-color: var(--accent); }
+
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .method-card h3 { font-size: 1.6rem; margin-bottom: 1rem; }
+        .method-card.bem h3 { color: var(--primary); }
+        .method-card.oocss h3 { color: var(--secondary); }
+        .method-card.smacss h3 { color: var(--accent); }
+
+        .code-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .code-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .code-panel-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.2rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .code-panel-header.bad { color: var(--accent); }
+        .code-panel-header.good { color: var(--secondary); }
+
+        .code-panel pre {
+            padding: 1.2rem;
+            margin: 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .title-slide { text-align: center; }
+        .title-slide h1 { font-size: 4rem; margin-bottom: 1rem; }
+        .title-slide .subtitle { font-size: 1.8rem; margin-bottom: 2rem; }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .badge.bem { border: 2px solid var(--primary); color: var(--primary); }
+        .badge.oocss { border: 2px solid var(--secondary); color: var(--secondary); }
+        .badge.smacss { border: 2px solid var(--accent); color: var(--accent); }
+
+        .break-slide { text-align: center; }
+        .break-slide h1 { font-size: 5rem; }
+        .break-icon { font-size: 4rem; margin: 0.5rem 0; }
+
+        .file-tree {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            line-height: 2;
+        }
+
+        .file-tree .folder { color: var(--primary); }
+        .file-tree .file { color: var(--secondary); }
+
+        code:not(.code-block code) {
+            background: rgba(45, 91, 255, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .summary-list { list-style: none; padding: 0; }
+        .summary-list li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .summary-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">22</span>
+        </div>
+    </header>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <main class="presentation">
+        
+        <!-- Slide 1: Título -->
+        <section class="slide active" data-slide="1">
+            <div class="title-slide">
+                <h1>Metodologías de Organización y Modularización de Estilos CSS</h1>
+                <p class="subtitle">Aprende a escribir CSS escalable, mantenible y profesional</p>
+                <div class="badge-container">
+                    <span class="badge bem">BEM</span>
+                    <span class="badge oocss">OOCSS</span>
+                    <span class="badge smacss">SMACSS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Objetivos -->
+        <section class="slide" data-slide="2">
+            <h2>🎯 Objetivos de la Clase</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>Comprender</h3>
+                    <p>Las limitaciones de escribir CSS sin metodología y por qué necesitamos estructura</p>
+                </div>
+                <div class="card">
+                    <h3>Conocer</h3>
+                    <p>Los principios y convenciones de BEM, OOCSS y SMACSS</p>
+                </div>
+                <div class="card">
+                    <h3>Aplicar</h3>
+                    <p>Convenciones de nombres claras y separación de estructura/apariencia</p>
+                </div>
+                <div class="card">
+                    <h3>Organizar</h3>
+                    <p>Estilos en archivos modulares siguiendo buenas prácticas profesionales</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: El Problema -->
+        <section class="slide" data-slide="3">
+            <h2>😰 El Problema del CSS Desorganizado</h2>
+            <div class="code-comparison">
+                <div class="code-panel">
+                    <div class="code-panel-header bad">❌ CSS Caótico</div>
+                    <pre><code><span class="code-selector">.header .nav a</span> { <span class="code-property">color</span>: <span class="code-value">blue</span>; }
+<span class="code-selector">.sidebar .nav a</span> { <span class="code-property">color</span>: <span class="code-value">green</span>; }
+<span class="code-selector">.btn</span> { <span class="code-property">padding</span>: <span class="code-value">10px</span>; }
+<span class="code-selector">.button</span> { <span class="code-property">padding</span>: <span class="code-value">10px</span>; }
+<span class="code-selector">.header .button</span> { <span class="code-property">padding</span>: <span class="code-value">15px</span>; }
+<span class="code-selector">div.content p.intro</span> { ... }</code></pre>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header good">✅ CSS Organizado</div>
+                    <pre><code><span class="code-selector">.nav__link</span> { <span class="code-property">color</span>: <span class="code-value">blue</span>; }
+<span class="code-selector">.nav__link--sidebar</span> { <span class="code-property">color</span>: <span class="code-value">green</span>; }
+<span class="code-selector">.button</span> { <span class="code-property">padding</span>: <span class="code-value">10px</span>; }
+<span class="code-selector">.button--large</span> { <span class="code-property">padding</span>: <span class="code-value">15px</span>; }
+<span class="code-selector">.content__intro</span> { ... }</code></pre>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <p><strong>Consecuencias:</strong> Selectores duplicados, nombres sin significado, conflictos de especificidad, código imposible de mantener</p>
+            </div>
+        </section>
+
+        <!-- Slide 4: Introducción a BEM -->
+        <section class="slide" data-slide="4">
+            <h2>🧱 Metodología BEM</h2>
+            <p class="subtitle">Block Element Modifier - La convención más adoptada en la industria</p>
+            <div class="cards-grid cards-grid-3">
+                <div class="card">
+                    <h3 style="color: var(--primary)">Bloque</h3>
+                    <p>Entidad independiente con significado propio</p>
+                    <code>.card</code> <code>.menu</code> <code>.form</code>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--secondary)">Elemento</h3>
+                    <p>Parte interna del bloque que no existe sin él</p>
+                    <code>.card__title</code> <code>.menu__item</code>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent)">Modificador</h3>
+                    <p>Varía apariencia, estado o comportamiento</p>
+                    <code>.card--featured</code> <code>.button--disabled</code>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <p><strong>Convención:</strong> <code>bloque__elemento--modificador</code></p>
+                <p>Doble guion bajo (<code>__</code>) separa bloque y elemento • Doble guion (<code>--</code>) indica modificadores</p>
+            </div>
+        </section>
+
+        <!-- Slide 5: BEM en HTML -->
+        <section class="slide" data-slide="5">
+            <h2>📝 BEM en la Práctica - HTML</h2>
+            <div class="code-block">
+                <pre><code><span class="code-tag">&lt;article</span> <span class="code-property">class=</span><span class="code-value">"card"</span><span class="code-tag">&gt;</span>
+    <span class="code-tag">&lt;img</span> <span class="code-property">class=</span><span class="code-value">"card__image"</span> <span class="code-property">src=</span><span class="code-value">"..."</span> <span class="code-property">alt=</span><span class="code-value">"..."</span><span class="code-tag">&gt;</span>
+    <span class="code-tag">&lt;div</span> <span class="code-property">class=</span><span class="code-value">"card__content"</span><span class="code-tag">&gt;</span>
+        <span class="code-tag">&lt;h3</span> <span class="code-property">class=</span><span class="code-value">"card__title"</span><span class="code-tag">&gt;</span>Título de la tarjeta<span class="code-tag">&lt;/h3&gt;</span>
+        <span class="code-tag">&lt;p</span> <span class="code-property">class=</span><span class="code-value">"card__description"</span><span class="code-tag">&gt;</span>Descripción aquí...<span class="code-tag">&lt;/p&gt;</span>
+        <span class="code-tag">&lt;button</span> <span class="code-property">class=</span><span class="code-value">"card__button card__button--primary"</span><span class="code-tag">&gt;</span>Ver más<span class="code-tag">&lt;/button&gt;</span>
+    <span class="code-tag">&lt;/div&gt;</span>
+<span class="code-tag">&lt;/article&gt;</span></code></pre>
+            </div>
+            <p style="margin-top: 1rem; color: rgba(248,249,250,0.8);">📖 Al leer el HTML puedes inferir inmediatamente la estructura y jerarquía sin necesidad de ver el CSS</p>
+        </section>
+
+        <!-- Slide 6: BEM en CSS -->
+        <section class="slide" data-slide="6">
+            <h2>🎨 BEM en la Práctica - CSS</h2>
+            <div class="code-comparison">
+                <div class="code-panel">
+                    <div class="code-panel-header" style="color: var(--primary);">Estructura (Bloque y Elementos)</div>
+                    <pre><code><span class="code-selector">.card</span> {
+    <span class="code-property">display</span>: <span class="code-value">flex</span>;
+    <span class="code-property">flex-direction</span>: <span class="code-value">column</span>;
+    <span class="code-property">border-radius</span>: <span class="code-value">8px</span>;
+    <span class="code-property">overflow</span>: <span class="code-value">hidden</span>;
+}
+
+<span class="code-selector">.card__image</span> {
+    <span class="code-property">width</span>: <span class="code-value">100%</span>;
+    <span class="code-property">height</span>: <span class="code-value">200px</span>;
+    <span class="code-property">object-fit</span>: <span class="code-value">cover</span>;
+}
+
+<span class="code-selector">.card__content</span> {
+    <span class="code-property">padding</span>: <span class="code-value">1.5rem</span>;
+}</code></pre>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header" style="color: var(--accent);">Modificadores</div>
+                    <pre><code><span class="code-selector">.card--featured</span> {
+    <span class="code-property">border</span>: <span class="code-value">2px solid gold</span>;
+}
+
+<span class="code-selector">.card--horizontal</span> {
+    <span class="code-property">flex-direction</span>: <span class="code-value">row</span>;
+}
+
+<span class="code-selector">.card__button--primary</span> {
+    <span class="code-property">background</span>: <span class="code-value">#2D5BFF</span>;
+    <span class="code-property">color</span>: <span class="code-value">white</span>;
+}
+
+<span class="code-selector">.card__button--disabled</span> {
+    <span class="code-property">opacity</span>: <span class="code-value">0.5</span>;
+    <span class="code-property">cursor</span>: <span class="code-value">not-allowed</span>;
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Ventajas BEM -->
+        <section class="slide" data-slide="7">
+            <h2>✨ Ventajas de BEM</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>🔮 Predictibilidad</h3>
+                    <p>Leer el HTML permite inferir el propósito y estilo de cada elemento sin ver el CSS</p>
+                </div>
+                <div class="card">
+                    <h3>👥 Colaboración</h3>
+                    <p>Facilita el trabajo en equipo al tener una estructura clara y consistente</p>
+                </div>
+                <div class="card">
+                    <h3>📈 Escalabilidad</h3>
+                    <p>Permite que el proyecto crezca de manera organizada y controlada</p>
+                </div>
+                <div class="card">
+                    <h3>🔧 Refactorización</h3>
+                    <p>Permite modificar el código de manera controlada sin efectos secundarios</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Intro OOCSS -->
+        <section class="slide" data-slide="8">
+            <h2>🎭 Metodología OOCSS</h2>
+            <p class="subtitle">Object-Oriented CSS - Estilos como objetos reutilizables</p>
+            <div class="highlight-box">
+                <p>OOCSS trata los estilos como <strong>objetos reutilizables</strong>, inspirándose en la programación orientada a objetos. Su filosofía: separar responsabilidades para maximizar la reutilización.</p>
+            </div>
+            <div class="cards-grid" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3 style="color: var(--primary)">1. Separar Estructura y Skin</h3>
+                    <p>Las clases estructurales (<code>.box</code>, <code>.media</code>) no definen colores ni fuentes. Los estilos visuales van en clases separadas (<code>.theme-dark</code>)</p>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--secondary)">2. Evitar Dependencia Contextual</h3>
+                    <p>Los estilos deben funcionar en cualquier lugar del DOM. Evitar reglas como <code>.sidebar .btn</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: OOCSS Ejemplo -->
+        <section class="slide" data-slide="9">
+            <h2>🔧 OOCSS en la Práctica</h2>
+            <div class="code-comparison">
+                <div class="code-panel">
+                    <div class="code-panel-header bad">❌ Sin OOCSS</div>
+                    <pre><code><span class="code-selector">.error-button</span> {
+    <span class="code-property">display</span>: <span class="code-value">inline-block</span>;
+    <span class="code-property">padding</span>: <span class="code-value">10px 15px</span>;
+    <span class="code-property">border-radius</span>: <span class="code-value">4px</span>;
+    <span class="code-property">background</span>: <span class="code-value">red</span>;
+    <span class="code-property">color</span>: <span class="code-value">white</span>;
+}
+
+<span class="code-selector">.success-button</span> {
+    <span class="code-property">display</span>: <span class="code-value">inline-block</span>;
+    <span class="code-property">padding</span>: <span class="code-value">10px 15px</span>;
+    <span class="code-property">border-radius</span>: <span class="code-value">4px</span>;
+    <span class="code-property">background</span>: <span class="code-value">green</span>;
+    <span class="code-property">color</span>: <span class="code-value">white</span>;
+}</code></pre>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header good">✅ Con OOCSS</div>
+                    <pre><code><span class="code-comment">/* Estructura */</span>
+<span class="code-selector">.button</span> {
+    <span class="code-property">display</span>: <span class="code-value">inline-block</span>;
+    <span class="code-property">padding</span>: <span class="code-value">10px 15px</span>;
+    <span class="code-property">border-radius</span>: <span class="code-value">4px</span>;
+}
+
+<span class="code-comment">/* Skins */</span>
+<span class="code-selector">.skin-error</span> {
+    <span class="code-property">background</span>: <span class="code-value">red</span>;
+    <span class="code-property">color</span>: <span class="code-value">white</span>;
+}
+
+<span class="code-selector">.skin-success</span> {
+    <span class="code-property">background</span>: <span class="code-value">green</span>;
+    <span class="code-property">color</span>: <span class="code-value">white</span>;
+}</code></pre>
+                </div>
+            </div>
+            <p style="margin-top: 1rem;"><strong>HTML:</strong> <code>&lt;button class="button skin-error"&gt;Error&lt;/button&gt;</code></p>
+        </section>
+
+        <!-- Slide 10: Estructura OOCSS -->
+        <section class="slide" data-slide="10">
+            <h2>📁 Estructura de Archivos OOCSS</h2>
+            <div class="cards-grid">
+                <div class="file-tree">
+                    <span class="folder">📂 styles/</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 base/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 reset.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 typography.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 objects/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 media.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 grid.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 skins/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 buttons.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 themes.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 utilities/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 spacing.css</span>
+                </div>
+                <div>
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <h3>📦 Objects</h3>
+                        <p>Clases estructurales reutilizables: layouts, contenedores, grids</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <h3>🎨 Skins</h3>
+                        <p>Clases de apariencia visual: colores, bordes, sombras</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔧 Utilities</h3>
+                        <p>Clases auxiliares de un solo propósito: márgenes, paddings</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Demo Tarjeta (después de BEM y OOCSS) -->
+        <section class="slide" data-slide="11">
+            <h2>💻 Demo en Vivo: Tarjeta con BEM + OOCSS</h2>
+            <p class="subtitle">Construiremos una tarjeta aplicando nomenclatura BEM y separación estructura/skin</p>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📋 Pasos del Live Coding</h3>
+                    <ol style="padding-left: 1.5rem;">
+                        <li>Diseñar el componente: tarjeta con imagen, título, descripción y botón</li>
+                        <li>Estructura HTML usando la convención BEM</li>
+                        <li>Hoja de estilos CSS: separar estructura y skin (OOCSS)</li>
+                        <li>Comentarios y reflexión</li>
+                        <li>Visualización en navegador</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3>🎯 Resultado esperado</h3>
+                    <ul style="padding-left: 1.5rem;">
+                        <li>HTML con clases BEM claras</li>
+                        <li>CSS separado en estructura y apariencia</li>
+                        <li>Modificadores para variantes</li>
+                        <li>Código documentado</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Actividad 1 -->
+        <section class="slide" data-slide="12">
+            <h2>🏋️ Actividad 1: Componente con BEM + OOCSS</h2>
+            <div class="activity-container">
+                <div class="timer-section">
+                    <h3>⏱️ Tiempo</h3>
+                    <div class="timer-display" id="timer1">30:00</div>
+                    <div class="timer-controls">
+                        <button class="timer-btn start" onclick="startTimer('timer1', 30)">Iniciar</button>
+                        <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+                        <button class="timer-btn reset" onclick="resetTimer('timer1', 30)">Reiniciar</button>
+                    </div>
+                    <p class="timer-status" id="timer1-status">Listo para comenzar</p>
+                </div>
+                <div class="activity-card">
+                    <h3>📝 Instrucciones</h3>
+                    <ol>
+                        <li>Elige: perfil de usuario, artículo de blog o ficha de película</li>
+                        <li>Crea el HTML con nomenclatura BEM estricta</li>
+                        <li>Separa el CSS en estructura y skins (OOCSS)</li>
+                        <li>Incluye al menos 2 modificadores BEM</li>
+                        <li>Crea al menos 2 clases de utilidad (<code>.shadow</code>, <code>.rounded</code>)</li>
+                        <li>Comenta qué representa cada clase</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Break -->
+        <section class="slide" data-slide="13">
+            <div class="break-slide">
+                <h1>Descanso</h1>
+                <div class="break-icon">🧘</div>
+                <div class="timer-section" style="max-width: 400px; margin: 0 auto;">
+                    <div class="timer-display" id="timerBreak">20:00</div>
+                    <div class="timer-controls">
+                        <button class="timer-btn start" onclick="startTimer('timerBreak', 20)">Iniciar</button>
+                        <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+                        <button class="timer-btn reset" onclick="resetTimer('timerBreak', 20)">Reiniciar</button>
+                    </div>
+                    <p class="timer-status" id="timerBreak-status">¡Aprovecha para estirarte!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Intro SMACSS -->
+        <section class="slide" data-slide="14">
+            <h2>📐 Metodología SMACSS</h2>
+            <p class="subtitle">Scalable and Modular Architecture for CSS</p>
+            <div class="highlight-box">
+                <p>SMACSS no impone una convención de nombres, sino que propone una <strong>arquitectura basada en categorías funcionales</strong> que permite modularizar el CSS y mantener una estructura clara.</p>
+            </div>
+            <div class="cards-grid cards-grid-3" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <h3 style="color: var(--primary)">Base</h3>
+                    <p>Estilos globales para elementos HTML: <code>h1</code>, <code>a</code>, <code>button</code></p>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--secondary)">Layout</h3>
+                    <p>Distribución de zonas principales: header, main, sidebar, footer</p>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent)">Module</h3>
+                    <p>Componentes visuales reutilizables: <code>.card</code>, <code>.nav</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: SMACSS Categorías -->
+        <section class="slide" data-slide="15">
+            <h2>🏷️ Categorías y Prefijos SMACSS</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>🏠 Layout (<code>l-</code>)</h3>
+                    <p>Estructura principal de la página</p>
+                    <code>l-header</code> <code>l-sidebar</code> <code>l-grid</code>
+                </div>
+                <div class="card">
+                    <h3>📦 Module (<code>m-</code>)</h3>
+                    <p>Componentes independientes</p>
+                    <code>m-card</code> <code>m-modal</code> <code>m-carousel</code>
+                </div>
+                <div class="card">
+                    <h3>🔄 State (<code>is-</code>, <code>has-</code>)</h3>
+                    <p>Estados dinámicos controlados por JS</p>
+                    <code>is-active</code> <code>is-hidden</code> <code>has-error</code>
+                </div>
+                <div class="card">
+                    <h3>🎨 Theme (<code>theme-</code>)</h3>
+                    <p>Variaciones visuales globales</p>
+                    <code>theme-dark</code> <code>theme-corporate</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 16: Estructura SMACSS -->
+        <section class="slide" data-slide="16">
+            <h2>📁 Estructura de Archivos SMACSS</h2>
+            <div class="cards-grid">
+                <div class="file-tree">
+                    <span class="folder">📂 styles/</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 base/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 reset.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 typography.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 layout/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 grid.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 header.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 modules/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 card.css</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 navigation.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 states/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 states.css</span><br>
+                    &nbsp;&nbsp;<span class="folder">📂 themes/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 theme-default.css</span>
+                </div>
+                <div>
+                    <div class="highlight-box">
+                        <h3 style="margin-bottom: 0.5rem;">💡 Clave de SMACSS</h3>
+                        <p>Cada nuevo estilo debe encajar en una categoría específica. Si no sabes dónde va, probablemente necesitas repensar su propósito.</p>
+                    </div>
+                    <div class="card" style="margin-top: 1rem;">
+                        <h3>🔗 Integración con JavaScript</h3>
+                        <p>Las clases de estado (<code>is-active</code>, <code>is-expanded</code>) son perfectas para ser controladas desde JavaScript.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 17: Comparación -->
+        <section class="slide" data-slide="17">
+            <h2>⚖️ Comparación de Metodologías</h2>
+            <div class="comparison-grid">
+                <div class="method-card bem">
+                    <h3>BEM</h3>
+                    <p><strong>Fortaleza:</strong> Convención de nombres clara</p>
+                    <p><strong>Ideal para:</strong> Equipos grandes, alta predictibilidad</p>
+                    <p><strong>Ejemplo:</strong><br><code>.card__button--primary</code></p>
+                </div>
+                <div class="method-card oocss">
+                    <h3>OOCSS</h3>
+                    <p><strong>Fortaleza:</strong> Máxima reutilización</p>
+                    <p><strong>Ideal para:</strong> Patrones visuales repetitivos</p>
+                    <p><strong>Ejemplo:</strong><br><code>.button .skin-primary .rounded</code></p>
+                </div>
+                <div class="method-card smacss">
+                    <h3>SMACSS</h3>
+                    <p><strong>Fortaleza:</strong> Organización funcional</p>
+                    <p><strong>Ideal para:</strong> Apps con muchos estados</p>
+                    <p><strong>Ejemplo:</strong><br><code>.m-card.is-active</code></p>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <p>🔀 <strong>En la práctica:</strong> Muchos equipos usan enfoques híbridos combinando nombres BEM + categorías SMACSS + separación OOCSS</p>
+            </div>
+        </section>
+
+        <!-- Slide 18: Demo Navbar -->
+        <section class="slide" data-slide="18">
+            <h2>💻 Demo en Vivo: Navbar con Enfoque Híbrido</h2>
+            <p class="subtitle">Aplicaremos las tres metodologías en un componente real</p>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📋 Estructura</h3>
+                    <ol style="padding-left: 1.5rem;">
+                        <li>HTML con nomenclatura BEM</li>
+                        <li>Separación estructura/skin (OOCSS)</li>
+                        <li>Archivos por categoría (SMACSS)</li>
+                        <li>Estados interactivos con JS</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3>📂 Archivos a crear</h3>
+                    <ul style="padding-left: 1.5rem;">
+                        <li><code>layout/nav.css</code> - Estructura</li>
+                        <li><code>skins/nav-theme.css</code> - Colores</li>
+                        <li><code>states/states.css</code> - Estados</li>
+                        <li><code>index.html</code> - Markup</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 19: Actividad 2 -->
+        <section class="slide" data-slide="19">
+            <h2>🏋️ Actividad 2: Componente con Metodología Híbrida</h2>
+            <div class="activity-container">
+                <div class="timer-section">
+                    <h3>⏱️ Tiempo</h3>
+                    <div class="timer-display" id="timer2">40:00</div>
+                    <div class="timer-controls">
+                        <button class="timer-btn start" onclick="startTimer('timer2', 40)">Iniciar</button>
+                        <button class="timer-btn pause" onclick="pauseTimer('timer2')">Pausar</button>
+                        <button class="timer-btn reset" onclick="resetTimer('timer2', 40)">Reiniciar</button>
+                    </div>
+                    <p class="timer-status" id="timer2-status">Listo para comenzar</p>
+                </div>
+                <div class="activity-card">
+                    <h3>📝 Instrucciones</h3>
+                    <ol>
+                        <li>Elige: menú hamburguesa, formulario de contacto, o galería de imágenes</li>
+                        <li>Organiza en 3 archivos mínimo:
+                            <ul style="margin-top: 0.3rem;">
+                                <li><code>component.css</code> (estructura)</li>
+                                <li><code>theme.css</code> (apariencia)</li>
+                                <li><code>states.css</code> (estados)</li>
+                            </ul>
+                        </li>
+                        <li>Usa nomenclatura BEM en las clases</li>
+                        <li>Incluye al menos 1 estado (<code>is-</code>)</li>
+                        <li>Documenta con comentarios</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 20: Impacto -->
+        <section class="slide" data-slide="20">
+            <h2>📊 Impacto de las Metodologías</h2>
+            <div class="cards-grid cards-grid-3">
+                <div class="card" style="text-align: center;">
+                    <h3 style="font-size: 3rem; color: var(--secondary);">30%</h3>
+                    <p>Reducción de código por reutilización de estilos</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h3 style="font-size: 3rem; color: var(--primary);">65%</h3>
+                    <p>Menos tiempo de depuración con estructura clara</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h3 style="font-size: 3rem; color: var(--accent);">80%</h3>
+                    <p>Mayor reutilización de componentes entre proyectos</p>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <p>💼 <strong>En la industria:</strong> Empresas como Airbnb, GitHub y Spotify utilizan metodologías CSS como estándar en sus equipos de desarrollo</p>
+            </div>
+        </section>
+
+        <!-- Slide 21: Próximos Pasos -->
+        <section class="slide" data-slide="21">
+            <h2>🚀 Próximos Pasos</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>🧪 Experimentar</h3>
+                    <p>Prueba cada metodología en proyectos pequeños para entender sus ventajas y limitaciones</p>
+                </div>
+                <div class="card">
+                    <h3>📚 Profundizar</h3>
+                    <p>Estudia casos de uso avanzados: BEM con SASS, SMACSS en SPAs, Design Systems</p>
+                </div>
+                <div class="card">
+                    <h3>🔧 Adaptar</h3>
+                    <p>Desarrolla tu propio enfoque híbrido que combine lo mejor según tus necesidades</p>
+                </div>
+                <div class="card">
+                    <h3>🌐 Explorar</h3>
+                    <p>Conoce tendencias modernas: CSS Modules, CSS-in-JS, Tailwind CSS</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 22: Resumen -->
+        <section class="slide" data-slide="22">
+            <h2>✅ Resumen de la Clase</h2>
+            <ul class="summary-list">
+                <li>Comprendimos por qué CSS sin metodología se vuelve insostenible</li>
+                <li>Dominamos BEM: Bloque__Elemento--Modificador para nombres predecibles</li>
+                <li>Aplicamos OOCSS: separación de estructura y skin para máxima reutilización</li>
+                <li>Conocimos SMACSS: organización por categorías funcionales (Base, Layout, Module, State, Theme)</li>
+                <li>Practicamos con demos en vivo y ejercicios reales</li>
+                <li>Aprendimos a pensar CSS como un sistema, no como reglas sueltas</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <p style="font-size: 1.4rem; text-align: center;">🎯 <strong>Recuerda:</strong> La mejor metodología es la que tu equipo adopta consistentemente</p>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Siguiente →</button>
+    </nav>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            currentSlide = n;
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === n - 1) slide.classList.add('active');
+            });
+            document.getElementById('currentSlide').textContent = n;
+            document.getElementById('progressBar').style.width = ((n / totalSlides) * 100) + '%';
+            document.getElementById('prevBtn').disabled = (n === 1);
+            document.getElementById('nextBtn').disabled = (n === totalSlides);
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+
+        const timers = {};
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 200);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay(timerId) {
+            const timer = timers[timerId];
+            const display = document.getElementById(timerId);
+            const status = document.getElementById(`${timerId}-status`);
+            display.textContent = formatTime(timer.remaining);
+            display.classList.remove('warning', 'danger');
+            if (timer.remaining <= 60) {
+                display.classList.add('danger');
+                if (status) status.textContent = '⚠️ ¡Menos de 1 minuto!';
+            } else if (timer.remaining <= 300) {
+                display.classList.add('warning');
+                if (status) status.textContent = '⏰ Menos de 5 minutos';
+            } else {
+                if (status) status.textContent = '🔄 En progreso...';
+            }
+        }
+
+        function startTimer(timerId, minutes) {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            if (!timers[timerId]) {
+                timers[timerId] = { total: minutes * 60, remaining: minutes * 60, interval: null };
+            }
+            if (timers[timerId].interval) return;
+            const status = document.getElementById(`${timerId}-status`);
+            if (status) status.textContent = '🔄 En progreso...';
+            timers[timerId].interval = setInterval(() => {
+                timers[timerId].remaining--;
+                updateTimerDisplay(timerId);
+                if (timers[timerId].remaining <= 0) {
+                    clearInterval(timers[timerId].interval);
+                    timers[timerId].interval = null;
+                    playBeep();
+                    setTimeout(playBeep, 300);
+                    setTimeout(playBeep, 600);
+                    if (status) status.textContent = '✅ ¡Tiempo completado!';
+                }
+            }, 1000);
+        }
+
+        function pauseTimer(timerId) {
+            if (timers[timerId] && timers[timerId].interval) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId].interval = null;
+                const status = document.getElementById(`${timerId}-status`);
+                if (status) status.textContent = '⏸️ Pausado';
+            }
+        }
+
+        function resetTimer(timerId, minutes) {
+            if (timers[timerId]) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId].interval = null;
+                timers[timerId].remaining = minutes * 60;
+                updateTimerDisplay(timerId);
+                const display = document.getElementById(timerId);
+                display.classList.remove('warning', 'danger');
+                const status = document.getElementById(`${timerId}-status`);
+                if (status) status.textContent = 'Listo para comenzar';
+            }
+        }
+
+        showSlide(1);
+    </script>
+</body>
+</html>

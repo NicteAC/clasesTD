@@ -490,7 +490,6 @@ sass --watch input.scss output.css</code></pre>
         <!-- Slide 5: Demo Variables -->
         <div class="slide" data-slide="5">
             <div class="slide-content">
-                <span class="demo-badge">🔴 DEMO EN VIVO</span>
                 <h2>Variables en SASS</h2>
                 <div class="split-layout">
                     <div>
@@ -526,7 +525,6 @@ sass --watch input.scss output.css</code></pre>
         <!-- Slide 6: Demo Anidamiento -->
         <div class="slide" data-slide="6">
             <div class="slide-content">
-                <span class="demo-badge">🔴 DEMO EN VIVO</span>
                 <h2>Anidamiento (Nesting)</h2>
                 <div class="split-layout">
                     <div>
@@ -611,39 +609,54 @@ sass --watch input.scss output.css</code></pre>
         <div class="slide" data-slide="8">
             <div class="slide-content">
                 <h2>El Patrón 7-1</h2>
-                <p style="margin-bottom: 1.5rem;">7 carpetas + 1 archivo principal para proyectos escalables</p>
+                <p style="margin-bottom: 1rem;">7 carpetas + 1 archivo principal para proyectos escalables</p>
                 <div class="split-layout">
-                    <div class="folder-structure"><span class="folder">sass/</span>
+                    <div class="folder-structure" style="font-size: 0.85rem; line-height: 1.4;"><span class="folder">sass/</span>
 ├── <span class="folder">abstracts/</span>
 │   ├── <span class="file">_variables.scss</span>
-│   ├── <span class="file">_mixins.scss</span>
-│   └── <span class="file">_functions.scss</span>
+│   └── <span class="file">_mixins.scss</span>
 ├── <span class="folder">base/</span>
 │   ├── <span class="file">_reset.scss</span>
 │   └── <span class="file">_typography.scss</span>
 ├── <span class="folder">components/</span>
-│   ├── <span class="file">_buttons.scss</span>
-│   └── <span class="file">_cards.scss</span>
+│   └── <span class="file">_buttons.scss</span>
 ├── <span class="folder">layout/</span>
-│   ├── <span class="file">_header.scss</span>
-│   └── <span class="file">_footer.scss</span>
+│   └── <span class="file">_header.scss</span>
+├── <span class="folder">pages/</span>
+│   └── <span class="file">_home.scss</span>
+├── <span class="folder">themes/</span>
+│   └── <span class="file">_dark.scss</span>
+├── <span class="folder">vendors/</span>
+│   └── <span class="file">_bootstrap.scss</span>
 └── <span class="file">main.scss</span></div>
-                    <div>
-                        <div class="card" style="margin-bottom: 1rem;">
-                            <h3>📁 abstracts/</h3>
-                            <p>Variables, mixins, funciones</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 abstracts/</h3>
+                            <p style="font-size: 0.9rem;">Variables, mixins, funciones</p>
                         </div>
-                        <div class="card" style="margin-bottom: 1rem;">
-                            <h3>📁 base/</h3>
-                            <p>Reset, tipografía, utilidades</p>
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 base/</h3>
+                            <p style="font-size: 0.9rem;">Reset, tipografía, utilidades</p>
                         </div>
-                        <div class="card" style="margin-bottom: 1rem;">
-                            <h3>📁 components/</h3>
-                            <p>Botones, cards, formularios</p>
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 components/</h3>
+                            <p style="font-size: 0.9rem;">Botones, cards, formularios</p>
                         </div>
-                        <div class="card">
-                            <h3>📁 layout/</h3>
-                            <p>Header, footer, grid, sidebar</p>
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 layout/</h3>
+                            <p style="font-size: 0.9rem;">Header, footer, grid</p>
+                        </div>
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 pages/</h3>
+                            <p style="font-size: 0.9rem;">Estilos por página</p>
+                        </div>
+                        <div class="card" style="padding: 0.8rem;">
+                            <h3 style="font-size: 1rem;">📁 themes/</h3>
+                            <p style="font-size: 0.9rem;">Temas visuales (dark/light)</p>
+                        </div>
+                        <div class="card" style="padding: 0.8rem; grid-column: span 2;">
+                            <h3 style="font-size: 1rem;">📁 vendors/</h3>
+                            <p style="font-size: 0.9rem;">Código de terceros (Bootstrap, plugins)</p>
                         </div>
                     </div>
                 </div>
@@ -690,7 +703,6 @@ sass --watch input.scss output.css</code></pre>
         <!-- Slide 10: Demo Mixins -->
         <div class="slide" data-slide="10">
             <div class="slide-content">
-                <span class="demo-badge">🔴 DEMO EN VIVO</span>
                 <h2>Mixins: Código Reutilizable</h2>
                 <div class="code-block">
                     <pre><code><span class="cc">// Definir mixin</span>
@@ -718,7 +730,6 @@ sass --watch input.scss output.css</code></pre>
         <!-- Slide 11: Mixin Media Queries -->
         <div class="slide" data-slide="11">
             <div class="slide-content">
-                <span class="demo-badge">🔴 DEMO EN VIVO</span>
                 <h2>Mixin para Media Queries</h2>
                 <div class="code-block">
                     <pre><code><span class="ck">@mixin</span> <span class="cv">respond-to</span>(<span class="cv">$breakpoint</span>) {
@@ -887,27 +898,29 @@ sass --watch input.scss output.css</code></pre>
                 <span class="demo-badge">🔴 DEMO EN VIVO</span>
                 <h2>Sistema de Grillas con SASS</h2>
                 <div class="code-block">
-                    <pre><code><span class="cc">// Variables</span>
+                    <pre><code><span class="ck">@use</span> <span class="cs">'sass:math'</span>;
+
+<span class="cc">// Variables</span>
 <span class="cv">$grid-columns</span>: 12;
 <span class="cv">$gutter</span>: 1.5rem;
 
 <span class="cc">// Función para calcular ancho</span>
 <span class="ck">@function</span> <span class="cv">col-width</span>(<span class="cv">$cols</span>) {
-    <span class="ck">@return</span> percentage(<span class="cv">$cols</span> / <span class="cv">$grid-columns</span>);
+    <span class="ck">@return</span> percentage(math.div(<span class="cv">$cols</span>, <span class="cv">$grid-columns</span>));
 }
 
 <span class="cc">// Generar clases con bucle</span>
 <span class="ck">@for</span> <span class="cv">$i</span> from 1 through <span class="cv">$grid-columns</span> {
     <span class="cp">.col-#{$i}</span> {
         <span class="ck">width</span>: <span class="cv">col-width</span>(<span class="cv">$i</span>);
-        <span class="ck">padding</span>: 0 <span class="cv">$gutter</span> / 2;
+        <span class="ck">padding</span>: 0 math.div(<span class="cv">$gutter</span>, 2);
     }
 }
 
 <span class="cp">.row</span> {
     <span class="ck">display</span>: flex;
     <span class="ck">flex-wrap</span>: wrap;
-    <span class="ck">margin</span>: 0 -<span class="cv">$gutter</span> / 2;
+    <span class="ck">margin</span>: 0 -(math.div(<span class="cv">$gutter</span>, 2));
 }</code></pre>
                 </div>
             </div>

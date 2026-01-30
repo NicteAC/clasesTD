@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Modelo de Cajas y Layout en CSS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+            --gradient-1: linear-gradient(135deg, var(--primary) 0%, #6B8CFF 100%);
+            --gradient-2: linear-gradient(135deg, var(--secondary) 0%, #00FFD4 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            letter-spacing: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(45, 91, 255, 0.2);
+            z-index: 999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-2);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            font-family: 'Sora', sans-serif;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.prev {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn.prev:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .nav-btn.next {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .nav-btn.next:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(45, 91, 255, 0.4);
+        }
+
+        /* Slides Container */
+        .slides-container {
+            height: 100vh;
+            padding-top: 70px;
+            padding-bottom: 100px;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            padding: 2rem 4rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide Content */
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .slide-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(248, 249, 250, 0.9);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Section Header Slide */
+        .section-slide {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+        }
+
+        .section-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--primary);
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0D0D1A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: left;
+            margin: 1.5rem auto;
+            max-width: 800px;
+            border: 1px solid rgba(45, 91, 255, 0.3);
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        .code-block .keyword { color: var(--accent); }
+        .code-block .property { color: var(--secondary); }
+        .code-block .value { color: #FFD700; }
+        .code-block .selector { color: var(--primary); }
+        .code-block .comment { color: #666; font-style: italic; }
+
+        /* Box Model Visualization */
+        .box-model-viz {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .box-outer {
+            background: rgba(255, 107, 107, 0.3);
+            padding: 30px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .box-outer::before {
+            content: 'margin';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        .box-border {
+            background: rgba(45, 91, 255, 0.5);
+            padding: 20px;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .box-border::before {
+            content: 'border';
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .box-padding {
+            background: rgba(0, 212, 170, 0.3);
+            padding: 25px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .box-padding::before {
+            content: 'padding';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--secondary);
+        }
+
+        .box-content {
+            background: var(--dark);
+            padding: 30px 50px;
+            border-radius: 4px;
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Cards */
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(45, 91, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.2);
+        }
+
+        .info-card h3 {
+            color: var(--secondary);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .info-card p {
+            font-size: 0.95rem;
+            color: rgba(248, 249, 250, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Activity Layout */
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1100px;
+            text-align: left;
+        }
+
+        .timer-section {
+            background: rgba(0, 212, 170, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid var(--secondary);
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 1rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .timer-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .timer-btn {
+            font-family: 'Sora', sans-serif;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.start {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .timer-btn.pause {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .timer-btn.reset {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--light);
+        }
+
+        .timer-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(248, 249, 250, 0.7);
+        }
+
+        .activity-card {
+            background: rgba(45, 91, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .activity-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .activity-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .activity-card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .activity-card li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+
+        /* Table Styles */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Demo Indicator */
+        .demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px var(--accent); }
+            50% { box-shadow: 0 0 20px var(--accent), 0 0 30px var(--accent); }
+        }
+
+        /* Break Slide */
+        .break-slide {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(45, 91, 255, 0.2) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+        }
+
+        .break-emoji {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* List Columns */
+        .list-columns {
+            column-count: 2;
+            column-gap: 3rem;
+            text-align: left;
+        }
+
+        .list-columns li {
+            break-inside: avoid;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(45, 91, 255, 0.2) 0%, rgba(0, 212, 170, 0.2) 100%);
+            border-left: 4px solid var(--secondary);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .highlight-box strong {
+            color: var(--secondary);
+        }
+
+        /* Display Types Visual */
+        .display-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .display-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .display-label {
+            width: 120px;
+            font-family: 'Space Mono', monospace;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .block-demo {
+            background: rgba(45, 91, 255, 0.3);
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .inline-demo {
+            background: rgba(255, 107, 107, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: inline;
+        }
+
+        .inline-block-demo {
+            background: rgba(0, 212, 170, 0.3);
+            padding: 1rem;
+            display: inline-block;
+            border-radius: 4px;
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 0.8rem;
+            color: rgba(248, 249, 250, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        /* Flexbox Visual Demo */
+        .flex-demo-container {
+            display: flex;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .flex-item {
+            background: var(--gradient-1);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        /* Position Demo */
+        .position-demo {
+            position: relative;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .pos-static {
+            background: var(--primary);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .pos-relative {
+            background: var(--secondary);
+            padding: 1rem;
+            border-radius: 4px;
+            position: relative;
+            top: 10px;
+            left: 20px;
+            color: var(--dark);
+        }
+
+        .pos-absolute {
+            background: var(--accent);
+            padding: 1rem;
+            border-radius: 4px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        /* Icon styles */
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 2rem;
+            }
+            
+            .slide-title {
+                font-size: 2.2rem;
+            }
+            
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .activity-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">28</span>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="slides-container">
+        
+        <!-- Slide 1: Portada -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-content">
+                <p style="color: var(--secondary); margin-bottom: 1rem; font-size: 1.1rem;">Desarrollo de Interfaces Web</p>
+                <h1 class="slide-title" style="font-size: 3.5rem;">El Modelo de Cajas<br>y Layout en CSS</h1>
+                <p class="slide-subtitle">Clase práctica · 3 horas</p>
+                <div style="margin-top: 3rem; display: flex; gap: 2rem; justify-content: center;">
+                    <div class="info-card" style="text-align: center; padding: 1rem 2rem;">
+                        <p style="color: var(--secondary); font-size: 0.9rem;">Aprendizaje Esperado</p>
+                        <p style="font-size: 0.85rem;">Implementar interfaces web con el modelo de cajas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <h2 class="slide-title">Agenda de Hoy</h2>
+                <div class="grid-2" style="max-width: 900px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>🎯 Bloque 1 (80 min)</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.4rem 0;">• Modelo de cajas: fundamentos</li>
+                            <li style="padding: 0.4rem 0;">• Demo: construir una card</li>
+                            <li style="padding: 0.4rem 0;">• Tipos de display</li>
+                            <li style="padding: 0.4rem 0;">• Actividad práctica #1</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>☕ Descanso (20 min)</h3>
+                        <p style="margin-top: 1rem; color: rgba(248,249,250,0.7);">Pausa para recargar energías</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>🚀 Bloque 2 (80 min)</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.4rem 0;">• Posicionamiento CSS</li>
+                            <li style="padding: 0.4rem 0;">• Flexbox y Grid intro</li>
+                            <li style="padding: 0.4rem 0;">• Demo: landing responsiva</li>
+                            <li style="padding: 0.4rem 0;">• Actividad práctica #2</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>📝 Cierre</h3>
+                        <p style="margin-top: 1rem; color: rgba(248,249,250,0.7);">Resumen y próximos pasos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Introducción -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content section-slide">
+                <div class="section-number">01</div>
+                <h2 class="slide-title">Modelo de Cajas</h2>
+                <p class="slide-subtitle">La base de todo diseño web</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: ¿Qué es el modelo de cajas? -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <h2 class="slide-title">¿Qué es el Modelo de Cajas?</h2>
+                <p class="slide-text">Cada elemento HTML es una <strong style="color: var(--secondary);">caja rectangular</strong> compuesta por cuatro áreas:</p>
+                
+                <div class="box-model-viz">
+                    <div class="box-outer">
+                        <div class="box-border">
+                            <div class="box-padding">
+                                <div class="box-content">Contenido</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid-4" style="max-width: 900px; margin: 1rem auto;">
+                    <div class="info-card" style="text-align: center;">
+                        <p style="color: var(--light); font-weight: 600;">Content</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">Texto, imagen, etc.</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <p style="color: var(--secondary); font-weight: 600;">Padding</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">Espacio interno</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <p style="color: var(--primary); font-weight: 600;">Border</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">Contorno visible</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <p style="color: var(--accent); font-weight: 600;">Margin</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">Espacio externo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Propiedades del modelo de cajas -->
+        <div class="slide" data-slide="5">
+            <div class="slide-content">
+                <h2 class="slide-title">Propiedades Fundamentales</h2>
+                
+                <div class="code-block">
+                    <code>
+<span class="selector">.elemento</span> {<br>
+&nbsp;&nbsp;<span class="comment">/* Dimensiones */</span><br>
+&nbsp;&nbsp;<span class="property">width</span>: <span class="value">300px</span>;<br>
+&nbsp;&nbsp;<span class="property">height</span>: <span class="value">200px</span>;<br><br>
+&nbsp;&nbsp;<span class="comment">/* Espaciado interno */</span><br>
+&nbsp;&nbsp;<span class="property">padding</span>: <span class="value">20px</span>; <span class="comment">/* todos los lados */</span><br>
+&nbsp;&nbsp;<span class="property">padding</span>: <span class="value">10px 20px</span>; <span class="comment">/* vertical horizontal */</span><br><br>
+&nbsp;&nbsp;<span class="comment">/* Borde */</span><br>
+&nbsp;&nbsp;<span class="property">border</span>: <span class="value">2px solid #2D5BFF</span>;<br><br>
+&nbsp;&nbsp;<span class="comment">/* Espaciado externo */</span><br>
+&nbsp;&nbsp;<span class="property">margin</span>: <span class="value">15px auto</span>; <span class="comment">/* centrado horizontal */</span><br>
+}
+                    </code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Box-sizing -->
+        <div class="slide" data-slide="6">
+            <div class="slide-content">
+                <h2 class="slide-title">Box-sizing: El Truco Clave</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>content-box (por defecto)</h3>
+                        <p style="margin: 1rem 0;">width = solo contenido</p>
+                        <div class="code-block" style="margin: 0;">
+                            <code>
+<span class="property">width</span>: <span class="value">200px</span>;<br>
+<span class="property">padding</span>: <span class="value">20px</span>;<br>
+<span class="property">border</span>: <span class="value">5px</span>;<br>
+<span class="comment">/* Ancho real: 250px */</span>
+                            </code>
+                        </div>
+                    </div>
+                    <div class="info-card" style="border-color: var(--secondary);">
+                        <h3>border-box ✓ Recomendado</h3>
+                        <p style="margin: 1rem 0;">width = contenido + padding + border</p>
+                        <div class="code-block" style="margin: 0;">
+                            <code>
+<span class="property">box-sizing</span>: <span class="value">border-box</span>;<br>
+<span class="property">width</span>: <span class="value">200px</span>;<br>
+<span class="property">padding</span>: <span class="value">20px</span>;<br>
+<span class="comment">/* Ancho real: 200px */</span>
+                            </code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="max-width: 800px; margin: 1rem auto;">
+                    <strong>Tip profesional:</strong> Siempre usa <code style="color: var(--secondary);">* { box-sizing: border-box; }</code> al inicio de tu CSS.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Tipos de Display -->
+        <div class="slide" data-slide="7">
+            <div class="slide-content">
+                <h2 class="slide-title">Tipos de Display</h2>
+                <p class="slide-text" style="margin-bottom: 2rem;">La propiedad <code style="color: var(--secondary);">display</code> define cómo se comporta cada caja:</p>
+                
+                <div class="display-demo" style="max-width: 800px; margin: 0 auto;">
+                    <div class="display-row">
+                        <span class="display-label">block:</span>
+                        <div class="block-demo">Ocupa todo el ancho disponible</div>
+                    </div>
+                    <div class="display-row">
+                        <span class="display-label">inline:</span>
+                        <span class="inline-demo">Solo el ancho</span>
+                        <span class="inline-demo">de su contenido</span>
+                        <span class="inline-demo">en línea</span>
+                    </div>
+                    <div class="display-row">
+                        <span class="display-label">inline-block:</span>
+                        <span class="inline-block-demo">Combina ambos</span>
+                        <span class="inline-block-demo">comportamientos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Tabla comparativa -->
+        <div class="slide" data-slide="8">
+            <div class="slide-content">
+                <h2 class="slide-title">Block vs Inline vs Inline-block</h2>
+                
+                <table class="comparison-table" style="max-width: 900px; margin: 1rem auto;">
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>Block</th>
+                            <th>Inline</th>
+                            <th>Inline-block</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ocupa todo el ancho</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                            <td style="color: var(--accent);">✗ No</td>
+                            <td style="color: var(--accent);">✗ No</td>
+                        </tr>
+                        <tr>
+                            <td>Nueva línea</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                            <td style="color: var(--accent);">✗ No</td>
+                            <td style="color: var(--accent);">✗ No</td>
+                        </tr>
+                        <tr>
+                            <td>Acepta width/height</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                            <td style="color: var(--accent);">✗ No</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                        </tr>
+                        <tr>
+                            <td>Margin vertical</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                            <td style="color: var(--accent);">✗ Colapsa</td>
+                            <td style="color: var(--secondary);">✓ Sí</td>
+                        </tr>
+                        <tr>
+                            <td>Ejemplos</td>
+                            <td>div, p, h1</td>
+                            <td>span, a, strong</td>
+                            <td>img, button</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 9: Demo 1 -->
+        <div class="slide" data-slide="9">
+            <div class="slide-content">
+                <div class="demo-badge">🔴 DEMO EN VIVO</div>
+                <h2 class="slide-title">Construyamos una Card de Usuario</h2>
+                <p class="slide-text" style="margin-bottom: 2rem;">Aplicaremos el modelo de cajas paso a paso</p>
+                
+                <div class="grid-2" style="max-width: 900px;">
+                    <div class="info-card">
+                        <h3>Estructura HTML</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Contenedor principal (.card)</li>
+                            <li>• Imagen de perfil</li>
+                            <li>• Nombre y cargo</li>
+                            <li>• Botones de redes sociales</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>CSS a aplicar</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• box-sizing: border-box</li>
+                            <li>• padding y margin</li>
+                            <li>• border y border-radius</li>
+                            <li>• display: inline-block</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 2rem; color: var(--secondary); font-size: 1.1rem;">⏱️ Tiempo estimado: 20 minutos</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Actividad 1 -->
+        <div class="slide" data-slide="10">
+            <div class="slide-content">
+                <h2 class="slide-title" style="margin-bottom: 1.5rem;">Actividad #1: Ficha de Perfil</h2>
+                
+                <div class="activity-layout">
+                    <div class="timer-section">
+                        <h4 style="color: var(--secondary);">⏱️ TIEMPO</h4>
+                        <div class="timer-display" id="timer1">40:00</div>
+                        <div class="timer-buttons">
+                            <button class="timer-btn start" onclick="startTimer('timer1', 40)">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer('timer1', 40)">Reiniciar</button>
+                        </div>
+                        <p class="timer-status" id="status1">Listo para comenzar</p>
+                    </div>
+                    
+                    <div class="activity-card">
+                        <h3>📋 Instrucciones</h3>
+                        <ul>
+                            <li>Crear <code>index.html</code> con estructura de card: imagen, nombre, rol, botón</li>
+                            <li>En <code>style.css</code>, aplicar <code>box-sizing: border-box</code> global</li>
+                            <li>Usar padding, margin y border para espaciar elementos</li>
+                            <li>Probar <code>display: block</code> vs <code>inline-block</code></li>
+                            <li>Elegir layout fijo (px) o fluido (%)</li>
+                            <li>Validar con DevTools del navegador</li>
+                            <li>Comentar el código explicando cada decisión</li>
+                        </ul>
+                        
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <strong>Entregable:</strong> Archivo HTML + CSS funcionando en el navegador
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Descanso -->
+        <div class="slide" data-slide="11">
+            <div class="slide-content break-slide">
+                <div class="break-emoji">☕</div>
+                <h2 class="slide-title">Descanso</h2>
+                <p class="slide-subtitle">20 minutos para recargar energías</p>
+                
+                <div class="timer-section" style="max-width: 300px; margin: 2rem auto;">
+                    <div class="timer-display" id="timerBreak">20:00</div>
+                    <div class="timer-buttons">
+                        <button class="timer-btn start" onclick="startTimer('timerBreak', 20)">Iniciar</button>
+                        <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+                        <button class="timer-btn reset" onclick="resetTimer('timerBreak', 20)">Reiniciar</button>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 2rem; color: rgba(248,249,250,0.7);">Estiren las piernas, tomen agua, descansen la vista 👀</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: Bloque 2 -->
+        <div class="slide" data-slide="12">
+            <div class="slide-content section-slide">
+                <div class="section-number">02</div>
+                <h2 class="slide-title">Posicionamiento y Layout</h2>
+                <p class="slide-subtitle">Control avanzado de elementos</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Position -->
+        <div class="slide" data-slide="13">
+            <div class="slide-content">
+                <h2 class="slide-title">La Propiedad Position</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div>
+                        <div class="code-block">
+                            <code>
+<span class="property">position</span>: <span class="value">static</span>;   <span class="comment">/* Por defecto */</span><br>
+<span class="property">position</span>: <span class="value">relative</span>; <span class="comment">/* Relativo a sí mismo */</span><br>
+<span class="property">position</span>: <span class="value">absolute</span>; <span class="comment">/* Sale del flujo */</span><br>
+<span class="property">position</span>: <span class="value">fixed</span>;    <span class="comment">/* Fijo en pantalla */</span><br>
+<span class="property">position</span>: <span class="value">sticky</span>;   <span class="comment">/* Híbrido inteligente */</span>
+                            </code>
+                        </div>
+                        
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <strong>Propiedades complementarias:</strong><br>
+                            <code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code>, <code>z-index</code>
+                        </div>
+                    </div>
+                    
+                    <div class="position-demo">
+                        <div class="pos-static" style="display: inline-block; margin: 10px;">static</div>
+                        <div class="pos-relative">relative (top: 10px, left: 20px)</div>
+                        <div class="pos-absolute">absolute</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Z-index -->
+        <div class="slide" data-slide="14">
+            <div class="slide-content">
+                <h2 class="slide-title">Z-index: Capas y Apilamiento</h2>
+                
+                <div style="position: relative; height: 250px; max-width: 600px; margin: 2rem auto;">
+                    <div style="position: absolute; width: 200px; height: 150px; background: var(--primary); border-radius: 8px; top: 0; left: 50px; display: flex; align-items: center; justify-content: center; z-index: 1;">
+                        z-index: 1
+                    </div>
+                    <div style="position: absolute; width: 200px; height: 150px; background: var(--secondary); border-radius: 8px; top: 40px; left: 150px; display: flex; align-items: center; justify-content: center; color: var(--dark); z-index: 2;">
+                        z-index: 2
+                    </div>
+                    <div style="position: absolute; width: 200px; height: 150px; background: var(--accent); border-radius: 8px; top: 80px; left: 250px; display: flex; align-items: center; justify-content: center; z-index: 3;">
+                        z-index: 3
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="max-width: 700px; margin: 1rem auto;">
+                    <strong>Importante:</strong> <code>z-index</code> solo funciona en elementos con <code>position</code> diferente de <code>static</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Tipos de Layout -->
+        <div class="slide" data-slide="15">
+            <div class="slide-content">
+                <h2 class="slide-title">Tipos de Layout</h2>
+                
+                <div class="grid-4" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3 style="color: var(--accent);">Fijo</h3>
+                        <p>Medidas en <strong>px</strong></p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: rgba(248,249,250,0.6);">Predecible pero rígido</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 style="color: var(--secondary);">Fluido</h3>
+                        <p>Medidas en <strong>%</strong></p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: rgba(248,249,250,0.6);">Se adapta al contenedor</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 style="color: var(--primary);">Elástico</h3>
+                        <p>Medidas en <strong>em/rem</strong></p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: rgba(248,249,250,0.6);">Escala con la fuente</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 style="color: var(--warning);">Viewport</h3>
+                        <p>Medidas en <strong>vw/vh</strong></p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: rgba(248,249,250,0.6);">Relativo a la ventana</p>
+                    </div>
+                </div>
+                
+                <table class="comparison-table" style="max-width: 800px; margin: 2rem auto; font-size: 0.9rem;">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Ventajas</th>
+                            <th>Desventajas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fijo (px)</td>
+                            <td>Fácil de diseñar</td>
+                            <td>No responsivo</td>
+                        </tr>
+                        <tr>
+                            <td>Fluido (%)</td>
+                            <td>Muy adaptable</td>
+                            <td>Requiere más pruebas</td>
+                        </tr>
+                        <tr>
+                            <td>Elástico (rem)</td>
+                            <td>Accesible, escalable</td>
+                            <td>Puede ser inconsistente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 16: Flexbox -->
+        <div class="slide" data-slide="16">
+            <div class="slide-content">
+                <h2 class="slide-title">Flexbox: Layout Moderno</h2>
+                <p class="slide-text" style="margin-bottom: 1.5rem;">Sistema unidimensional para distribuir espacio y alinear elementos</p>
+                
+                <div class="code-block" style="max-width: 600px;">
+                    <code>
+<span class="selector">.contenedor</span> {<br>
+&nbsp;&nbsp;<span class="property">display</span>: <span class="value">flex</span>;<br>
+&nbsp;&nbsp;<span class="property">justify-content</span>: <span class="value">center</span>; <span class="comment">/* eje principal */</span><br>
+&nbsp;&nbsp;<span class="property">align-items</span>: <span class="value">center</span>;    <span class="comment">/* eje cruzado */</span><br>
+&nbsp;&nbsp;<span class="property">gap</span>: <span class="value">1rem</span>;                 <span class="comment">/* espacio entre items */</span><br>
+}
+                    </code>
+                </div>
+                
+                <div class="flex-demo-container">
+                    <div class="flex-item">Item 1</div>
+                    <div class="flex-item">Item 2</div>
+                    <div class="flex-item">Item 3</div>
+                </div>
+                
+                <div class="highlight-box" style="max-width: 700px; margin: 1rem auto;">
+                    <strong>¡El centrado perfecto!</strong> <code>display: flex; justify-content: center; align-items: center;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Grid -->
+        <div class="slide" data-slide="17">
+            <div class="slide-content">
+                <h2 class="slide-title">CSS Grid: Layout Bidimensional</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div>
+                        <div class="code-block">
+                            <code>
+<span class="selector">.grid</span> {<br>
+&nbsp;&nbsp;<span class="property">display</span>: <span class="value">grid</span>;<br>
+&nbsp;&nbsp;<span class="property">grid-template-columns</span>: <span class="value">1fr 1fr 1fr</span>;<br>
+&nbsp;&nbsp;<span class="property">gap</span>: <span class="value">1rem</span>;<br>
+}<br><br>
+<span class="comment">/* También: */</span><br>
+<span class="property">grid-template-columns</span>: <span class="value">repeat(3, 1fr)</span>;<br>
+<span class="property">grid-template-columns</span>: <span class="value">200px auto 200px</span>;
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;">
+                        <div style="background: var(--primary); padding: 1.5rem; border-radius: 8px; text-align: center;">1</div>
+                        <div style="background: var(--secondary); padding: 1.5rem; border-radius: 8px; text-align: center; color: var(--dark);">2</div>
+                        <div style="background: var(--accent); padding: 1.5rem; border-radius: 8px; text-align: center;">3</div>
+                        <div style="background: var(--warning); padding: 1.5rem; border-radius: 8px; text-align: center; color: var(--dark);">4</div>
+                        <div style="background: var(--primary); padding: 1.5rem; border-radius: 8px; text-align: center;">5</div>
+                        <div style="background: var(--secondary); padding: 1.5rem; border-radius: 8px; text-align: center; color: var(--dark);">6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Media Queries -->
+        <div class="slide" data-slide="18">
+            <div class="slide-content">
+                <h2 class="slide-title">Media Queries: Diseño Responsivo</h2>
+                
+                <div class="code-block" style="max-width: 700px;">
+                    <code>
+<span class="comment">/* Mobile first */</span><br>
+<span class="selector">.container</span> {<br>
+&nbsp;&nbsp;<span class="property">width</span>: <span class="value">100%</span>;<br>
+&nbsp;&nbsp;<span class="property">padding</span>: <span class="value">1rem</span>;<br>
+}<br><br>
+<span class="comment">/* Tablet: 768px+ */</span><br>
+<span class="keyword">@media</span> (<span class="property">min-width</span>: <span class="value">768px</span>) {<br>
+&nbsp;&nbsp;<span class="selector">.container</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="property">width</span>: <span class="value">750px</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="property">margin</span>: <span class="value">0 auto</span>;<br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+<span class="comment">/* Desktop: 1024px+ */</span><br>
+<span class="keyword">@media</span> (<span class="property">min-width</span>: <span class="value">1024px</span>) {<br>
+&nbsp;&nbsp;<span class="selector">.container</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="property">width</span>: <span class="value">960px</span>;<br>
+&nbsp;&nbsp;}<br>
+}
+                    </code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Breakpoints comunes -->
+        <div class="slide" data-slide="19">
+            <div class="slide-content">
+                <h2 class="slide-title">Breakpoints Comunes</h2>
+                
+                <div class="grid-3" style="max-width: 900px; margin: 2rem auto;">
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📱</div>
+                        <h3>Mobile</h3>
+                        <p style="font-family: 'Space Mono', monospace; color: var(--secondary); margin: 0.5rem 0;">0 - 767px</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">Diseño base</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📱</div>
+                        <h3>Tablet</h3>
+                        <p style="font-family: 'Space Mono', monospace; color: var(--secondary); margin: 0.5rem 0;">768px - 1023px</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">@media (min-width: 768px)</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💻</div>
+                        <h3>Desktop</h3>
+                        <p style="font-family: 'Space Mono', monospace; color: var(--secondary); margin: 0.5rem 0;">1024px+</p>
+                        <p style="font-size: 0.85rem; color: rgba(248,249,250,0.7);">@media (min-width: 1024px)</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="max-width: 700px; margin: 1rem auto;">
+                    <strong>Tip:</strong> Siempre diseña "mobile first" y añade complejidad con <code>min-width</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Demo 2 -->
+        <div class="slide" data-slide="20">
+            <div class="slide-content">
+                <div class="demo-badge">🔴 DEMO EN VIVO</div>
+                <h2 class="slide-title">Sección de Landing Responsiva</h2>
+                <p class="slide-text" style="margin-bottom: 2rem;">Construiremos una hero section adaptable</p>
+                
+                <div class="grid-2" style="max-width: 900px;">
+                    <div class="info-card">
+                        <h3>Estructura</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Header con navegación</li>
+                            <li>• Título y subtítulo</li>
+                            <li>• Botón CTA</li>
+                            <li>• Imagen o ícono</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>CSS a aplicar</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Flexbox para centrado</li>
+                            <li>• Unidades relativas (rem, %)</li>
+                            <li>• Media queries (mobile/desktop)</li>
+                            <li>• position para elementos</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 2rem; color: var(--secondary); font-size: 1.1rem;">⏱️ Tiempo estimado: 25 minutos</p>
+            </div>
+        </div>
+
+        <!-- Slide 21: Overflow -->
+        <div class="slide" data-slide="21">
+            <div class="slide-content">
+                <h2 class="slide-title">Overflow: Contenido Desbordado</h2>
+                
+                <div class="grid-4" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>visible</h3>
+                        <div style="width: 100%; height: 80px; background: rgba(45,91,255,0.2); overflow: visible; position: relative; border-radius: 4px; margin-top: 0.5rem;">
+                            <div style="position: absolute; width: 120%; height: 60px; background: var(--primary); top: 10px; border-radius: 4px;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Por defecto</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>hidden</h3>
+                        <div style="width: 100%; height: 80px; background: rgba(45,91,255,0.2); overflow: hidden; position: relative; border-radius: 4px; margin-top: 0.5rem;">
+                            <div style="position: absolute; width: 120%; height: 60px; background: var(--secondary); top: 10px; border-radius: 4px;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Oculta exceso</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>scroll</h3>
+                        <div style="width: 100%; height: 80px; background: rgba(45,91,255,0.2); overflow: scroll; position: relative; border-radius: 4px; margin-top: 0.5rem;">
+                            <div style="width: 200%; height: 60px; background: var(--accent); border-radius: 4px;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Siempre scroll</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>auto</h3>
+                        <div style="width: 100%; height: 80px; background: rgba(45,91,255,0.2); overflow: auto; position: relative; border-radius: 4px; margin-top: 0.5rem;">
+                            <div style="width: 200%; height: 60px; background: var(--warning); border-radius: 4px;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Scroll si necesita</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Buenas prácticas -->
+        <div class="slide" data-slide="22">
+            <div class="slide-content">
+                <h2 class="slide-title">Buenas Prácticas</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card" style="border-color: var(--secondary);">
+                        <h3 style="color: var(--secondary);">✓ Hacer</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.4rem 0;">• Usar <code>box-sizing: border-box</code> global</li>
+                            <li style="padding: 0.4rem 0;">• Preferir unidades relativas (rem, %)</li>
+                            <li style="padding: 0.4rem 0;">• Diseñar mobile first</li>
+                            <li style="padding: 0.4rem 0;">• Usar Flexbox/Grid para layouts</li>
+                            <li style="padding: 0.4rem 0;">• Probar en múltiples dispositivos</li>
+                            <li style="padding: 0.4rem 0;">• Mantener sistema de espaciado consistente</li>
+                        </ul>
+                    </div>
+                    <div class="info-card" style="border-color: var(--accent);">
+                        <h3 style="color: var(--accent);">✗ Evitar</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.4rem 0;">• Tamaños fijos en px para todo</li>
+                            <li style="padding: 0.4rem 0;">• Floats para layout (obsoleto)</li>
+                            <li style="padding: 0.4rem 0;">• Position absolute excesivo</li>
+                            <li style="padding: 0.4rem 0;">• Ignorar el colapso de márgenes</li>
+                            <li style="padding: 0.4rem 0;">• No usar reset CSS</li>
+                            <li style="padding: 0.4rem 0;">• Olvidar probar en móviles</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: DevTools -->
+        <div class="slide" data-slide="23">
+            <div class="slide-content">
+                <h2 class="slide-title">DevTools: Tu Mejor Aliado</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>🔍 Inspeccionar Elementos</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Click derecho → "Inspeccionar"</li>
+                            <li>• Ver modelo de cajas visual</li>
+                            <li>• Modificar CSS en vivo</li>
+                            <li>• Ver estilos computados</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>📱 Modo Responsivo</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Ctrl+Shift+M (toggle)</li>
+                            <li>• Simular diferentes dispositivos</li>
+                            <li>• Probar breakpoints</li>
+                            <li>• Ver media queries activas</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="max-width: 700px; margin: 1rem auto;">
+                    <strong>Shortcut:</strong> <kbd>F12</kbd> o <kbd>Ctrl+Shift+I</kbd> para abrir DevTools
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Actividad 2 -->
+        <div class="slide" data-slide="24">
+            <div class="slide-content">
+                <h2 class="slide-title" style="margin-bottom: 1.5rem;">Actividad #2: Sección Adaptable</h2>
+                
+                <div class="activity-layout">
+                    <div class="timer-section">
+                        <h4 style="color: var(--secondary);">⏱️ TIEMPO</h4>
+                        <div class="timer-display" id="timer2">30:00</div>
+                        <div class="timer-buttons">
+                            <button class="timer-btn start" onclick="startTimer('timer2', 30)">Iniciar</button>
+                            <button class="timer-btn pause" onclick="pauseTimer('timer2')">Pausar</button>
+                            <button class="timer-btn reset" onclick="resetTimer('timer2', 30)">Reiniciar</button>
+                        </div>
+                        <p class="timer-status" id="status2">Listo para comenzar</p>
+                    </div>
+                    
+                    <div class="activity-card">
+                        <h3>📋 Instrucciones</h3>
+                        <ul>
+                            <li>Crear sección con: título, subtítulo, imagen/ícono, botón</li>
+                            <li>Aplicar modelo de cajas (box-sizing, padding, margin, border)</li>
+                            <li>Usar <code>display: flex</code> para centrar y alinear</li>
+                            <li>Definir unidades relativas (%, rem, vw, vh)</li>
+                            <li>Agregar media queries para mobile/tablet/desktop</li>
+                            <li>Usar position y z-index si necesitas elementos decorativos</li>
+                            <li>Validar en navegador con diferentes tamaños</li>
+                        </ul>
+                        
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <strong>Bonus:</strong> Añade una animación de hover al botón
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Problemas comunes -->
+        <div class="slide" data-slide="25">
+            <div class="slide-content">
+                <h2 class="slide-title">Problemas Comunes y Soluciones</h2>
+                
+                <div class="grid-2" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>❌ Colapso de márgenes</h3>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">Márgenes verticales se fusionan</p>
+                        <p style="color: var(--secondary); font-size: 0.9rem;"><strong>Solución:</strong> Usar padding o display: flex</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>❌ Elemento se desborda</h3>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">Contenido sale de su caja</p>
+                        <p style="color: var(--secondary); font-size: 0.9rem;"><strong>Solución:</strong> overflow: hidden/auto</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>❌ Ancho inesperado</h3>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">Caja más grande de lo esperado</p>
+                        <p style="color: var(--secondary); font-size: 0.9rem;"><strong>Solución:</strong> box-sizing: border-box</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>❌ Centrado vertical</h3>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">No funciona con margin: auto</p>
+                        <p style="color: var(--secondary); font-size: 0.9rem;"><strong>Solución:</strong> Flexbox con align-items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Resumen -->
+        <div class="slide" data-slide="26">
+            <div class="slide-content">
+                <h2 class="slide-title">Resumen de la Clase</h2>
+                
+                <div class="grid-3" style="max-width: 1000px; margin: 2rem auto;">
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📦</div>
+                        <h3>Modelo de Cajas</h3>
+                        <p style="font-size: 0.9rem;">content, padding, border, margin + box-sizing</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+                        <h3>Posicionamiento</h3>
+                        <p style="font-size: 0.9rem;">static, relative, absolute, fixed, sticky</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                        <h3>Display</h3>
+                        <p style="font-size: 0.9rem;">block, inline, inline-block, flex, grid</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📐</div>
+                        <h3>Layouts</h3>
+                        <p style="font-size: 0.9rem;">fijo, fluido, elástico, viewport</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+                        <h3>Responsivo</h3>
+                        <p style="font-size: 0.9rem;">media queries, mobile first, breakpoints</p>
+                    </div>
+                    <div class="info-card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛠️</div>
+                        <h3>DevTools</h3>
+                        <p style="font-size: 0.9rem;">inspección, debug, pruebas responsivas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 27: Próximos pasos -->
+        <div class="slide" data-slide="27">
+            <div class="slide-content">
+                <h2 class="slide-title">Próximos Pasos</h2>
+                
+                <div class="grid-2" style="max-width: 900px; margin: 2rem auto;">
+                    <div class="info-card">
+                        <h3>📚 Para practicar</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Recrear layouts de sitios populares</li>
+                            <li>• Practicar Flexbox en flexboxfroggy.com</li>
+                            <li>• Practicar Grid en cssgridgarden.com</li>
+                            <li>• Construir componentes desde cero</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>🔜 Próxima clase</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Bootstrap 4 como framework CSS</li>
+                            <li>• Sistema de grillas predefinido</li>
+                            <li>• Componentes listos para usar</li>
+                            <li>• Utilidades responsivas</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="max-width: 700px; margin: 2rem auto; text-align: center;">
+                    <strong>Recursos:</strong> MDN Web Docs · CSS-Tricks · freeCodeCamp
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 28: Cierre -->
+        <div class="slide" data-slide="28">
+            <div class="slide-content section-slide">
+                <h2 class="slide-title" style="font-size: 3rem;">¡Gracias!</h2>
+                <p class="slide-subtitle">¿Preguntas?</p>
+                
+                <div style="margin-top: 3rem;">
+                    <p style="color: rgba(248,249,250,0.7);">Recuerden subir su actividad antes de la próxima clase</p>
+                </div>
+                
+                <div style="margin-top: 2rem; font-size: 3rem;">🎉</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+        <button class="nav-btn prev" onclick="prevSlide()">← Anterior</button>
+        <button class="nav-btn next" onclick="nextSlide()">Siguiente →</button>
+    </div>
+
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint">
+        <kbd>←</kbd> <kbd>→</kbd> o <kbd>Space</kbd> para navegar
+    </div>
+
+    <!-- Audio for timer -->
+    <audio id="beepSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAAPZrdpWslABJ8xdK7fygABHLI1bB8IgAAd8rYsXcfAAB5ydWxeSEAAHnK1rF4HwABeMrVsXkgAAF4ytWweSAAAXjK1bB5IAABeMrUsHkgAAF4ytSweR8AAXnK1LB5HwABecnUsHofAAF5ydSveh8AAXnJ1K96HwABecnUr3ofAAF5ydSveh8AAXnJ0696HwABecnTr3ofAAF5yNOveh8AAXnI0695HwABesjTr3kfAAF6yNKveR8AAXrI0q55HwABesjSrnkeAAF7yNKueB4AAXvI0q14HgABe8fSrXgeAAF7x9GteB4AAXvH0a14HgABe8fRrHgdAAF8x9GseB0AAXzH0ax3HQABfMfQrHcdAAF8xtCsdx0AAXzG0Kt3HQABfcbQq3cdAAF9xtCrdh0AAX3Gz6t2HAABfcbPq3YcAAF9xs+qdhwAAX7Fz6p2HAABfsTOqnUcAAF+xM6qdRsAAX7EzqpzGwABf8TOqXMbAAF/xM2pcxsAAX/EzalzGgABf8TNqXIaAAGAw82ochkAAYDDzKhyGQABgMPMqHEZAAGAwsyocRkAAYHCzKdxGAABgcLLp3AYAAGB" type="audio/wav">
+    </audio>
+
+    <script>
+        // Slide Management
+        let currentSlide = 1;
+        const totalSlides = 28;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        function updateSlide() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Show current slide
+            document.querySelector(`[data-slide="${currentSlide}"]`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('currentSlide').textContent = currentSlide;
+            
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+        
+        // Timer Management
+        const timers = {};
+        
+        function startTimer(timerId, minutes) {
+            if (timers[timerId] && timers[timerId].running) return;
+            
+            const display = document.getElementById(timerId);
+            const statusEl = document.getElementById('status' + timerId.replace('timer', ''));
+            
+            if (!timers[timerId]) {
+                timers[timerId] = {
+                    remaining: minutes * 60,
+                    running: false,
+                    interval: null
+                };
+            }
+            
+            timers[timerId].running = true;
+            if (statusEl) statusEl.textContent = 'En progreso...';
+            
+            timers[timerId].interval = setInterval(() => {
+                if (timers[timerId].remaining <= 0) {
+                    clearInterval(timers[timerId].interval);
+                    timers[timerId].running = false;
+                    display.textContent = '00:00';
+                    display.classList.remove('warning');
+                    display.classList.add('danger');
+                    if (statusEl) statusEl.textContent = '¡Tiempo terminado!';
+                    
+                    // Play beep sound
+                    const beep = document.getElementById('beepSound');
+                    beep.play().catch(() => {});
+                    
+                    return;
+                }
+                
+                timers[timerId].remaining--;
+                const mins = Math.floor(timers[timerId].remaining / 60);
+                const secs = timers[timerId].remaining % 60;
+                display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                // Visual alerts
+                if (timers[timerId].remaining <= 60) {
+                    display.classList.remove('warning');
+                    display.classList.add('danger');
+                } else if (timers[timerId].remaining <= 300) {
+                    display.classList.add('warning');
+                    display.classList.remove('danger');
+                } else {
+                    display.classList.remove('warning', 'danger');
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer(timerId) {
+            if (timers[timerId] && timers[timerId].running) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId].running = false;
+                const statusEl = document.getElementById('status' + timerId.replace('timer', ''));
+                if (statusEl) statusEl.textContent = 'Pausado';
+            }
+        }
+        
+        function resetTimer(timerId, minutes) {
+            if (timers[timerId]) {
+                clearInterval(timers[timerId].interval);
+                timers[timerId] = null;
+            }
+            
+            const display = document.getElementById(timerId);
+            display.textContent = `${minutes.toString().padStart(2, '0')}:00`;
+            display.classList.remove('warning', 'danger');
+            
+            const statusEl = document.getElementById('status' + timerId.replace('timer', ''));
+            if (statusEl) statusEl.textContent = 'Listo para comenzar';
+        }
+        
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>

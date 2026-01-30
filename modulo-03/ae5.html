@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap 4 - Framework CSS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2D5BFF;
+      --secondary: #00D4AA;
+      --accent: #FF6B6B;
+      --dark: #1A1A2E;
+      --light: #F8F9FA;
+      --warning: #FFA500;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: linear-gradient(135deg, var(--dark) 0%, #0F0F1E 100%);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .presentation-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      padding: 1.5rem 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slide-counter {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--secondary);
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+      margin: 0 2rem;
+      flex: 1;
+      max-width: 400px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.3s ease;
+      box-shadow: 0 0 20px rgba(45, 91, 255, 0.6);
+    }
+
+    .slide-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      animation: slideIn 0.6s ease-out;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--light);
+    }
+
+    h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--secondary);
+    }
+
+    p, li {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      padding-left: 2rem;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    .two-columns {
+      column-count: 2;
+      column-gap: 3rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+    }
+
+    .navigation {
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      border: 2px solid var(--primary);
+      background: transparent;
+      color: var(--light);
+      font-family: 'Sora', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(45, 91, 255, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn:disabled:hover {
+      transform: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .activity-layout {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+
+    .timer-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timer-display {
+      font-family: 'Space Mono', monospace;
+      font-size: 6rem;
+      font-weight: 700;
+      margin: 2rem 0;
+      text-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
+      transition: color 0.3s ease;
+    }
+
+    .timer-display.normal {
+      color: var(--secondary);
+    }
+
+    .timer-display.warning {
+      color: var(--warning);
+    }
+
+    .timer-display.critical {
+      color: var(--accent);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .timer-btn {
+      padding: 0.6rem 1.5rem;
+      border: 2px solid var(--secondary);
+      background: transparent;
+      color: var(--light);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .timer-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    .timer-status {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: var(--light);
+      text-align: center;
+    }
+
+    .activity-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .demo-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: linear-gradient(135deg, var(--accent), #FF8E53);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+
+    .break-slide {
+      text-align: center;
+    }
+
+    .break-slide h1 {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+    }
+
+    .break-slide .timer-display {
+      font-size: 8rem;
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--secondary);
+    }
+
+    .highlight {
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    .steps-list {
+      counter-reset: step-counter;
+    }
+
+    .steps-list li {
+      counter-increment: step-counter;
+    }
+
+    .steps-list li::before {
+      content: counter(step-counter);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(45, 91, 255, 0.2);
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="slide-container" id="slidesContainer">
+      
+      <!-- Slide 1: Portada -->
+      <div class="slide active">
+        <div style="text-align: center;">
+          <h1 style="font-size: 4.5rem; margin-bottom: 2rem;">Bootstrap 4</h1>
+          <h2 style="color: var(--secondary);">Framework CSS para desarrollo web moderno</h2>
+          <p style="font-size: 1.5rem; margin-top: 3rem; opacity: 0.8;">Duración: 3 horas</p>
+        </div>
+      </div>
+
+      <!-- Slide 2: Objetivos -->
+      <div class="slide">
+        <h2>Objetivos de la clase</h2>
+        <ul style="margin-top: 2rem;">
+          <li>Comprender qué es y para qué se utiliza un framework CSS</li>
+          <li>Dominar el sistema de grillas de Bootstrap 4</li>
+          <li>Construir layouts responsivos sin escribir CSS</li>
+          <li>Utilizar componentes dinámicos (modales, carruseles)</li>
+          <li>Aplicar clases utilitarias para estilos comunes</li>
+          <li>Personalizar Bootstrap con SASS</li>
+        </ul>
+      </div>
+
+      <!-- Slide 3: ¿Qué es un Framework CSS? -->
+      <div class="slide">
+        <h2>¿Qué es un Framework CSS?</h2>
+        <p style="margin-top: 2rem; font-size: 1.4rem; line-height: 1.8;">
+          Una <span class="highlight">colección de herramientas, convenciones, clases y componentes</span> diseñados para facilitar la construcción de sitios web.
+        </p>
+        <div class="grid-2" style="margin-top: 3rem;">
+          <div class="card">
+            <h3>✓ Coherencia visual</h3>
+            <p>Estilo uniforme en todo el sitio</p>
+          </div>
+          <div class="card">
+            <h3>⚡ Velocidad</h3>
+            <p>Desarrollo rápido y eficiente</p>
+          </div>
+          <div class="card">
+            <h3>📱 Responsividad</h3>
+            <p>Adaptación automática a dispositivos</p>
+          </div>
+          <div class="card">
+            <h3>🔧 Mantenibilidad</h3>
+            <p>Código organizado y escalable</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Bootstrap vs Otros -->
+      <div class="slide">
+        <h2>Frameworks CSS populares</h2>
+        <div class="grid-2" style="margin-top: 2rem;">
+          <div class="card">
+            <h3>Bootstrap</h3>
+            <p>El más popular. Completo, bien documentado, amplia comunidad.</p>
+            <div style="margin-top: 1rem;">
+              <span class="tag">Grilla Flexbox</span>
+              <span class="tag">Componentes JS</span>
+              <span class="tag">SASS</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Tailwind CSS</h3>
+            <p>Utilidades first. Personalización extrema.</p>
+            <div style="margin-top: 1rem;">
+              <span class="tag">Utility-first</span>
+              <span class="tag">JIT</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Bulma</h3>
+            <p>Moderno, basado en Flexbox. Fácil y liviano.</p>
+            <div style="margin-top: 1rem;">
+              <span class="tag">Solo CSS</span>
+              <span class="tag">Mobile-first</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Foundation</h3>
+            <p>Potente para proyectos empresariales.</p>
+            <div style="margin-top: 1rem;">
+              <span class="tag">Enterprise</span>
+              <span class="tag">Avanzado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Demo 1 -->
+      <div class="slide">
+        <span class="demo-badge">🎯 DEMO EN VIVO #1</span>
+        <h2>Estructura básica con Bootstrap</h2>
+        <p style="font-size: 1.4rem; margin-top: 1.5rem;">
+          Vamos a crear nuestro primer documento HTML con Bootstrap CDN y explorar el sistema de contenedores y grillas.
+        </p>
+        <ul class="steps-list" style="margin-top: 2rem;">
+          <li>Crear estructura HTML5 básica</li>
+          <li>Enlazar Bootstrap desde CDN</li>
+          <li>Crear un <code>container</code></li>
+          <li>Agregar una <code>row</code> con columnas</li>
+          <li>Probar la responsividad</li>
+        </ul>
+        <p style="margin-top: 2rem; font-size: 1.2rem; opacity: 0.8;">⏱️ Duración: ~15 minutos</p>
+      </div>
+
+      <!-- Slide 6: Sistema de Grillas -->
+      <div class="slide">
+        <h2>Sistema de Grillas Bootstrap</h2>
+        <div style="margin-top: 2rem;">
+          <h3>Estructura base</h3>
+          <ul style="margin-top: 1rem;">
+            <li><code>.container</code> o <code>.container-fluid</code> - Contenedor principal</li>
+            <li><code>.row</code> - Fila que agrupa columnas</li>
+            <li><code>.col-*</code> - Columnas (sistema de 12 unidades)</li>
+          </ul>
+          <h3 style="margin-top: 2rem;">Breakpoints responsivos</h3>
+          <div class="grid-2" style="margin-top: 1rem;">
+            <div class="card">
+              <code>col-sm-*</code>
+              <p style="font-size: 1.1rem; margin-top: 0.5rem;">≥ 576px</p>
+            </div>
+            <div class="card">
+              <code>col-md-*</code>
+              <p style="font-size: 1.1rem; margin-top: 0.5rem;">≥ 768px</p>
+            </div>
+            <div class="card">
+              <code>col-lg-*</code>
+              <p style="font-size: 1.1rem; margin-top: 0.5rem;">≥ 992px</p>
+            </div>
+            <div class="card">
+              <code>col-xl-*</code>
+              <p style="font-size: 1.1rem; margin-top: 0.5rem;">≥ 1200px</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Clases Utilitarias -->
+      <div class="slide">
+        <h2>Clases Utilitarias Bootstrap</h2>
+        <div class="two-columns" style="margin-top: 2rem;">
+          <div>
+            <h3>Espaciado</h3>
+            <ul>
+              <li><code>m-*</code> - Margin</li>
+              <li><code>p-*</code> - Padding</li>
+              <li><code>mt-*, mb-*</code> - Top/Bottom</li>
+              <li><code>mx-*, my-*</code> - Horizontal/Vertical</li>
+            </ul>
+            <h3 style="margin-top: 1.5rem;">Flexbox</h3>
+            <ul>
+              <li><code>d-flex</code> - Display flex</li>
+              <li><code>justify-content-*</code></li>
+              <li><code>align-items-*</code></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Texto</h3>
+            <ul>
+              <li><code>text-center</code></li>
+              <li><code>text-primary</code></li>
+              <li><code>font-weight-bold</code></li>
+            </ul>
+            <h3 style="margin-top: 1.5rem;">Visibilidad</h3>
+            <ul>
+              <li><code>d-none</code> - Ocultar</li>
+              <li><code>d-md-block</code> - Mostrar en MD+</li>
+            </ul>
+            <h3 style="margin-top: 1.5rem;">Colores</h3>
+            <ul>
+              <li><code>bg-primary, bg-light</code></li>
+              <li><code>text-success, text-danger</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Demo 2 -->
+      <div class="slide">
+        <span class="demo-badge">🎯 DEMO EN VIVO #2</span>
+        <h2>Landing Section Completa</h2>
+        <p style="font-size: 1.4rem; margin-top: 1.5rem;">
+          Construiremos una sección de bienvenida profesional usando grillas, componentes y clases utilitarias.
+        </p>
+        <ul class="steps-list" style="margin-top: 2rem;">
+          <li>Crear container con row y columnas <code>col-md-6</code></li>
+          <li>Agregar título, párrafo y botón en una columna</li>
+          <li>Insertar imagen responsive en la otra columna</li>
+          <li>Aplicar clases de espaciado y alineación</li>
+          <li>Verificar responsividad en mobile y desktop</li>
+        </ul>
+        <p style="margin-top: 2rem; font-size: 1.2rem; opacity: 0.8;">⏱️ Duración: ~20 minutos</p>
+      </div>
+
+      <!-- Slide 9: Actividad 1 -->
+      <div class="slide">
+        <h2>Actividad #1: Tu Primera Landing</h2>
+        <div class="activity-layout">
+          <div class="timer-box">
+            <h3 style="color: var(--secondary);">Cronómetro</h3>
+            <div class="timer-display normal" id="timer1">40:00</div>
+            <div class="timer-controls">
+              <button class="timer-btn" onclick="startTimer(1, 40)">Iniciar</button>
+              <button class="timer-btn" onclick="pauseTimer(1)">Pausar</button>
+              <button class="timer-btn" onclick="resetTimer(1, 40)">Reiniciar</button>
+            </div>
+            <div class="timer-status" id="status1">Listo para comenzar</div>
+          </div>
+          <div class="activity-card">
+            <h3>Consigna</h3>
+            <p>Implementa una landing page básica utilizando Bootstrap 4.</p>
+            <h3 style="margin-top: 1.5rem;">Requisitos</h3>
+            <ul>
+              <li>Crear archivo <code>index.html</code> con Bootstrap CDN</li>
+              <li>Usar <code>container → row → col-md-6</code></li>
+              <li>Incluir: título (<code>h1</code>), párrafo, botón (<code>.btn .btn-primary</code>)</li>
+              <li>Agregar imagen responsive (<code>.img-fluid</code>)</li>
+              <li>Aplicar clases de alineación y espaciado</li>
+              <li>Verificar responsividad</li>
+              <li>Comentar el código explicando cada clase</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 10: Descanso -->
+      <div class="slide break-slide">
+        <h1>☕ Descanso</h1>
+        <div class="timer-display normal" id="timer-break">20:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn" onclick="startTimer('break', 20)">Iniciar</button>
+          <button class="timer-btn" onclick="pauseTimer('break')">Pausar</button>
+          <button class="timer-btn" onclick="resetTimer('break', 20)">Reiniciar</button>
+        </div>
+        <p style="font-size: 1.5rem; margin-top: 3rem; opacity: 0.8;">Regresamos en 20 minutos</p>
+      </div>
+
+      <!-- Slide 11: Componentes Dinámicos -->
+      <div class="slide">
+        <h2>Componentes Dinámicos Bootstrap</h2>
+        <p style="font-size: 1.4rem; margin-top: 1rem;">
+          Bootstrap incluye componentes con JavaScript para añadir interactividad sin código adicional.
+        </p>
+        <div class="grid-2" style="margin-top: 2rem;">
+          <div class="card">
+            <h3>🎠 Carrusel</h3>
+            <p>Slider de imágenes rotativas con controles e indicadores</p>
+          </div>
+          <div class="card">
+            <h3>🪟 Modal</h3>
+            <p>Ventana emergente para contenido adicional</p>
+          </div>
+          <div class="card">
+            <h3>💬 Tooltip</h3>
+            <p>Información al pasar el cursor sobre un elemento</p>
+          </div>
+          <div class="card">
+            <h3>📝 Popover</h3>
+            <p>Cuadro de información al hacer clic</p>
+          </div>
+        </div>
+        <p style="margin-top: 2rem; font-size: 1.2rem; opacity: 0.9;">
+          <span class="highlight">Importante:</span> Requieren jQuery y JavaScript de Bootstrap
+        </p>
+      </div>
+
+      <!-- Slide 12: Demo 3 -->
+      <div class="slide">
+        <span class="demo-badge">🎯 DEMO EN VIVO #3</span>
+        <h2>Modal + Carrusel + Tooltips</h2>
+        <p style="font-size: 1.4rem; margin-top: 1.5rem;">
+          Construiremos una sección interactiva con todos los componentes dinámicos de Bootstrap.
+        </p>
+        <ul class="steps-list" style="margin-top: 2rem;">
+          <li>Enlazar jQuery y Bootstrap JS</li>
+          <li>Crear un carrusel con 3 imágenes e indicadores</li>
+          <li>Agregar botón que active un modal</li>
+          <li>Implementar tooltips y popovers</li>
+          <li>Inicializar componentes con JavaScript</li>
+          <li>Aplicar utilidades de borde y color</li>
+        </ul>
+        <p style="margin-top: 2rem; font-size: 1.2rem; opacity: 0.8;">⏱️ Duración: ~25 minutos</p>
+      </div>
+
+      <!-- Slide 13: Personalización SASS -->
+      <div class="slide">
+        <h2>Personalización con SASS</h2>
+        <p style="font-size: 1.4rem; margin-top: 1rem;">
+          Bootstrap permite modificar variables SASS para personalizar colores, tipografías y más.
+        </p>
+        <div style="margin-top: 2rem; background: rgba(0, 0, 0, 0.3); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <code style="display: block; line-height: 2; font-size: 1.2rem;">
+            // Variables personalizadas<br>
+            $primary: #4CAF50;<br>
+            $font-family-base: 'Roboto', sans-serif;<br>
+            $border-radius: 0.5rem;<br>
+            <br>
+            // Importar Bootstrap<br>
+            @import "bootstrap";
+          </code>
+        </div>
+        <p style="margin-top: 2rem; font-size: 1.2rem;">
+          Esto permite mantener la funcionalidad de Bootstrap con tu identidad visual única.
+        </p>
+      </div>
+
+      <!-- Slide 14: Actividad 2 -->
+      <div class="slide">
+        <h2>Actividad #2: Sección Dinámica</h2>
+        <div class="activity-layout">
+          <div class="timer-box">
+            <h3 style="color: var(--secondary);">Cronómetro</h3>
+            <div class="timer-display normal" id="timer2">30:00</div>
+            <div class="timer-controls">
+              <button class="timer-btn" onclick="startTimer(2, 30)">Iniciar</button>
+              <button class="timer-btn" onclick="pauseTimer(2)">Pausar</button>
+              <button class="timer-btn" onclick="resetTimer(2, 30)">Reiniciar</button>
+            </div>
+            <div class="timer-status" id="status2">Listo para comenzar</div>
+          </div>
+          <div class="activity-card">
+            <h3>Consigna</h3>
+            <p>Crea una sección con modal, carrusel y tooltips.</p>
+            <h3 style="margin-top: 1.5rem;">Requisitos</h3>
+            <ul>
+              <li>Enlazar jQuery y Bootstrap JS</li>
+              <li>Crear carrusel con 3 imágenes mínimo</li>
+              <li>Botón que active modal con <code>data-toggle="modal"</code></li>
+              <li>Agregar tooltips y popovers</li>
+              <li>Inicializar con <code>$('[data-toggle="tooltip"]').tooltip()</code></li>
+              <li>Aplicar utilidades de espaciado y color</li>
+              <li>Comentar el código</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 15: Buenas Prácticas -->
+      <div class="slide">
+        <h2>Buenas Prácticas con Bootstrap</h2>
+        <div class="grid-2" style="margin-top: 2rem;">
+          <div class="card" style="border-color: var(--secondary);">
+            <h3>✓ Hacer</h3>
+            <ul>
+              <li>Usar el sistema de grillas correctamente</li>
+              <li>Aprovechar clases utilitarias</li>
+              <li>Personalizar con variables SASS</li>
+              <li>Mantener semántica HTML</li>
+              <li>Importar solo lo necesario</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color: var(--accent);">
+            <h3>✗ Evitar</h3>
+            <ul>
+              <li>Sobrescribir clases base directamente</li>
+              <li>Ignorar la responsividad</li>
+              <li>Cargar todo Bootstrap sin usar</li>
+              <li>Sobrecarga de clases en un elemento</li>
+              <li>Modificar archivos core de Bootstrap</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 16: Resumen -->
+      <div class="slide">
+        <h2>¿Qué aprendimos hoy?</h2>
+        <ul style="margin-top: 2rem; font-size: 1.4rem;">
+          <li>Qué es un framework CSS y cuándo usarlo</li>
+          <li>Sistema de grillas Bootstrap: contenedores, filas y columnas</li>
+          <li>Clases utilitarias para estilos sin escribir CSS</li>
+          <li>Componentes dinámicos: modal, carrusel, tooltips</li>
+          <li>Personalización con SASS</li>
+          <li>Buenas prácticas y errores comunes</li>
+        </ul>
+        <div style="margin-top: 3rem; text-align: center;">
+          <h3 style="color: var(--secondary); font-size: 2rem;">
+            ¡Excelente trabajo! 🎉
+          </h3>
+        </div>
+      </div>
+
+      <!-- Slide 17: Recursos -->
+      <div class="slide">
+        <h2>Recursos para continuar</h2>
+        <div class="grid-2" style="margin-top: 2rem;">
+          <div class="card">
+            <h3>📚 Documentación oficial</h3>
+            <p>getbootstrap.com</p>
+          </div>
+          <div class="card">
+            <h3>💡 Bootstrap Examples</h3>
+            <p>Ejemplos oficiales de layouts</p>
+          </div>
+          <div class="card">
+            <h3>🎨 Bootsnipp</h3>
+            <p>Galería de snippets comunitarios</p>
+          </div>
+          <div class="card">
+            <h3>❓ Stack Overflow</h3>
+            <p>Preguntas y respuestas</p>
+          </div>
+        </div>
+        <p style="margin-top: 2rem; font-size: 1.3rem; text-align: center;">
+          Practica creando proyectos reales para dominar Bootstrap 🚀
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <button class="btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+      <button class="btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+  </div>
+
+  <audio id="beepSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBiyJ1/LUgCsFHG7A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyI1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg9mt7wu2IdBiyJ1/LUfywGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+mt7wu2IdBiyJ1/LUfiwGHG3A7+OZSA0PVqzn77BdGAg+g==" type="audio/wav">
+  </audio>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const timers = {};
+
+    // Initialize
+    document.getElementById('totalSlides').textContent = totalSlides;
+    updateSlide();
+
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+
+      document.getElementById('currentSlide').textContent = currentSlide + 1;
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+      
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    function changeSlide(direction) {
+      currentSlide += direction;
+      if (currentSlide < 0) currentSlide = 0;
+      if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+      updateSlide();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        if (currentSlide < totalSlides - 1) changeSlide(1);
+      } else if (e.key === 'ArrowLeft') {
+        if (currentSlide > 0) changeSlide(-1);
+      }
+    });
+
+    // Timer functions
+    function startTimer(id, minutes) {
+      if (timers[id]?.interval) {
+        clearInterval(timers[id].interval);
+      }
+
+      if (!timers[id] || timers[id].isPaused) {
+        const startTime = timers[id]?.remaining || minutes * 60;
+        timers[id] = {
+          remaining: startTime,
+          interval: setInterval(() => updateTimer(id), 1000),
+          isPaused: false
+        };
+      }
+      
+      updateTimerDisplay(id);
+      updateTimerStatus(id, 'En progreso...');
+    }
+
+    function pauseTimer(id) {
+      if (timers[id]?.interval) {
+        clearInterval(timers[id].interval);
+        timers[id].isPaused = true;
+        updateTimerStatus(id, 'Pausado');
+      }
+    }
+
+    function resetTimer(id, minutes) {
+      if (timers[id]?.interval) {
+        clearInterval(timers[id].interval);
+      }
+      timers[id] = { remaining: minutes * 60, isPaused: false };
+      updateTimerDisplay(id);
+      updateTimerStatus(id, 'Listo para comenzar');
+    }
+
+    function updateTimer(id) {
+      if (!timers[id]) return;
+      
+      timers[id].remaining--;
+      updateTimerDisplay(id);
+
+      if (timers[id].remaining <= 0) {
+        clearInterval(timers[id].interval);
+        updateTimerStatus(id, '¡Tiempo completado!');
+        document.getElementById('beepSound').play();
+        return;
+      }
+
+      if (timers[id].remaining === 300) {
+        updateTimerStatus(id, '⚠️ 5 minutos restantes');
+      } else if (timers[id].remaining === 60) {
+        updateTimerStatus(id, '⚠️ ¡1 minuto restante!');
+      }
+    }
+
+    function updateTimerDisplay(id) {
+      const minutes = Math.floor(timers[id].remaining / 60);
+      const seconds = timers[id].remaining % 60;
+      const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      const element = document.getElementById(`timer${id === 'break' ? '-break' : id}`);
+      element.textContent = display;
+
+      // Update color based on time
+      element.classList.remove('normal', 'warning', 'critical');
+      if (timers[id].remaining > 300) {
+        element.classList.add('normal');
+      } else if (timers[id].remaining > 60) {
+        element.classList.add('warning');
+      } else {
+        element.classList.add('critical');
+      }
+    }
+
+    function updateTimerStatus(id, message) {
+      const statusElement = document.getElementById(`status${id}`);
+      if (statusElement) {
+        statusElement.textContent = message;
+      }
+    }
+  </script>
+</body>
+</html>

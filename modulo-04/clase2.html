@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arreglos, Ciclos y Funciones en JavaScript</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0F3460 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 99;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .slide-container {
+            height: 100vh;
+            padding-top: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        p, li {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul.two-columns {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-size: 1.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .activity-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .timer {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            position: sticky;
+            top: 100px;
+        }
+
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 6rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .timer-display.warning {
+            color: var(--warning);
+        }
+
+        .timer-display.danger {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                text-shadow: 0 0 40px rgba(255, 107, 107, 0.8);
+            }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        button {
+            font-family: 'Sora', sans-serif;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a45d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 91, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #00b894;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .activity-card h3 {
+            margin-top: 0;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        code {
+            font-family: 'Space Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .break-slide {
+            text-align: center;
+        }
+
+        .break-slide h1 {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: var(--warning);
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="slide-container" id="slideContainer">
+        <!-- Slide 1: Portada -->
+        <div class="slide active">
+            <h1>Arreglos, Ciclos y Funciones en JavaScript</h1>
+            <p class="subtitle">AE3 y AE4: Estructuras de datos, iteración y reutilización de código</p>
+            <div class="grid-2" style="margin-top: 3rem;">
+                <div class="card">
+                    <h3>Duración</h3>
+                    <p>3 horas (con descanso de 20 min)</p>
+                </div>
+                <div class="card">
+                    <h3>Modalidad</h3>
+                    <p>Demos en vivo + Ejercicios prácticos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Objetivos de la clase -->
+        <div class="slide">
+            <h2 style="margin-bottom: 1rem;">Objetivos de Aprendizaje</h2>
+            <ul class="objectives-list two-columns" style="font-size: 1.2rem; line-height: 1.6;">
+                <li>Entender qué son los arreglos y cómo se almacenan en JavaScript</li>
+                <li>Crear, modificar y recorrer arreglos de manera eficiente</li>
+                <li>Dominar los ciclos: for, while, do-while, forEach y map</li>
+                <li>Controlar el flujo con break y continue</li>
+                <li>Aplicar buenas prácticas en ciclos iterativos</li>
+                <li>Comprender qué son las funciones y su propósito</li>
+                <li>Identificar tipos de funciones: declaradas, anónimas y arrow</li>
+                <li>Manejar parámetros, valores de retorno y alcance de variables</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: ¿Qué es un Arreglo? -->
+        <div class="slide">
+            <h2>¿Qué es un Arreglo?</h2>
+            <div class="grid-2">
+                <div>
+                    <p>Un <span class="highlight">arreglo</span> es una estructura de datos que almacena múltiples valores en una secuencia indexada.</p>
+                    <h3 style="margin-top: 2rem;">Características:</h3>
+                    <ul>
+                        <li>Los índices comienzan en <code>0</code></li>
+                        <li>Son mutables (se pueden modificar)</li>
+                        <li>Pueden contener cualquier tipo de dato</li>
+                        <li>Organizados en posiciones numeradas</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>¿Para qué se usan?</h3>
+                    <ul>
+                        <li>Almacenar listas de usuarios</li>
+                        <li>Gestionar carritos de compras</li>
+                        <li>Procesar datos dinámicos</li>
+                        <li>Iterar sobre elementos de forma eficiente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Arreglos vs Objetos -->
+        <div class="slide">
+            <h2>Arreglos vs Objetos en JavaScript</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Arreglos</h3>
+                    <ul>
+                        <li>Índices numéricos secuenciales</li>
+                        <li>Orden garantizado</li>
+                        <li>Ideal para colecciones homogéneas</li>
+                        <li>Métodos: push(), pop(), map(), filter()</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Objetos</h3>
+                    <ul>
+                        <li>Claves de texto (strings)</li>
+                        <li>Sin orden garantizado</li>
+                        <li>Ideal para datos estructurados</li>
+                        <li>Pares clave-valor</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; text-align: center; color: var(--warning);">
+                <strong>Dato clave:</strong> Los arreglos son un tipo especial de objeto en JavaScript
+            </p>
+        </div>
+
+        <!-- Slide 5: DEMO - Arreglos Básicos -->
+        <div class="slide">
+            <span class="demo-badge">🔴 DEMO EN VIVO</span>
+            <h2>Creación y Manipulación de Arreglos</h2>
+            <p class="subtitle">Vamos a trabajar directamente con la consola del navegador</p>
+            <div class="">
+                <div class="card">
+                    <h3>Lo que veremos:</h3>
+                    <ul>
+                        <li>Declarar arreglos con []</li>
+                        <li>Acceder con índices</li>
+                        <li>Modificar valores</li>
+                        <li>push(), pop(), splice()</li>
+                        <li>Propiedad .length</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Actividad 1 - Carrito de Compras -->
+        <div class="slide">
+            <h2>Actividad 1: Carrito de Compras</h2>
+            <div class="activity-layout">
+                <div class="timer">
+                    <h3>Cronómetro</h3>
+                    <div class="timer-display" data-minutes="15">15:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary timer-start">Iniciar</button>
+                        <button class="btn-secondary timer-pause" disabled>Pausar</button>
+                        <button class="btn-danger timer-reset">Reiniciar</button>
+                    </div>
+                    <div class="timer-status">Listo para comenzar</div>
+                </div>
+                <div class="activity-card">
+                    <h3>Contexto</h3>
+                    <p>Estás trabajando en una tienda online y necesitas gestionar el carrito de compras de un cliente.</p>
+                    <h3>Consigna</h3>
+                    <ul>
+                        <li>Crea un arreglo con productos: ["Laptop", "Mouse", "Teclado", "Monitor"]</li>
+                        <li>Usa un ciclo <code>for</code> para recorrer el arreglo</li>
+                        <li>Imprime cada producto en la consola con <code>console.log()</code></li>
+                        <li><strong>Extra:</strong> Agrega un producto nuevo con push()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Ciclos en JavaScript -->
+        <div class="slide">
+            <h2>Ciclos de Repetición</h2>
+            <p class="subtitle">Herramientas para ejecutar código repetidamente</p>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Ciclo for</h3>
+                    <p>Ideal cuando conoces el número exacto de repeticiones</p>
+                    <pre><code>for (let i = 0; i < 5; i++) {
+  console.log(i);
+}</code></pre>
+                </div>
+                <div class="card">
+                    <h3>Ciclo while</h3>
+                    <p>Útil cuando no sabes cuántas repeticiones necesitas</p>
+                    <pre><code>let i = 0;
+while (i < 5) {
+  console.log(i);
+  i++;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: DEMO - Ciclos for y while -->
+        <div class="slide">
+            <span class="demo-badge">🔴 DEMO EN VIVO</span>
+            <h2>Recorriendo Arreglos con Ciclos</h2>
+            <p class="subtitle">Comparación práctica de for vs while</p>
+            <div class="">
+                <div class="card">
+                    <h3>Demostraremos:</h3>
+                    <ul>
+                        <li>Recorrer un arreglo con for</li>
+                        <li>Recorrer con while</li>
+                        <li>Comparar cuándo usar cada uno</li>
+                        <li>Uso de break y continue</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Actividad 2 - Filtrar Números Pares -->
+        <div class="slide">
+            <h2>Actividad 2: Filtrar Números Pares</h2>
+            <div class="activity-layout">
+                <div class="timer">
+                    <h3>Cronómetro</h3>
+                    <div class="timer-display" data-minutes="20">20:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary timer-start">Iniciar</button>
+                        <button class="btn-secondary timer-pause" disabled>Pausar</button>
+                        <button class="btn-danger timer-reset">Reiniciar</button>
+                    </div>
+                    <div class="timer-status">Listo para comenzar</div>
+                </div>
+                <div class="activity-card">
+                    <h3>Contexto</h3>
+                    <p>Necesitas extraer solo los números pares de una lista para mostrarlos al usuario.</p>
+                    <h3>Consigna</h3>
+                    <ul>
+                        <li>Crea un arreglo: <code>[1, 2, 3, 4, 5, 6, 7, 8]</code></li>
+                        <li>Usa el método <code>filter()</code> para obtener solo pares</li>
+                        <li>Muestra el resultado en consola</li>
+                        <li><strong>Pista:</strong> Un número es par si <code>numero % 2 === 0</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: DESCANSO -->
+        <div class="slide break-slide">
+            <h1>☕ Descanso</h1>
+            <div class="timer" style="max-width: 500px; margin: 2rem auto;">
+                <h2>Cronómetro</h2>
+                <div class="timer-display" data-minutes="20">20:00</div>
+                <div class="timer-controls">
+                    <button class="btn-primary timer-start">Iniciar</button>
+                    <button class="btn-secondary timer-pause" disabled>Pausar</button>
+                    <button class="btn-danger timer-reset">Reiniciar</button>
+                </div>
+                <div class="timer-status">Nos vemos en 20 minutos</div>
+            </div>
+        </div>
+
+        <!-- Slide 11: forEach y map -->
+        <div class="slide">
+            <h2>Métodos de Iteración: forEach() y map()</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>forEach()</h3>
+                    <p>Ejecuta una función para cada elemento. <strong>No retorna nada.</strong></p>
+                    <pre><code>const frutas = ["🍎", "🍌", "🍊"];
+frutas.forEach(fruta => {
+  console.log(fruta);
+});</code></pre>
+                </div>
+                <div class="card">
+                    <h3>map()</h3>
+                    <p>Transforma cada elemento y <strong>retorna un nuevo arreglo.</strong></p>
+                    <pre><code>const nums = [1, 2, 3];
+const dobles = nums.map(n => n * 2);
+// [2, 4, 6]</code></pre>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; text-align: center; color: var(--secondary);">
+                <strong>Regla de oro:</strong> Usa map() cuando necesites transformar datos, forEach() solo para ejecutar acciones
+            </p>
+        </div>
+
+        <!-- Slide 12: DEMO - forEach vs map -->
+        <div class="slide">
+            <span class="demo-badge">🔴 DEMO EN VIVO</span>
+            <h2>Comparando forEach() y map()</h2>
+            <p class="subtitle">Entendiendo cuándo usar cada uno</p>
+            <div class="">
+                <div class="card">
+                    <h3>Ejemplos a desarrollar:</h3>
+                    <ul>
+                        <li>Imprimir nombres con forEach</li>
+                        <li>Convertir precios con map</li>
+                        <li>Mostrar la diferencia en retorno</li>
+                        <li>Comparar con ciclo for tradicional</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Actividad 3 - Suma con ciclos -->
+        <div class="slide">
+            <h2>Actividad 3: Sumar Elementos de un Arreglo</h2>
+            <div class="activity-layout">
+                <div class="timer">
+                    <h3>Cronómetro</h3>
+                    <div class="timer-display" data-minutes="25">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary timer-start">Iniciar</button>
+                        <button class="btn-secondary timer-pause" disabled>Pausar</button>
+                        <button class="btn-danger timer-reset">Reiniciar</button>
+                    </div>
+                    <div class="timer-status">Listo para comenzar</div>
+                </div>
+                <div class="activity-card">
+                    <h3>Contexto</h3>
+                    <p>Compara tres formas diferentes de sumar los elementos de un arreglo.</p>
+                    <h3>Consigna</h3>
+                    <ul>
+                        <li>Crea un arreglo: <code>[10, 20, 30, 40, 50]</code></li>
+                        <li><strong>Método 1:</strong> Suma con ciclo <code>for</code></li>
+                        <li><strong>Método 2:</strong> Suma con <code>forEach()</code></li>
+                        <li><strong>Método 3:</strong> Usa <code>reduce()</code> (investígalo)</li>
+                        <li>Compara cuál te parece más claro</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Introducción a Funciones -->
+        <div class="slide">
+            <h2>¿Qué es una Función?</h2>
+            <p class="subtitle">Un bloque de código reutilizable que realiza una tarea específica</p>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Analogía: Receta de Cocina</h3>
+                    <ul>
+                        <li><strong>Entrada:</strong> Ingredientes (parámetros)</li>
+                        <li><strong>Proceso:</strong> Pasos de la receta (código)</li>
+                        <li><strong>Salida:</strong> Plato terminado (return)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Ventajas</h3>
+                    <ul>
+                        <li>Reutilización de código</li>
+                        <li>Facilita el mantenimiento</li>
+                        <li>Código más legible</li>
+                        <li>Reducción de errores</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Tipos de Funciones -->
+        <div class="slide">
+            <h2 style="margin-bottom: 1rem;">Tres Formas de Definir Funciones</h2>
+            <div class="grid-2" style="gap: 1.5rem;">
+                <div class="card" style="padding: 1.2rem;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.8rem;">1. Función Declarada</h3>
+                    <pre style="margin: 0.8rem 0;"><code>function saludar(nombre) {
+  return `Hola, ${nombre}!`;
+}</code></pre>
+                    <p style="font-size: 1.1rem; margin: 0;">✓ Hoisting habilitado</p>
+                </div>
+                <div class="card" style="padding: 1.2rem;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.8rem;">2. Función Anónima</h3>
+                    <pre style="margin: 0.8rem 0;"><code>const saludar = function(nombre) {
+  return `Hola, ${nombre}!`;
+};</code></pre>
+                    <p style="font-size: 1.1rem; margin: 0;">✓ Útil para callbacks</p>
+                </div>
+            </div>
+            <div class="card" style="padding: 1.2rem; margin-top: 1.5rem;">
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.8rem;">3. Arrow Function (función flecha) - ES6+</h3>
+                <pre style="margin: 0.8rem 0;"><code>const saludar = (nombre) => `Hola, ${nombre}!`;</code></pre>
+                <p style="font-size: 1.1rem; margin: 0;">✓ Sintaxis corta, ideal para programación funcional</p>
+            </div>
+        </div>
+
+        <!-- Slide 16: DEMO - Funciones -->
+        <div class="slide">
+            <span class="demo-badge">🔴 DEMO EN VIVO</span>
+            <h2>Trabajando con Funciones</h2>
+            <p class="subtitle">De lo básico a lo práctico</p>
+            <div class="">
+                <div class="card">
+                    <h3>Demostraremos:</h3>
+                    <ul>
+                        <li>Crear función tradicional</li>
+                        <li>Función con parámetros</li>
+                        <li>Función con return</li>
+                        <li>Arrow function</li>
+                        <li>Diferencia entre declarar e invocar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Actividad 4 - Contador de Visitas -->
+        <div class="slide">
+            <h2>Actividad 4: Contador de Visitas</h2>
+            <div class="activity-layout">
+                <div class="timer">
+                    <h3>Cronómetro</h3>
+                    <div class="timer-display" data-minutes="15">15:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary timer-start">Iniciar</button>
+                        <button class="btn-secondary timer-pause" disabled>Pausar</button>
+                        <button class="btn-danger timer-reset">Reiniciar</button>
+                    </div>
+                    <div class="timer-status">Listo para comenzar</div>
+                </div>
+                <div class="activity-card">
+                    <h3>Contexto</h3>
+                    <p>Crea un sistema de conteo de visitas para un sitio web.</p>
+                    <h3>Consigna</h3>
+                    <ul>
+                        <li>Define una variable global <code>visitas = 0</code></li>
+                        <li>Crea una función <code>incrementarVisitas()</code></li>
+                        <li>La función debe incrementar visitas en 1</li>
+                        <li>Mostrar el número actualizado con <code>console.log()</code></li>
+                        <li>Llama a la función 5 veces y observa el resultado</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Parámetros y Return -->
+        <div class="slide">
+            <h2>Parámetros y Valores de Retorno</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Sin return</h3>
+                    <p>Solo ejecuta acciones</p>
+                    <pre><code>function saludar(nombre) {
+  console.log("Hola " + nombre);
+}
+saludar("Ana"); // Imprime
+let x = saludar("Ana");
+// x es undefined</code></pre>
+                </div>
+                <div class="card">
+                    <h3>Con return</h3>
+                    <p>Devuelve un valor reutilizable</p>
+                    <pre><code>function sumar(a, b) {
+  return a + b;
+}
+let resultado = sumar(5, 3);
+// resultado es 8</code></pre>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; text-align: center; color: var(--warning);">
+                <strong>Importante:</strong> Si no hay return, la función retorna <code>undefined</code>
+            </p>
+        </div>
+
+        <!-- Slide 19: Buenas Prácticas -->
+        <div class="slide">
+            <h2>Buenas Prácticas con Funciones</h2>
+            <ul class="two-columns">
+                <li><strong>Nombres descriptivos:</strong> <code>calcularTotal()</code> mejor que <code>calc()</code></li>
+                <li><strong>Una sola responsabilidad:</strong> Cada función hace una cosa bien</li>
+                <li><strong>Evitar funciones largas:</strong> Máximo 20-30 líneas</li>
+                <li><strong>No modificar variables globales:</strong> Usa parámetros y return</li>
+                <li><strong>Documentar parámetros:</strong> Qué espera recibir y qué devuelve</li>
+                <li><strong>Validar entradas:</strong> Verificar que los parámetros sean válidos</li>
+            </ul>
+        </div>
+
+        <!-- Slide 20: Resumen y Cierre -->
+        <div class="slide">
+            <h2>Resumen de la Clase</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Arreglos y Ciclos</h3>
+                    <ul>
+                        <li>Arreglos: índices desde 0, mutables</li>
+                        <li>Ciclos: for, while, forEach, map</li>
+                        <li>break y continue para control</li>
+                        <li>filter() para filtrar datos</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Funciones</h3>
+                    <ul>
+                        <li>3 formas: declarada, anónima, arrow</li>
+                        <li>Parámetros para entrada de datos</li>
+                        <li>return para salida de datos</li>
+                        <li>Reutilización y modularidad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-primary" id="prevBtn">← Anterior</button>
+        <button class="btn-primary" id="nextBtn">Siguiente →</button>
+    </div>
+
+    <audio id="beepSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZUCE=" type="audio/wav">
+    </audio>
+
+    <script>
+        // Navegación de slides
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const slideCounter = document.getElementById('currentSlide');
+        const totalSlidesEl = document.getElementById('totalSlides');
+        const progressFill = document.getElementById('progressFill');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const beepSound = document.getElementById('beepSound');
+
+        totalSlidesEl.textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            slideCounter.textContent = currentSlide + 1;
+            progressFill.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+            
+            // Reset timers when changing slides
+            const timers = slides[currentSlide].querySelectorAll('.timer');
+            timers.forEach(timer => {
+                const display = timer.querySelector('.timer-display');
+                const minutes = parseInt(display.getAttribute('data-minutes'));
+                display.textContent = `${minutes}:00`;
+                display.classList.remove('warning', 'danger');
+                timer.querySelector('.timer-start').disabled = false;
+                timer.querySelector('.timer-pause').disabled = true;
+                timer.querySelector('.timer-status').textContent = 'Listo para comenzar';
+            });
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Sistema de cronómetros
+        class Timer {
+            constructor(element) {
+                this.element = element;
+                this.display = element.querySelector('.timer-display');
+                this.startBtn = element.querySelector('.timer-start');
+                this.pauseBtn = element.querySelector('.timer-pause');
+                this.resetBtn = element.querySelector('.timer-reset');
+                this.status = element.querySelector('.timer-status');
+                this.minutes = parseInt(this.display.getAttribute('data-minutes'));
+                this.timeLeft = this.minutes * 60;
+                this.interval = null;
+                this.isRunning = false;
+
+                this.startBtn.addEventListener('click', () => this.start());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.resetBtn.addEventListener('click', () => this.reset());
+            }
+
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                this.startBtn.disabled = true;
+                this.pauseBtn.disabled = false;
+                this.status.textContent = 'En progreso...';
+                
+                this.interval = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateDisplay();
+                    
+                    if (this.timeLeft <= 0) {
+                        this.complete();
+                    } else if (this.timeLeft === 60) {
+                        this.status.textContent = '⚠️ ¡Último minuto!';
+                    } else if (this.timeLeft === 300) {
+                        this.status.textContent = '⏰ Quedan 5 minutos';
+                    }
+                }, 1000);
+            }
+
+            pause() {
+                this.isRunning = false;
+                clearInterval(this.interval);
+                this.startBtn.disabled = false;
+                this.pauseBtn.disabled = true;
+                this.status.textContent = 'Pausado';
+            }
+
+            reset() {
+                this.pause();
+                this.timeLeft = this.minutes * 60;
+                this.updateDisplay();
+                this.display.classList.remove('warning', 'danger');
+                this.status.textContent = 'Listo para comenzar';
+            }
+
+            complete() {
+                this.pause();
+                this.timeLeft = 0;
+                this.updateDisplay();
+                this.status.textContent = '✅ ¡Tiempo completado!';
+                beepSound.play();
+            }
+
+            updateDisplay() {
+                const mins = Math.floor(this.timeLeft / 60);
+                const secs = this.timeLeft % 60;
+                this.display.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                // Update colors
+                this.display.classList.remove('warning', 'danger');
+                if (this.timeLeft < 60) {
+                    this.display.classList.add('danger');
+                } else if (this.timeLeft < 300) {
+                    this.display.classList.add('warning');
+                }
+            }
+        }
+
+        // Initialize all timers
+        document.querySelectorAll('.timer').forEach(timerEl => {
+            new Timer(timerEl);
+        });
+
+        // Initialize first slide
+        showSlide(0);
+    </script>
+</body>
+</html>

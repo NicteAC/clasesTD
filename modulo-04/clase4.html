@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceptos Básicos de Objetos en JavaScript - Parte II</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --warning: #FFA500;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #0f0f1a 100%);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .slide-counter {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(45, 91, 255, 0.6);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            max-width: 1200px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        p, li {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding-left: 2rem;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .two-columns {
+            column-count: 2;
+            column-gap: 3rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(45, 91, 255, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(45, 91, 255, 0.3);
+        }
+
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        nav {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 2px solid rgba(45, 91, 255, 0.3);
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), #1a3fbf);
+            color: var(--light);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 91, 255, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--light);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(45, 91, 255, 0.3);
+        }
+
+        th {
+            background: rgba(45, 91, 255, 0.2);
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .break-slide {
+            background: linear-gradient(135deg, var(--accent) 0%, #d45555 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .break-slide h1 {
+            color: white;
+            -webkit-text-fill-color: white;
+        }
+
+        .key-point {
+            background: rgba(0, 212, 170, 0.1);
+            border-left: 4px solid var(--secondary);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .demo-indicator {
+            background: rgba(0, 212, 170, 0.15);
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .demo-indicator h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .demo-indicator p {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .exercise-card {
+            background: rgba(0, 212, 170, 0.05);
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .exercise-card h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .exercise-card p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-card ul {
+            margin-top: 0.5rem;
+        }
+
+        .exercise-card li {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .exercise-card li::before {
+            font-size: 1.1rem;
+        }
+
+        .exercise-number {
+            display: inline-block;
+            background: var(--secondary);
+            color: var(--dark);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            line-height: 2rem;
+            text-align: center;
+            font-weight: 700;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .formula-box {
+            background: rgba(45, 91, 255, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="presentation-wrapper">
+        <header>
+            <div class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="center">
+                        <div class="badge">AE5 - Parte II</div>
+                        <h1>Conceptos Básicos de Objetos en JavaScript</h1>
+                        <p class="subtitle">Parte II - Profundizando en Math y String</p>
+                        <div class="emoji">🔧</div>
+                        <p style="margin-top: 2rem; opacity: 0.7;">Objetos preconstruidos avanzados para resolver problemas complejos</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Learning Path -->
+                <div class="slide">
+                    <h2>📚 Learning Path - Hoy trabajaremos</h2>
+                    <div class="grid-2" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>Objeto Math Avanzado</h3>
+                            <ul>
+                                <li>Generación de números aleatorios en rangos</li>
+                                <li>Métodos de redondeo (round, floor, ceil, trunc)</li>
+                                <li>Aplicaciones prácticas</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Objeto String Avanzado</h3>
+                            <ul>
+                                <li>Reemplazo de texto (replace, replaceAll)</li>
+                                <li>Comparación de cadenas</li>
+                                <li>Extracción con expresiones regulares</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Objetivos -->
+                <div class="slide">
+                    <h2>🎯 Objetivos de Aprendizaje</h2>
+                    <p style="margin-bottom: 2rem;">Al finalizar esta clase, serás capaz de:</p>
+                    <div class="two-columns">
+                        <ul>
+                            <li>Comprender qué son los objetos preconstruidos en JavaScript y su utilidad</li>
+                            <li>Explorar los métodos y propiedades de los objetos Math y String en profundidad</li>
+                            <li>Aplicar métodos de Math y String en ejercicios prácticos complejos</li>
+                            <li>Integrar los objetos preconstruidos con estructuras como arreglos, ciclos y funciones</li>
+                            <li>Utilizar expresiones regulares básicas para manipulación de texto</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Recordatorio -->
+                <div class="slide">
+                    <h2>💡 Recordatorio: Math y String</h2>
+                    <div class="grid-2" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>Objeto Math</h3>
+                            <p>Objeto incorporado que proporciona propiedades y métodos para realizar operaciones matemáticas.</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">Math.round(), Math.random(), Math.pow(), Math.sqrt()</p>
+                        </div>
+                        <div class="card">
+                            <h3>Objeto String</h3>
+                            <p>Objeto que representa cadenas de texto y ofrece métodos para manipularlas.</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">toUpperCase(), slice(), replace(), split()</p>
+                        </div>
+                    </div>
+                    <div class="key-point" style="margin-top: 2rem;">
+                        <p>Hoy profundizaremos en técnicas avanzadas con estos objetos</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Math.random() -->
+                <div class="slide">
+                    <h2>🎲 Generación de Números Aleatorios</h2>
+                    <div class="key-point">
+                        <p><span class="highlight">Math.random()</span> genera un número decimal entre 0 (inclusive) y 1 (exclusivo)</p>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <h3>Fórmula para un rango específico</h3>
+                        <div class="formula-box">
+                            Math.random() * (max - min) + min
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <h3>Para obtener números enteros</h3>
+                        <div class="formula-box">
+                            Math.floor(Math.random() * (max - min + 1)) + min
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Demo Math.random() -->
+                <div class="slide">
+                    <h2>💻 Demo en Vivo: Math.random()</h2>
+                    <div class="demo-indicator">
+                        <h3>Números aleatorios en diferentes rangos</h3>
+                        <p>Vamos a generar números entre diferentes rangos...</p>
+                        <div class="emoji" style="margin-top: 1rem;">🎰</div>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Métodos de Redondeo -->
+                <div class="slide">
+                    <h2>🔢 Redondeo de Números con Math</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Math.round()</h3>
+                            <p>Redondea al entero más cercano</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">Math.round(4.5) → 5</p>
+                            <p style="color: var(--secondary);">Math.round(4.4) → 4</p>
+                        </div>
+                        <div class="card">
+                            <h3>Math.floor()</h3>
+                            <p>Redondea hacia abajo</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">Math.floor(4.9) → 4</p>
+                            <p style="color: var(--secondary);">Math.floor(4.1) → 4</p>
+                        </div>
+                        <div class="card">
+                            <h3>Math.ceil()</h3>
+                            <p>Redondea hacia arriba</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">Math.ceil(4.1) → 5</p>
+                            <p style="color: var(--secondary);">Math.ceil(4.9) → 5</p>
+                        </div>
+                        <div class="card">
+                            <h3>Math.trunc()</h3>
+                            <p>Elimina los decimales</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">Math.trunc(4.9) → 4</p>
+                            <p style="color: var(--secondary);">Math.trunc(-4.9) → -4</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Demo Redondeo -->
+                <div class="slide">
+                    <h2>💻 Demo en Vivo: Métodos de Redondeo</h2>
+                    <div class="demo-indicator">
+                        <h3>Comparando los diferentes métodos</h3>
+                        <p>Veamos cómo se comporta cada método con el mismo número...</p>
+                        <div class="emoji" style="margin-top: 1rem;">📊</div>
+                    </div>
+                </div>
+
+                <!-- Slide 9: DESCANSO -->
+                <div class="slide">
+                    <div class="break-slide">
+                        <h1>☕ Descanso</h1>
+                        <div style="font-size: 4rem; margin: 2rem 0;">20:00</div>
+                        <p style="font-size: 2rem; color: white;">¡Nos vemos en 20 minutos!</p>
+                        <p style="font-size: 1.5rem; color: white; margin-top: 2rem; opacity: 0.9;">Aprovecha para estirar, tomar agua y descansar la vista 🌟</p>
+                    </div>
+                </div>
+
+                <!-- Slide 10: String.replace() -->
+                <div class="slide">
+                    <h2>✏️ Reemplazo de Texto con String.replace()</h2>
+                    <div class="key-point">
+                        <p><span class="highlight">replace()</span> reemplaza la primera coincidencia encontrada</p>
+                    </div>
+                    <div class="grid-2" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>replace() básico</h3>
+                            <p>Reemplaza solo la primera ocurrencia</p>
+                        </div>
+                        <div class="card">
+                            <h3>Con expresión regular /g</h3>
+                            <p>Reemplaza todas las ocurrencias</p>
+                        </div>
+                        <div class="card">
+                            <h3>Bandera /gi</h3>
+                            <p>Global e ignora mayúsculas/minúsculas</p>
+                        </div>
+                        <div class="card">
+                            <h3>replaceAll() (ES2021+)</h3>
+                            <p>Alternativa moderna sin regex</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 11: Tabla replace() -->
+                <div class="slide">
+                    <h2>📋 Métodos de Reemplazo</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Función</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>replace("a", "b")</td>
+                                <td>Reemplaza la primera ocurrencia de "a" por "b"</td>
+                            </tr>
+                            <tr>
+                                <td>replace(/a/g, "b")</td>
+                                <td>Reemplaza todas las ocurrencias de "a" por "b"</td>
+                            </tr>
+                            <tr>
+                                <td>replace(/a/gi, "b")</td>
+                                <td>Reemplaza todas, sin distinguir mayúsculas/minúsculas</td>
+                            </tr>
+                            <tr>
+                                <td>replaceAll("a", "b")</td>
+                                <td>Reemplaza todas las ocurrencias (ES2021+)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Slide 12: Demo replace() -->
+                <div class="slide">
+                    <h2>💻 Demo en Vivo: String.replace()</h2>
+                    <div class="demo-indicator">
+                        <h3>Reemplazando texto de diferentes formas</h3>
+                        <p>Comparemos replace() vs replaceAll() y expresiones regulares...</p>
+                        <div class="emoji" style="margin-top: 1rem;">🔄</div>
+                    </div>
+                </div>
+
+                <!-- Slide 13: Comparación de Cadenas -->
+                <div class="slide">
+                    <h2>⚖️ Comparación de Cadenas</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Comparación básica</h3>
+                            <p>Usa operadores === o ==</p>
+                            <p style="margin-top: 1rem; color: var(--warning);">⚠️ Sensible a mayúsculas</p>
+                        </div>
+                        <div class="card">
+                            <h3>Ignorando mayúsculas</h3>
+                            <p>Convierte ambas con toLowerCase()</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">✓ Más flexible</p>
+                        </div>
+                        <div class="card">
+                            <h3>Con espacios extras</h3>
+                            <p>Usa trim() antes de comparar</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">✓ Limpia espacios</p>
+                        </div>
+                        <div class="card">
+                            <h3>localeCompare()</h3>
+                            <p>Comparación natural y ordenamiento</p>
+                            <p style="margin-top: 1rem; color: var(--secondary);">✓ Orden alfabético correcto</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 14: Demo Comparación -->
+                <div class="slide">
+                    <h2>💻 Demo en Vivo: Comparación de Cadenas</h2>
+                    <div class="demo-indicator">
+                        <h3>Diferentes formas de comparar texto</h3>
+                        <p>Veamos cómo manejar mayúsculas, espacios y orden alfabético...</p>
+                        <div class="emoji" style="margin-top: 1rem;">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Slide 15: String.match() -->
+                <div class="slide">
+                    <h2>🔎 Extraer Números con String.match()</h2>
+                    <div class="key-point">
+                        <p><span class="highlight">match()</span> encuentra coincidencias usando expresiones regulares</p>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <h3>Expresiones regulares útiles</h3>
+                        <ul>
+                            <li><span class="highlight">/\d+/g</span> - Encuentra todos los números enteros</li>
+                            <li><span class="highlight">/-?\d+(\.\d+)?/g</span> - Enteros, decimales y negativos</li>
+                            <li><span class="highlight">/\d{2}\/\d{2}\/\d{4}/g</span> - Fechas formato dd/mm/yyyy</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 16: Tabla match() -->
+                <div class="slide">
+                    <h2>📋 Expresiones Regulares Comunes</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Expresión Regular</th>
+                                <th>Función</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/\d+/g</td>
+                                <td>Encuentra todos los números enteros</td>
+                            </tr>
+                            <tr>
+                                <td>/-?\d+(\.\d+)?/g</td>
+                                <td>Encuentra enteros, decimales y negativos</td>
+                            </tr>
+                            <tr>
+                                <td>/\b\d{2}\/\d{2}\/\d{4}\b/g</td>
+                                <td>Extrae fechas en formato dd/mm/yyyy</td>
+                            </tr>
+                            <tr>
+                                <td>/[a-zA-Z]+/g</td>
+                                <td>Extrae todas las palabras</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Slide 17: Demo match() -->
+                <div class="slide">
+                    <h2>💻 Demo en Vivo: String.match()</h2>
+                    <div class="demo-indicator">
+                        <h3>Extrayendo información de texto</h3>
+                        <p>Usemos expresiones regulares para extraer números, fechas y más...</p>
+                        <div class="emoji" style="margin-top: 1rem;">🎯</div>
+                    </div>
+                </div>
+
+                <!-- Slide 18: EJERCICIOS PRÁCTICOS -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 1rem;">🎯 Ejercicios Prácticos</h2>
+                    
+                    <div class="exercises-grid">
+                        <div class="exercise-card">
+                            <h3><span class="exercise-number">1</span>Simulación de Juego con Dados</h3>
+                            <p><strong>Contexto:</strong> Juego donde lanzas dos dados. Si la suma > 7: ganas, = 7: empatas, < 7: pierdes.</p>
+                            <p style="margin-top: 0.8rem;"><strong>Tareas:</strong></p>
+                            <ul>
+                                <li>Función lanzarDado() que devuelva número entre 1 y 6</li>
+                                <li>Función jugar() que lance dos dados y determine resultado</li>
+                                <li>Usa ciclo for para jugar 5 veces</li>
+                                <li>Muestra el resultado de cada ronda en consola</li>
+                            </ul>
+                        </div>
+
+                        <div class="exercise-card">
+                            <h3><span class="exercise-number">2</span>Generador de Códigos Aleatorios</h3>
+                            <p><strong>Contexto:</strong> Sistema de seguridad que genera códigos alfanuméricos de 6 caracteres.</p>
+                            <p style="margin-top: 0.8rem;"><strong>Tareas:</strong></p>
+                            <ul>
+                                <li>Función generarCodigo() que genere código de 6 caracteres</li>
+                                <li>Usa Math.random() y String para formar el código</li>
+                                <li>Genera 5 códigos y guárdalos en un arreglo</li>
+                                <li>Muestra los códigos generados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 19: Preguntas Reflexión -->
+                <div class="slide">
+                    <h2>💭 Momento de Reflexión</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>¿Por qué usar objetos preconstruidos?</h3>
+                            <p>¿Cómo nos ayudan en la programación diaria?</p>
+                        </div>
+                        <div class="card">
+                            <h3>¿Cuándo usar Math.random()?</h3>
+                            <p>¿En qué situaciones sería útil generar números aleatorios?</p>
+                        </div>
+                        <div class="card">
+                            <h3>Manipulación de texto</h3>
+                            <p>¿Cómo podríamos cambiar o extraer información de cadenas?</p>
+                        </div>
+                        <div class="card">
+                            <h3>Aplicaciones reales</h3>
+                            <p>¿En qué casos usarías Math en una aplicación web?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 20: Resumen -->
+                <div class="slide">
+                    <h2>✨ Resumen de la Clase</h2>
+                    <h3 style="margin-bottom: 2rem;">¿Qué logramos hoy?</h3>
+                    <div class="two-columns">
+                        <ul>
+                            <li>Entendimos que los objetos preconstruidos facilitan tareas comunes en JavaScript</li>
+                            <li>Aprendimos a generar números aleatorios en rangos específicos con Math.random()</li>
+                            <li>Dominamos los diferentes métodos de redondeo: round, floor, ceil y trunc</li>
+                            <li>Exploramos técnicas avanzadas de reemplazo de texto con replace y replaceAll</li>
+                            <li>Aprendimos a comparar cadenas ignorando mayúsculas y espacios</li>
+                            <li>Descubrimos cómo extraer información con expresiones regulares y match()</li>
+                            <li>Integramos Math y String con ciclos, funciones y arreglos en ejercicios prácticos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 21: Cierre -->
+                <div class="slide">
+                    <div class="center">
+                        <div class="emoji">🎉</div>
+                        <h1>¡Excelente Trabajo!</h1>
+                        <p class="subtitle">Has completado los objetos preconstruidos en JavaScript</p>
+                        <div style="margin-top: 3rem;">
+                            <h3>Próximos pasos</h3>
+                            <p style="font-size: 1.5rem; margin-top: 1rem;">Continúa practicando con Math y String</p>
+                            <p style="font-size: 1.5rem;">Integra estos conceptos en proyectos más complejos</p>
+                        </div>
+                        <div style="margin-top: 3rem; opacity: 0.7;">
+                            <p>¿Preguntas finales? 🙋</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav>
+            <button class="nav-btn" id="prevBtn">← Anterior</button>
+            <button class="nav-btn" id="nextBtn">Siguiente →</button>
+        </nav>
+    </div>
+
+    <script>
+        // Slides Navigation
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progressBar');
+        const currentSlideSpan = document.getElementById('currentSlide');
+        const totalSlidesSpan = document.getElementById('totalSlides');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        totalSlidesSpan.textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = n;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            if (currentSlide < 0) currentSlide = 0;
+            
+            slides[currentSlide].classList.add('active');
+            currentSlideSpan.textContent = currentSlide + 1;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = progress + '%';
+            
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+        nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                showSlide(currentSlide + 1);
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

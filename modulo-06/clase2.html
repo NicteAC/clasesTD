@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Templates y Rendering en Vue.js — Clase Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2D5BFF;
+    --secondary: #00D4AA;
+    --accent: #FF6B6B;
+    --dark: #1A1A2E;
+    --light: #F8F9FA;
+    --warning: #FFA500;
+    --bg: #0F0F1E;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #E8EAF6;
+    --muted: rgba(232,234,246,0.55);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;background:var(--bg);font-family:'Sora',sans-serif;color:var(--text);overflow:hidden;}
+
+  /* ── LAYOUT ── */
+  #app{display:flex;flex-direction:column;width:100%;height:100vh;}
+
+  /* ── HEADER ── */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0.55rem 2rem;
+    background:rgba(15,15,30,0.96);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .h-logo{display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.85rem;letter-spacing:.05em;color:var(--secondary);}
+  .h-logo span{color:var(--muted);font-weight:400;}
+  .h-counter{font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--muted);letter-spacing:.1em;}
+  .h-counter strong{color:var(--primary);font-size:.95rem;}
+  .h-btns{display:flex;gap:.4rem;}
+  .h-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.3rem .85rem;border-radius:6px;font-family:'Sora',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;}
+  .h-btn:hover{background:var(--primary);border-color:var(--primary);}
+
+  /* ── PROGRESS ── */
+  .prog{height:3px;background:rgba(255,255,255,.05);flex-shrink:0;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .4s ease;}
+
+  /* ── SLIDES ── */
+  #slides{flex:1;overflow:hidden;position:relative;}
+  .slide{
+    position:absolute;inset:0;display:none;
+    align-items:center;justify-content:center;
+    padding:1.2rem 2rem;
+    animation:slideIn .5s ease-out;
+  }
+  .slide.active{display:flex;}
+  @keyframes slideIn{from{opacity:0;transform:translateX(28px);}to{opacity:1;transform:translateX(0);}}
+
+  .container{width:100%;max-width:1200px;margin:0 auto;}
+
+  /* ── TYPOGRAPHY ── */
+  h1{font-size:clamp(2rem,3.8vw,3.5rem);font-weight:800;line-height:1.15;
+     background:linear-gradient(135deg,#fff 30%,var(--secondary));
+     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem;}
+  h2{font-size:clamp(1.4rem,2.4vw,2.2rem);font-weight:700;
+     background:linear-gradient(135deg,var(--primary),var(--secondary));
+     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.9rem;}
+  h3{font-size:1.25rem;font-weight:600;color:var(--secondary);margin-bottom:.5rem;}
+  p,li{font-size:1.05rem;line-height:1.8;color:var(--text);}
+  .muted{color:var(--muted);font-size:.9rem;}
+  ul{list-style:none;}
+  ul li{padding-left:1.3rem;position:relative;margin-bottom:.4rem;}
+  ul li::before{content:'→';position:absolute;left:0;color:var(--secondary);font-weight:700;}
+
+  /* ── BADGES ── */
+  .badge{display:inline-block;padding:.18rem .75rem;border-radius:50px;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+  .b-pri{background:rgba(45,91,255,.18);color:var(--primary);border:1px solid var(--primary);}
+  .b-sec{background:rgba(0,212,170,.18);color:var(--secondary);border:1px solid var(--secondary);}
+  .b-acc{background:rgba(255,107,107,.18);color:var(--accent);border:1px solid var(--accent);}
+  .b-warn{background:rgba(255,165,0,.18);color:var(--warning);border:1px solid var(--warning);}
+
+  /* ── CARDS ── */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all .3s ease;}
+  .card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 32px rgba(45,91,255,.15);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+  .gap-sm{gap:1rem;}
+
+  /* ── CODE ── */
+  pre,code{font-family:'Space Mono',monospace;font-size:.76rem;line-height:1.7;}
+  pre{background:rgba(0,0,0,.55);border:1px solid rgba(45,91,255,.28);border-radius:10px;padding:.9rem 1.1rem;overflow-x:auto;white-space:pre;}
+  code.il{background:rgba(45,91,255,.15);color:var(--secondary);padding:.1rem .38rem;border-radius:4px;font-size:.82em;}
+  .kw{color:#9580ff;}.str{color:#00D4AA;}.fn{color:#50fa7b;}.cm{color:#6272a4;}.prop{color:#ffb86c;}
+  .tag{color:#FF6B6B;}.attr{color:#8be9fd;}.val{color:#f1fa8c;}.op{color:#ff79c6;}
+
+  /* ── TITLE SLIDE ── */
+  .title-slide{background:radial-gradient(ellipse at 20% 50%,rgba(45,91,255,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,212,170,.1) 0%,transparent 50%),var(--bg);}
+  .eyebrow{font-size:.82rem;font-weight:600;letter-spacing:.15em;color:var(--secondary);text-transform:uppercase;margin-bottom:.9rem;}
+  .title-tags{display:flex;gap:.55rem;margin-top:1.3rem;flex-wrap:wrap;}
+  .title-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:1.8rem;}
+  .meta-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.9rem;text-align:center;}
+  .meta-num{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--primary);}
+  .meta-lbl{font-size:.78rem;color:var(--muted);margin-top:.15rem;}
+
+  /* ── AGENDA ── */
+  .agenda-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.85rem 1.2rem;display:flex;align-items:center;gap:.9rem;transition:all .3s;}
+  .agenda-item:hover{border-color:var(--primary);transform:translateX(4px);}
+  .ag-time{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--secondary);min-width:52px;font-weight:700;}
+  .ag-icon{font-size:1.3rem;flex-shrink:0;}
+  .ag-title{font-size:.95rem;font-weight:600;}
+  .ag-sub{font-size:.78rem;color:var(--muted);}
+  .ag-list{display:flex;flex-direction:column;gap:.45rem;}
+
+  /* ── DEMO ── */
+  .demo-slide{background:radial-gradient(ellipse at 80% 80%,rgba(45,91,255,.07) 0%,transparent 60%),var(--bg);}
+  .demo-hdr{display:flex;align-items:center;gap:.9rem;margin-bottom:1.3rem;}
+  .demo-icon{width:48px;height:48px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+  .demo-steps{display:flex;flex-direction:column;gap:.45rem;}
+  .d-step{display:flex;align-items:flex-start;gap:.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.65rem .95rem;}
+  .d-num{min-width:22px;height:22px;background:var(--primary);border-radius:50%;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+  .d-txt{font-size:.9rem;line-height:1.5;}
+
+  /* ── CONCEPT LAYOUT ── */
+  .c2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+
+  /* ── HIGHLIGHT BOX ── */
+  .hl{background:linear-gradient(135deg,rgba(45,91,255,.1),rgba(0,212,170,.1));border:1px solid rgba(45,91,255,.3);border-radius:10px;padding:.9rem 1.1rem;margin-top:.9rem;}
+  .hl-warn{background:linear-gradient(135deg,rgba(255,107,107,.1),rgba(255,165,0,.1));border-color:rgba(255,107,107,.3);}
+
+  /* ── TABLE ── */
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th{background:rgba(45,91,255,.2);padding:.6rem .9rem;text-align:left;font-weight:600;color:var(--primary);border-bottom:1px solid rgba(45,91,255,.3);}
+  td{padding:.55rem .9rem;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,.02);}
+
+  /* ── FLOW ROW ── */
+  .flow{display:flex;align-items:center;gap:.7rem;justify-content:center;margin:.8rem 0;flex-wrap:wrap;}
+  .fbox{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.6rem 1rem;text-align:center;font-size:.85rem;font-weight:600;}
+  .farrow{color:var(--muted);font-size:1.1rem;}
+  .f-pri{border-color:var(--primary);color:var(--primary);}
+  .f-sec{border-color:var(--secondary);color:var(--secondary);}
+  .f-acc{border-color:var(--accent);color:var(--accent);}
+  .f-warn{border-color:var(--warning);color:var(--warning);}
+
+  /* ── ACTIVITY ── */
+  .act-grid{display:grid;grid-template-columns:1fr 1.9fr;gap:3rem;align-items:start;}
+  .timer-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem 1.3rem;text-align:center;transition:border-color .4s;}
+  .timer-card.tc-warn{border-color:var(--warning);}
+  .timer-card.tc-danger{border-color:var(--accent);}
+  .t-lbl{font-size:.75rem;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+  .t-disp{font-family:'Space Mono',monospace;font-size:clamp(3rem,5.5vw,5rem);font-weight:700;color:var(--secondary);text-shadow:0 0 28px rgba(0,212,170,.4);transition:color .4s,text-shadow .4s;letter-spacing:.04em;line-height:1;margin:.45rem 0;}
+  .t-disp.tw{color:var(--warning);text-shadow:0 0 28px rgba(255,165,0,.5);}
+  .t-disp.td{color:var(--accent);text-shadow:0 0 28px rgba(255,107,107,.6);animation:pulse .8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+  .t-status{font-size:.82rem;color:var(--muted);margin-top:.45rem;min-height:1.1rem;}
+  .t-ctrls{display:flex;justify-content:center;gap:.8rem;margin-top:.9rem;}
+  .t-btn{padding:.38rem .95rem;border-radius:7px;font-family:'Sora',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;}
+  .tb-s{background:rgba(0,212,170,.15);border-color:var(--secondary);color:var(--secondary);}
+  .tb-s:hover{background:var(--secondary);color:var(--dark);}
+  .tb-p{background:rgba(255,165,0,.15);border-color:var(--warning);color:var(--warning);}
+  .tb-p:hover{background:var(--warning);color:var(--dark);}
+  .tb-r{background:rgba(255,107,107,.15);border-color:var(--accent);color:var(--accent);}
+  .tb-r:hover{background:var(--accent);color:#fff;}
+  .act-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+  .act-steps{display:flex;flex-direction:column;gap:.45rem;margin-top:.9rem;}
+  .a-step{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem .85rem;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;}
+  .a-num{width:21px;height:21px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+  .a-txt{font-size:.88rem;line-height:1.5;}
+
+  /* ── BREAK ── */
+  .break-slide{background:radial-gradient(ellipse at 50% 50%,rgba(0,212,170,.08) 0%,transparent 70%),var(--bg);text-align:center;}
+  .break-big{font-size:clamp(3.5rem,7vw,6.5rem);font-weight:800;line-height:1;
+     background:linear-gradient(135deg,var(--secondary),var(--primary));
+     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.5rem 0;}
+
+  /* ── CHECK LIST ── */
+  .check-item{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem .9rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:.45rem;}
+  .ch-ico{color:var(--secondary);font-size:1rem;flex-shrink:0;}
+
+  /* ── ICON ROW ── */
+  .irow{display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem;}
+  .icircle{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+
+  /* ── TWO COL LIST ── */
+  .two-col{columns:2;column-gap:2.5rem;}
+  .two-col li{break-inside:avoid;}
+
+  /* ── FOOTER ── */
+  footer{display:flex;justify-content:center;align-items:center;gap:1.4rem;padding:.55rem 2rem;background:rgba(15,15,30,.9);border-top:1px solid var(--border);flex-shrink:0;}
+  .nav-btn{padding:.4rem 1.3rem;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:.35rem;}
+  .nav-btn:hover{background:var(--primary);border-color:var(--primary);}
+  .nav-btn:disabled{opacity:.3;cursor:default;}
+  .nav-btn:disabled:hover{background:var(--surface);border-color:var(--border);}
+  .ft-hint{font-size:.72rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="h-logo">📐 Templates y Rendering <span>/ Vue.js</span></div>
+  <div class="h-counter" id="ctr"><strong>1</strong> / <span id="tot">21</span></div>
+  <div class="h-btns">
+    <button class="h-btn" onclick="goTo(0)">Inicio</button>
+    <button class="h-btn" onclick="goTo(12)">☕ Break</button>
+    <button class="h-btn" onclick="goTo(20)">Fin</button>
+  </div>
+</header>
+<div class="prog"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+
+<!-- SLIDES -->
+<div id="slides">
+
+<!-- ═══ 0 TÍTULO ═══ -->
+<div class="slide title-slide active" data-i="0">
+  <div class="container">
+    <div class="eyebrow">Desarrollo de Aplicaciones Front-end Trainee · Lección 2</div>
+    <h1>Templates y<br>Rendering en Vue.js</h1>
+    <p style="color:var(--muted);font-size:1.05rem;margin-top:.4rem">Clase de 3 horas · 2 demos en vivo · 2 actividades prácticas</p>
+    <div class="title-tags">
+      <span class="badge b-pri">Interpolaciones</span>
+      <span class="badge b-sec">Directivas</span>
+      <span class="badge b-sec">v-if / v-show</span>
+      <span class="badge b-acc">v-for</span>
+      <span class="badge b-warn">Componentes dinámicos</span>
+      <span class="badge b-pri">Slots</span>
+      <span class="badge b-sec">keep-alive</span>
+    </div>
+    <div class="title-meta">
+      <div class="meta-item"><div class="meta-num">3 hs</div><div class="meta-lbl">Duración total</div></div>
+      <div class="meta-item"><div class="meta-num">4</div><div class="meta-lbl">Demos en vivo</div></div>
+      <div class="meta-item"><div class="meta-num">2</div><div class="meta-lbl">Actividades prácticas</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 1 AGENDA ═══ -->
+<div class="slide" data-i="1">
+  <div class="container">
+    <h2>Agenda del día</h2>
+    <p class="muted" style="margin-bottom:1rem">3 horas · 1 break de 20 min · foco total en demos y práctica</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem 2.5rem">
+      <div class="ag-list">
+        <div class="agenda-item"><div class="ag-icon">🎯</div><div><div class="ag-time">00:00</div><div class="ag-title">Templates e Interpolaciones</div><div class="ag-sub">¿qué son, cómo funcionan, buenas prácticas</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">🔧</div><div><div class="ag-time">00:15</div><div class="ag-title">Directivas y Modificadores</div><div class="ag-sub">v-bind, v-on, .prevent, .stop, .once</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">💻</div><div><div class="ag-time">00:30</div><div class="ag-title">Demo 1 — Interpolaciones + Directivas</div><div class="ag-sub">formulario, modificadores, v-show</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">🔀</div><div><div class="ag-time">00:55</div><div class="ag-title">v-if vs v-show · v-for básico</div><div class="ag-sub">diferencias clave y cuándo usar cada uno</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">💻</div><div><div class="ag-time">01:05</div><div class="ag-title">Demo 2 — v-if, v-show, v-for</div><div class="ag-sub">lista de productos con condicionales</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">🧪</div><div><div class="ag-time">01:20</div><div class="ag-title">Actividad 1 — Productos y stock</div><div class="ag-sub">40 min · templates + directivas</div></div></div>
+      </div>
+      <div class="ag-list">
+        <div class="agenda-item" style="border-color:var(--secondary)"><div class="ag-icon">☕</div><div><div class="ag-time" style="color:var(--accent)">02:00</div><div class="ag-title">Break</div><div class="ag-sub">20 minutos</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">⚡</div><div><div class="ag-time">02:20</div><div class="ag-title">v-for avanzado · Directivas personalizadas</div><div class="ag-sub">claves compuestas, v-html, directiva custom</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">💻</div><div><div class="ag-time">02:35</div><div class="ag-title">Demo 3 — v-for avanzado</div><div class="ag-sub">componentes en lista, v-html, directiva focus</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">🔄</div><div><div class="ag-time">02:50</div><div class="ag-title">Componentes dinámicos + Slots</div><div class="ag-sub">&lt;component :is=""&gt;, keep-alive, slots nombrados</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">💻</div><div><div class="ag-time">03:05</div><div class="ag-title">Demo 4 — Dynamic + Slots</div><div class="ag-sub">tabs con keep-alive y slot personalizado</div></div></div>
+        <div class="agenda-item"><div class="ag-icon">🧪</div><div><div class="ag-time">03:20</div><div class="ag-title">Actividad 2 + Cierre</div><div class="ag-sub">catálogo con vista dinámica</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 2 QUÉ SON LOS TEMPLATES ═══ -->
+<div class="slide" data-i="2">
+  <div class="container">
+    <h2>¿Qué son los Templates en Vue?</h2>
+    <div class="c2">
+      <div>
+        <p style="margin-bottom:1rem">Los templates son estructuras <strong style="color:var(--secondary)">declarativas</strong> que definen qué ve el usuario. Viven dentro del bloque <code class="il">&lt;template&gt;</code> y son HTML enriquecido con expresiones de Vue.</p>
+        <div class="grid3 gap-sm" style="margin-bottom:1rem">
+          <div class="card" style="padding:1rem;border-color:var(--accent)">
+            <div style="font-size:1.4rem;margin-bottom:.3rem">📋</div>
+            <h3 style="color:var(--accent);font-size:1rem">Declarativo</h3>
+            <p style="font-size:.82rem">Describís qué mostrar, no cómo manipular el DOM.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:var(--primary)">
+            <div style="font-size:1.4rem;margin-bottom:.3rem">⚡</div>
+            <h3 style="color:var(--primary);font-size:1rem">Reactivo</h3>
+            <p style="font-size:.82rem">Cuando cambian los datos, la vista se actualiza sola.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:var(--secondary)">
+            <div style="font-size:1.4rem;margin-bottom:.3rem">🔧</div>
+            <h3 style="color:var(--secondary);font-size:1rem">Componible</h3>
+            <p style="font-size:.82rem">Los componentes se usan como etiquetas HTML custom.</p>
+          </div>
+        </div>
+        <div class="hl">
+          <p style="font-size:.9rem">Vue transforma los templates en <strong>funciones render</strong> que manipulan el <strong>DOM virtual</strong>. Solo actualiza lo que cambió.</p>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Anatomía de un template</p>
+        <pre><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"tarjeta"</span><span class="tag">&gt;</span>
+
+    <span class="cm">&lt;!-- interpolación --&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>{{ <span class="prop">titulo</span> }}<span class="tag">&lt;/h2&gt;</span>
+
+    <span class="cm">&lt;!-- directiva de atributo --&gt;</span>
+    <span class="tag">&lt;img</span> <span class="attr">:src</span>=<span class="str">"imagen"</span> <span class="tag">/&gt;</span>
+
+    <span class="cm">&lt;!-- directiva condicional --&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">v-if</span>=<span class="str">"activo"</span><span class="tag">&gt;</span>✅<span class="tag">&lt;/span&gt;</span>
+
+    <span class="cm">&lt;!-- evento --&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"accion"</span><span class="tag">&gt;</span>Click<span class="tag">&lt;/button&gt;</span>
+
+    <span class="cm">&lt;!-- componente hijo --&gt;</span>
+    <span class="tag">&lt;mi-componente</span> <span class="attr">:datos</span>=<span class="str">"info"</span> <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3 INTERPOLACIONES ═══ -->
+<div class="slide" data-i="3">
+  <div class="container">
+    <h2>Interpolaciones y Expresiones</h2>
+    <div class="c2">
+      <div>
+        <p style="margin-bottom:.9rem">La sintaxis <code class="il">{{ expresión }}</code> inserta contenido dinámico en el HTML. Se evalúa en el contexto del componente — puede acceder a <code class="il">data</code>, <code class="il">computed</code> y <code class="il">methods</code>.</p>
+        <div style="display:flex;flex-direction:column;gap:.65rem">
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Datos simples</h3>
+            <pre style="font-size:.74rem"><span class="tag">&lt;p&gt;</span>{{ <span class="prop">mensaje</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="prop">usuario</span>.<span class="prop">nombre</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="prop">usuario</span>.<span class="prop">datos</span>.<span class="prop">edad</span> }}<span class="tag">&lt;/p&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Expresiones JS válidas</h3>
+            <pre style="font-size:.74rem"><span class="tag">&lt;p&gt;</span>{{ <span class="prop">nombre</span> + <span class="str">' '</span> + <span class="prop">apellido</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="prop">precio</span> * <span class="val">1.21</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="prop">activo</span> ? <span class="str">'On'</span> : <span class="str">'Off'</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="fn">formatearFecha</span>(<span class="prop">fecha</span>) }}<span class="tag">&lt;/p&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:1rem;margin-bottom:.8rem;border-color:var(--accent)">
+          <h3 style="font-size:1rem;color:var(--accent)">⛔ NO permitido en interpolaciones</h3>
+          <pre style="font-size:.74rem"><span class="cm">// No podés poner estructuras de control</span>
+{{ <span class="kw">if</span> (<span class="prop">condicion</span>) { } }}      <span class="cm">// ❌</span>
+{{ <span class="kw">for</span> (<span class="kw">let</span> i ...) { } }}   <span class="cm">// ❌</span>
+{{ <span class="kw">var</span> x = <span class="val">1</span> }}              <span class="cm">// ❌ (declaración)</span>
+
+<span class="cm">// Sí podés: expresiones de una sola línea</span>
+{{ <span class="prop">lista</span>.<span class="fn">length</span> > <span class="val">0</span> }}         <span class="cm">// ✅</span>
+{{ <span class="prop">items</span>.<span class="fn">filter</span>(i => i.<span class="prop">a</span>).<span class="prop">length</span> }} <span class="cm">// ✅</span></pre>
+        </div>
+        <div class="hl">
+          <p style="font-size:.88rem">💡 Si la lógica es compleja → movela a una <strong>computed property</strong>. Los templates deben ser legibles.</p>
+        </div>
+        <div class="card" style="padding:1rem;margin-top:.8rem">
+          <h3 style="font-size:1rem">Atributos: usá v-bind</h3>
+          <pre style="font-size:.74rem"><span class="cm">&lt;!-- ❌ Incorrecto --&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="str">"{{ imagen }}"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- ✅ Correcto --&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">:src</span>=<span class="str">"imagen"</span> <span class="tag">/&gt;</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 4 DIRECTIVAS Y MODIFICADORES ═══ -->
+<div class="slide" data-i="4">
+  <div class="container">
+    <h2>Directivas · Modificadores · Abreviaciones</h2>
+    <div class="c2">
+      <div>
+        <p class="muted" style="margin-bottom:.7rem;font-size:.8rem">DIRECTIVAS PRINCIPALES</p>
+        <table style="margin-bottom:.9rem">
+          <thead><tr><th>Directiva</th><th>Uso</th><th>Short</th></tr></thead>
+          <tbody>
+            <tr><td><code class="il">v-bind</code></td><td>Enlaza atributos HTML</td><td><code class="il">:</code></td></tr>
+            <tr><td><code class="il">v-on</code></td><td>Escucha eventos DOM</td><td><code class="il">@</code></td></tr>
+            <tr><td><code class="il">v-model</code></td><td>Binding bidireccional</td><td>—</td></tr>
+            <tr><td><code class="il">v-if</code></td><td>Renderizado condicional</td><td>—</td></tr>
+            <tr><td><code class="il">v-show</code></td><td>Visibilidad CSS</td><td>—</td></tr>
+            <tr><td><code class="il">v-for</code></td><td>Iteración de listas</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="margin-bottom:.5rem;font-size:.8rem">MODIFICADORES DE EVENTO</p>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div class="card" style="padding:.7rem 1rem"><code class="il">@submit.prevent</code> <span style="font-size:.85rem;margin-left:.5rem">→ evita recarga de página</span></div>
+          <div class="card" style="padding:.7rem 1rem"><code class="il">@click.stop</code> <span style="font-size:.85rem;margin-left:.5rem">→ detiene propagación</span></div>
+          <div class="card" style="padding:.7rem 1rem"><code class="il">@click.once</code> <span style="font-size:.85rem;margin-left:.5rem">→ se ejecuta una sola vez</span></div>
+          <div class="card" style="padding:.7rem 1rem"><code class="il">@click.stop.prevent</code> <span style="font-size:.85rem;margin-left:.5rem">→ se encadenan</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">ejemplos combinados</p>
+        <pre><span class="cm">&lt;!-- v-bind abreviado --&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">:href</span>=<span class="str">"url"</span> <span class="attr">:class</span>=<span class="str">"{ activo: esActivo }"</span><span class="tag">&gt;</span>Link<span class="tag">&lt;/a&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">:src</span>=<span class="str">"img"</span> <span class="attr">:alt</span>=<span class="str">"desc"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- v-on abreviado + modificadores --&gt;</span>
+<span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"nombre"</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"edad"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"submit"</span><span class="tag">&gt;</span>Enviar<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+
+<span class="cm">&lt;!-- teclado --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keyup.enter</span>=<span class="str">"agregar"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keyup.esc</span>=<span class="str">"cancelar"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- modificadores de v-model --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">v-model.lazy</span>=<span class="str">"busqueda"</span> <span class="tag">/&gt;</span>
+<span class="cm">&lt;!-- .lazy: sincroniza on:change, no on:input --&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 5 DEMO 1 ═══ -->
+<div class="slide demo-slide" data-i="5">
+  <div class="container">
+    <div class="demo-hdr">
+      <div class="demo-icon">💻</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
+          <span class="badge b-pri">DEMO 1</span>
+          <span class="badge b-sec">~20 min</span>
+        </div>
+        <h2 style="margin:0">Interpolaciones · Directivas · Modificadores</h2>
+      </div>
+    </div>
+    <div class="c2">
+      <div class="demo-steps">
+        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Crear componente con <code class="il">data()</code>: nombre, activo, contador, lista de usuarios</div></div>
+        <div class="d-step"><div class="d-num">2</div><div class="d-txt">Mostrar datos con interpolaciones simples y ternario <code class="il">{{ activo ? 'Sí' : 'No' }}</code></div></div>
+        <div class="d-step"><div class="d-num">3</div><div class="d-txt">Formulario con <code class="il">@submit.prevent</code> y <code class="il">v-model.trim</code> + <code class="il">v-model.number</code></div></div>
+        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Botón con <code class="il">@click.once</code> que solo se ejecuta la primera vez</div></div>
+        <div class="d-step"><div class="d-num">5</div><div class="d-txt"><code class="il">:class</code> y <code class="il">:style</code> dinámicos según estado</div></div>
+        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Elemento con <code class="il">v-show="activo"</code> — ver en DevTools que el nodo existe aunque oculto</div></div>
+        <div class="d-step"><div class="d-num">7</div><div class="d-txt">Input con <code class="il">@keyup.enter</code> para agregar a la lista sin botón</div></div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Demo1.vue — código inicial</p>
+        <pre style="font-size:.73rem"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>Hola {{ <span class="prop">nombre</span> || <span class="str">'visitante'</span> }}<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Activo: {{ <span class="prop">activo</span> ? <span class="str">'✅ Sí'</span> : <span class="str">'❌ No'</span> }}<span class="tag">&lt;/p&gt;</span>
+
+    <span class="tag">&lt;div</span>
+      <span class="attr">:class</span>=<span class="str">"{ resaltado: activo }"</span>
+      <span class="attr">:style</span>=<span class="str">"{ color: activo ? '#00D4AA' : 'gray' }"</span>
+    <span class="tag">&gt;</span>Contenido dinámico<span class="tag">&lt;/div&gt;</span>
+
+    <span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"nombre"</span>
+             <span class="attr">@keyup.enter</span>=<span class="str">"enviar"</span>
+             <span class="attr">placeholder</span>=<span class="str">"Tu nombre"</span> <span class="tag">/&gt;</span>
+      <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"edad"</span>
+             <span class="attr">type</span>=<span class="str">"number"</span> <span class="tag">/&gt;</span>
+      <span class="tag">&lt;button&gt;</span>Enviar<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/form&gt;</span>
+
+    <span class="tag">&lt;button</span> <span class="attr">@click.once</span>=<span class="str">"activarUnaVez"</span><span class="tag">&gt;</span>Solo una vez<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">v-show</span>=<span class="str">"activo"</span><span class="tag">&gt;</span>Solo visible si activo<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 6 v-if vs v-show ═══ -->
+<div class="slide" data-i="6">
+  <div class="container">
+    <h2>v-if vs v-show — ¿Cuándo usar cada uno?</h2>
+    <div class="c2" style="margin-bottom:.9rem">
+      <div class="card" style="border-color:var(--primary)">
+        <h3 style="color:var(--primary)">v-if · v-else-if · v-else</h3>
+        <p style="font-size:.88rem;margin-bottom:.7rem">Añade o <strong>elimina el nodo del DOM</strong> según la condición. El componente se destruye y recrea.</p>
+        <pre style="font-size:.73rem"><span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"rol === 'admin'"</span><span class="tag">&gt;</span>
+  Panel admin
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">v-else-if</span>=<span class="str">"rol === 'user'"</span><span class="tag">&gt;</span>
+  Panel usuario
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">v-else</span><span class="tag">&gt;</span>
+  Sin acceso
+<span class="tag">&lt;/div&gt;</span></pre>
+        <div class="hl" style="margin-top:.7rem">
+          <p style="font-size:.82rem">✅ Usalo cuando: la condición cambia pocas veces · el componente es pesado · necesitás controlar permisos</p>
+        </div>
+      </div>
+      <div class="card" style="border-color:var(--secondary)">
+        <h3 style="color:var(--secondary)">v-show</h3>
+        <p style="font-size:.88rem;margin-bottom:.7rem">El nodo <strong>siempre está en el DOM</strong>. Solo cambia <code class="il">display: none</code>. El componente se mantiene vivo.</p>
+        <pre style="font-size:.73rem"><span class="tag">&lt;div</span> <span class="attr">v-show</span>=<span class="str">"mostrarMenu"</span><span class="tag">&gt;</span>
+  Menú lateral
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">v-show</span>=<span class="str">"cargando"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;spinner</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- inspeccioná en DevTools:
+     el nodo existe aunque esté oculto --&gt;</span></pre>
+        <div class="hl" style="margin-top:.7rem">
+          <p style="font-size:.82rem">✅ Usalo cuando: alterna frecuentemente · el componente es ligero · tooltips, dropdowns, sidebars</p>
+        </div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th></th><th>v-if</th><th>v-show</th></tr></thead>
+      <tbody>
+        <tr><td>Nodo en DOM</td><td>Solo si condición = true</td><td>Siempre</td></tr>
+        <tr><td>Alternancia frecuente</td><td>❌ Costoso</td><td>✅ Eficiente</td></tr>
+        <tr><td>Carga inicial</td><td>✅ Menor (no renderiza)</td><td>❌ Mayor (todo cargado)</td></tr>
+        <tr><td>Lifecycle hooks</td><td>Se ejecutan al montar/destruir</td><td>No se ejecutan</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ 7 v-for ═══ -->
+<div class="slide" data-i="7">
+  <div class="container">
+    <h2>v-for — Renderización de Listas</h2>
+    <div class="c2">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:.7rem">
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Array básico</h3>
+            <pre style="font-size:.73rem"><span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"item in lista"</span> <span class="attr">:key</span>=<span class="str">"item.id"</span><span class="tag">&gt;</span>
+  {{ item.nombre }}
+<span class="tag">&lt;/li&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Con índice</h3>
+            <pre style="font-size:.73rem"><span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"(item, i) in lista"</span> <span class="attr">:key</span>=<span class="str">"item.id"</span><span class="tag">&gt;</span>
+  {{ i + 1 }}. {{ item.nombre }}
+<span class="tag">&lt;/li&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Sobre objetos</h3>
+            <pre style="font-size:.73rem"><span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"(val, clave, i) in objeto"</span>
+     <span class="attr">:key</span>=<span class="str">"clave"</span><span class="tag">&gt;</span>
+  {{ clave }}: {{ val }}
+<span class="tag">&lt;/div&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Con template (sin wrapper)</h3>
+            <pre style="font-size:.73rem"><span class="tag">&lt;template</span> <span class="attr">v-for</span>=<span class="str">"item in lista"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;dt</span> <span class="attr">:key</span>=<span class="str">"'dt-'+item.id"</span><span class="tag">&gt;</span>{{ item.nombre }}<span class="tag">&lt;/dt&gt;</span>
+  <span class="tag">&lt;dd</span> <span class="attr">:key</span>=<span class="str">"'dd-'+item.id"</span><span class="tag">&gt;</span>{{ item.desc }}<span class="tag">&lt;/dd&gt;</span>
+<span class="tag">&lt;/template&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="hl hl-warn" style="margin-bottom:.8rem">
+          <h3 style="font-size:1rem;color:var(--accent)">⚠️ :key es obligatorio</h3>
+          <p style="font-size:.85rem">Permite a Vue identificar cada elemento durante actualizaciones del DOM virtual. Sin <code class="il">:key</code>, Vue puede reutilizar nodos incorrectamente.</p>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:.7rem;border-color:var(--accent)">
+          <h3 style="font-size:1rem;color:var(--accent)">NO mezcles v-if y v-for en el mismo elemento</h3>
+          <pre style="font-size:.72rem"><span class="cm">&lt;!-- ❌ Evitar --&gt;</span>
+<span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"u in usuarios"</span> <span class="attr">v-if</span>=<span class="str">"u.activo"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- ✅ Mejor: filtrar con computed --&gt;</span>
+<span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"u in usuariosActivos"</span> <span class="attr">:key</span>=<span class="str">"u.id"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">// computed</span>
+<span class="fn">usuariosActivos</span>() {
+  <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">usuarios</span>.<span class="fn">filter</span>(u => u.<span class="prop">activo</span>)
+}</pre>
+        </div>
+        <div class="hl">
+          <p style="font-size:.85rem">Si no tenés ID único → usá clave compuesta: <code class="il">:key="`${cat}-${nombre}`"</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 8 DEMO 2 ═══ -->
+<div class="slide demo-slide" data-i="8">
+  <div class="container">
+    <div class="demo-hdr">
+      <div class="demo-icon">💻</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
+          <span class="badge b-pri">DEMO 2</span>
+          <span class="badge b-sec">~15 min</span>
+        </div>
+        <h2 style="margin:0">v-if · v-show · v-for — Lista de Productos</h2>
+      </div>
+    </div>
+    <div class="c2">
+      <div class="demo-steps">
+        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Definir array <code class="il">productos</code> con <code class="il">id, nombre, precio, stock</code></div></div>
+        <div class="d-step"><div class="d-num">2</div><div class="d-txt"><code class="il">v-for</code> sobre productos mostrando nombre y precio</div></div>
+        <div class="d-step"><div class="d-num">3</div><div class="d-txt"><code class="il">v-if / v-else</code> para mostrar "En stock ✅" o "Agotado ❌"</div></div>
+        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Computed <code class="il">productosActivos</code> para filtrar — demostrar por qué es mejor que <code class="il">v-if</code> en el <code class="il">v-for</code></div></div>
+        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Botón "Ver detalles" con <code class="il">@click.once</code> que activa <code class="il">v-show</code></div></div>
+        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Mensaje <code class="il">v-if="productos.length === 0"</code> cuando la lista está vacía</div></div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Productos.vue</p>
+        <pre style="font-size:.72rem"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"productos.length === 0"</span><span class="tag">&gt;</span>
+      Sin productos
+    <span class="tag">&lt;/p&gt;</span>
+
+    <span class="tag">&lt;div</span>
+      <span class="attr">v-for</span>=<span class="str">"p in productos"</span>
+      <span class="attr">:key</span>=<span class="str">"p.id"</span>
+      <span class="attr">style</span>=<span class="str">"border:1px solid #ccc;padding:1rem;margin:.5rem 0"</span>
+    <span class="tag">&gt;</span>
+      <span class="tag">&lt;h3&gt;</span>{{ p.nombre }}<span class="tag">&lt;/h3&gt;</span>
+      <span class="tag">&lt;p&gt;</span>${{ p.precio }}<span class="tag">&lt;/p&gt;</span>
+
+      <span class="tag">&lt;span</span> <span class="attr">v-if</span>=<span class="str">"p.stock > 0"</span><span class="tag">&gt;</span>✅ En stock<span class="tag">&lt;/span&gt;</span>
+      <span class="tag">&lt;span</span> <span class="attr">v-else</span><span class="tag">&gt;</span>❌ Agotado<span class="tag">&lt;/span&gt;</span>
+
+      <span class="tag">&lt;button</span> <span class="attr">@click.once</span>=<span class="str">"p.verDetalle = true"</span><span class="tag">&gt;</span>
+        Ver detalles
+      <span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">v-show</span>=<span class="str">"p.verDetalle"</span><span class="tag">&gt;</span>
+        Stock: {{ p.stock }} unidades
+      <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 9 ACTIVIDAD 1 ═══ -->
+<div class="slide" data-i="9">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem">
+      <span class="badge b-acc">ACTIVIDAD 1</span>
+      <h2 style="margin:0">Listado de Productos y Control de Stock</h2>
+    </div>
+    <div class="act-grid">
+      <div>
+        <div class="timer-card" id="tc1">
+          <div class="t-lbl">⏱ tiempo disponible</div>
+          <div class="t-disp" id="t1">40:00</div>
+          <div class="t-status" id="t1s">Listo para iniciar</div>
+          <div class="t-ctrls">
+            <button class="t-btn tb-s" onclick="startT('t1',40)">▶ Iniciar</button>
+            <button class="t-btn tb-p" onclick="pauseT('t1')">⏸ Pausar</button>
+            <button class="t-btn tb-r" onclick="resetT('t1',40)">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="act-card">
+        <p style="margin-bottom:.3rem">Construí un componente que recorra una lista de productos con <strong>v-for</strong> y muestre mensajes según disponibilidad de stock.</p>
+        <div class="act-steps">
+          <div class="a-step"><div class="a-num">1</div><div class="a-txt">Crear array <code class="il">productos</code> con: <code class="il">id, nombre, precio, stock, verDetalle</code></div></div>
+          <div class="a-step"><div class="a-num">2</div><div class="a-txt">Iterar con <code class="il">v-for</code> mostrando nombre, precio con <code class="il">:key="p.id"</code></div></div>
+          <div class="a-step"><div class="a-num">3</div><div class="a-txt"><code class="il">v-if / v-else</code> para "✅ En stock (X unidades)" o "❌ Agotado"</div></div>
+          <div class="a-step"><div class="a-num">4</div><div class="a-txt">Botón "Ver detalles" con <code class="il">@click.once</code> — activa <code class="il">v-show</code> con información extra</div></div>
+          <div class="a-step"><div class="a-num">5</div><div class="a-txt">Formulario para agregar producto con <code class="il">@submit.prevent</code> y <code class="il">v-model.trim</code></div></div>
+          <div class="a-step"><div class="a-num">6</div><div class="a-txt">Computed <code class="il">productosEnStock</code> y mostrarlo en un contador</div></div>
+          <div class="a-step"><div class="a-num">7</div><div class="a-txt">⭐ Bonus: <code class="il">:class</code> dinámico para resaltar productos agotados en rojo</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 10 CORRECCIÓN ACT 1 ═══ -->
+<div class="slide" data-i="10">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
+      <span class="badge b-sec">CORRECCIÓN</span>
+      <h2 style="margin:0">Listado de Productos — Solución</h2>
+    </div>
+    <div class="c2">
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">template</p>
+        <pre style="font-size:.72rem"><span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"productos.length === 0"</span><span class="tag">&gt;</span>
+  Sin productos disponibles
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"p in productos"</span> <span class="attr">:key</span>=<span class="str">"p.id"</span>
+  <span class="attr">:class</span>=<span class="str">"{ agotado: p.stock === 0 }"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h3&gt;</span>{{ p.nombre }}<span class="tag">&lt;/h3&gt;</span>
+  <span class="tag">&lt;p&gt;</span>${{ p.precio.toFixed(2) }}<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">v-if</span>=<span class="str">"p.stock > 0"</span><span class="tag">&gt;</span>
+    ✅ En stock ({{ p.stock }})
+  <span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">v-else</span><span class="tag">&gt;</span>❌ Agotado<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">@click.once</span>=<span class="str">"p.verDetalle = true"</span><span class="tag">&gt;</span>
+    Ver detalles
+  <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">v-show</span>=<span class="str">"p.verDetalle"</span><span class="tag">&gt;</span>
+    ID: {{ p.id }} · Stock: {{ p.stock }}
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;p&gt;</span>En stock: {{ productosEnStock }}<span class="tag">&lt;/p&gt;</span></pre>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">script</p>
+        <pre style="font-size:.72rem"><span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      <span class="prop">nuevo</span>: { <span class="prop">nombre</span>:<span class="str">''</span>, <span class="prop">precio</span>:<span class="val">0</span>, <span class="prop">stock</span>:<span class="val">0</span> },
+      <span class="prop">productos</span>: [
+        { <span class="prop">id</span>:<span class="val">1</span>, <span class="prop">nombre</span>:<span class="str">'Laptop'</span>, <span class="prop">precio</span>:<span class="val">999</span>,
+          <span class="prop">stock</span>:<span class="val">5</span>, <span class="prop">verDetalle</span>:<span class="val">false</span> },
+        { <span class="prop">id</span>:<span class="val">2</span>, <span class="prop">nombre</span>:<span class="str">'Mouse'</span>, <span class="prop">precio</span>:<span class="val">29</span>,
+          <span class="prop">stock</span>:<span class="val">0</span>, <span class="prop">verDetalle</span>:<span class="val">false</span> },
+      ]
+    }
+  },
+  <span class="prop">computed</span>: {
+    <span class="fn">productosEnStock</span>() {
+      <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">productos</span>
+        .<span class="fn">filter</span>(p => p.<span class="prop">stock</span> > <span class="val">0</span>).<span class="prop">length</span>
+    }
+  },
+  <span class="prop">methods</span>: {
+    <span class="fn">agregar</span>() {
+      <span class="kw">const</span> id = <span class="prop">Date</span>.<span class="fn">now</span>()
+      <span class="kw">this</span>.<span class="prop">productos</span>.<span class="fn">push</span>({
+        ...<span class="kw">this</span>.<span class="prop">nuevo</span>, id, <span class="prop">verDetalle</span>:<span class="val">false</span>
+      })
+      <span class="kw">this</span>.<span class="prop">nuevo</span> = { <span class="prop">nombre</span>:<span class="str">''</span>, <span class="prop">precio</span>:<span class="val">0</span>, <span class="prop">stock</span>:<span class="val">0</span> }
+    }
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 11 TRANSICIÓN ═══ -->
+<div class="slide" data-i="11">
+  <div class="container" style="text-align:center">
+    <h2 style="margin-bottom:1.2rem">Primera parte completada ✅</h2>
+    <div class="grid3" style="margin-bottom:1.5rem">
+      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">📝</div><h3>Templates</h3><p style="font-size:.88rem">Declarativos, reactivos, componibles</p></div>
+      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">🔧</div><h3>Directivas</h3><p style="font-size:.88rem">v-bind, v-on, v-model + modificadores</p></div>
+      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">🔀</div><h3>Condicionales y Listas</h3><p style="font-size:.88rem">v-if, v-show, v-for con :key</p></div>
+    </div>
+    <div class="hl" style="max-width:650px;margin:0 auto">
+      <p>Después del break: <strong style="color:var(--primary)">v-for avanzado</strong> · <strong style="color:var(--secondary)">directivas personalizadas</strong> · <strong style="color:var(--accent)">&lt;component :is=""&gt;</strong> · <strong style="color:var(--warning)">slots + keep-alive</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 12 BREAK ═══ -->
+<div class="slide break-slide" data-i="12">
+  <div class="container" style="text-align:center">
+    <div style="font-size:3.5rem;margin-bottom:.4rem">☕</div>
+    <div class="break-big">BREAK</div>
+    <p style="font-size:1rem;color:var(--muted);margin:.7rem 0 1.4rem">20 minutos · volvemos con v-for avanzado, directivas custom, slots y keep-alive</p>
+    <div class="timer-card" style="max-width:320px;margin:0 auto" id="tcb">
+      <div class="t-lbl">⏱ descanso</div>
+      <div class="t-disp" id="tb">20:00</div>
+      <div class="t-status" id="tbs">¡A descansar!</div>
+      <div class="t-ctrls">
+        <button class="t-btn tb-s" onclick="startT('tb',20)">▶ Iniciar</button>
+        <button class="t-btn tb-p" onclick="pauseT('tb')">⏸ Pausar</button>
+        <button class="t-btn tb-r" onclick="resetT('tb',20)">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 13 v-for AVANZADO ═══ -->
+<div class="slide" data-i="13">
+  <div class="container">
+    <h2>v-for Avanzado + Claves Compuestas</h2>
+    <div class="c2">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:.65rem">
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">v-for con componentes</h3>
+            <pre style="font-size:.72rem"><span class="cm">&lt;!-- Renderiza un ProductoCard por cada item --&gt;</span>
+<span class="tag">&lt;ProductoCard</span>
+  <span class="attr">v-for</span>=<span class="str">"p in productos"</span>
+  <span class="attr">:key</span>=<span class="str">"p.id"</span>
+  <span class="attr">:nombre</span>=<span class="str">"p.nombre"</span>
+  <span class="attr">:precio</span>=<span class="str">"p.precio"</span>
+  <span class="attr">@eliminar</span>=<span class="str">"quitarProducto(p.id)"</span>
+<span class="tag">/&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Listas anidadas</h3>
+            <pre style="font-size:.72rem"><span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"cat in categorias"</span> <span class="attr">:key</span>=<span class="str">"cat.id"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h3&gt;</span>{{ cat.nombre }}<span class="tag">&lt;/h3&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li</span>
+      <span class="attr">v-for</span>=<span class="str">"p in cat.productos"</span>
+      <span class="attr">:key</span>=<span class="str">"`${cat.id}-${p.id}`"</span>
+    <span class="tag">&gt;</span>{{ p.nombre }}<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/div&gt;</span></pre>
+          </div>
+          <div class="card" style="padding:1rem">
+            <h3 style="font-size:1rem">Clave compuesta (sin ID)</h3>
+            <pre style="font-size:.72rem"><span class="tag">&lt;div</span>
+  <span class="attr">v-for</span>=<span class="str">"item in items"</span>
+  <span class="attr">:key</span>=<span class="str">"`${item.categoria}-${item.nombre}`"</span>
+<span class="tag">&gt;</span>{{ item.nombre }}<span class="tag">&lt;/div&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">v-html · v-text</p>
+        <pre style="font-size:.73rem"><span class="cm">&lt;!-- v-html: inyecta HTML real --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">v-html</span>=<span class="str">"descripcionHtml"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+<span class="cm">// En data:
+// descripcionHtml: '&lt;strong&gt;Oferta&lt;/strong&gt; 20% off'</span>
+
+<span class="cm">&lt;!-- v-text: equivalente a {{ }} pero reemplaza TODO --&gt;</span>
+<span class="tag">&lt;span</span> <span class="attr">v-text</span>=<span class="str">"mensaje"</span><span class="tag">&gt;&lt;/span&gt;</span>
+<span class="cm">&lt;!-- igual que: &lt;span&gt;{{ mensaje }}&lt;/span&gt; --&gt;</span></pre>
+        <div class="hl hl-warn" style="margin-top:.8rem;margin-bottom:.8rem">
+          <p style="font-size:.85rem">⚠️ <strong>v-html y XSS</strong>: nunca usés <code class="il">v-html</code> con contenido del usuario sin sanitizar. Solo con datos confiables (tuyo, de tu API).</p>
+        </div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Directiva personalizada — v-focus</p>
+        <pre style="font-size:.73rem"><span class="cm">// En main.js (Vue 2)</span>
+<span class="fn">Vue</span>.<span class="fn">directive</span>(<span class="str">'focus'</span>, {
+  <span class="fn">inserted</span>(el) {
+    el.<span class="fn">focus</span>()
+  }
+})
+
+<span class="cm">// Uso en template</span>
+<span class="tag">&lt;input</span> <span class="attr">v-focus</span> <span class="attr">placeholder</span>=<span class="str">"Se enfoca automáticamente"</span> <span class="tag">/&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 14 DEMO 3 ═══ -->
+<div class="slide demo-slide" data-i="14">
+  <div class="container">
+    <div class="demo-hdr">
+      <div class="demo-icon">💻</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
+          <span class="badge b-pri">DEMO 3</span>
+          <span class="badge b-sec">~15 min</span>
+        </div>
+        <h2 style="margin:0">v-for Avanzado · Componentes en Lista · Directiva Custom</h2>
+      </div>
+    </div>
+    <div class="c2">
+      <div class="demo-steps">
+        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Crear <code class="il">ProductoCard.vue</code> con props: <code class="il">nombre, precio, descripcion</code></div></div>
+        <div class="d-step"><div class="d-num">2</div><div class="d-txt"><code class="il">v-for</code> sobre array de productos usando <code class="il">ProductoCard</code></div></div>
+        <div class="d-step"><div class="d-num">3</div><div class="d-txt">El componente emite evento <code class="il">@eliminar</code> — el padre hace el splice</div></div>
+        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Campo descripción con <code class="il">v-html</code> — mostrar qué pasa con HTML vs texto plano</div></div>
+        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Registrar directiva global <code class="il">v-focus</code> en <code class="il">main.js</code> y usarla en el input de búsqueda</div></div>
+        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Clave compuesta: <code class="il">:key="`${cat.id}-${p.id}`"</code> en lista anidada</div></div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">ProductoCard.vue</p>
+        <pre style="font-size:.72rem"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"card"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>{{ nombre }}<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;p&gt;</span>${{ precio }}<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">v-html</span>=<span class="str">"descripcion"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"$emit('eliminar')"</span><span class="tag">&gt;</span>
+      🗑️ Eliminar
+    <span class="tag">&lt;/button&gt;</span>
+    <span class="cm">&lt;!-- slot para contenido extra --&gt;</span>
+    <span class="tag">&lt;slot</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="prop">props</span>: {
+    <span class="prop">nombre</span>: <span class="kw">String</span>,
+    <span class="prop">precio</span>: <span class="kw">Number</span>,
+    <span class="prop">descripcion</span>: <span class="kw">String</span>
+  }
+}
+<span class="tag">&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 15 COMPONENTES DINÁMICOS ═══ -->
+<div class="slide" data-i="15">
+  <div class="container">
+    <h2>Componentes Dinámicos · keep-alive</h2>
+    <div class="c2">
+      <div>
+        <p style="margin-bottom:.9rem"><code class="il">&lt;component :is=""&gt;</code> renderiza el componente que corresponde al valor de la variable. Perfecto para tabs, wizards y layouts condicionales.</p>
+        <pre style="font-size:.73rem;margin-bottom:.8rem"><span class="tag">&lt;component</span> <span class="attr">:is</span>=<span class="str">"vistaActual"</span><span class="tag">&gt;&lt;/component&gt;</span>
+
+<span class="cm">// En data:</span>
+<span class="prop">vistaActual</span>: <span class="str">'TabInicio'</span>
+
+<span class="cm">// Cambiar de vista:</span>
+<span class="kw">this</span>.<span class="prop">vistaActual</span> = <span class="str">'TabConfig'</span></pre>
+
+        <div class="card" style="padding:1rem;border-color:var(--secondary)">
+          <h3 style="font-size:1rem">keep-alive — preservar estado</h3>
+          <pre style="font-size:.73rem"><span class="tag">&lt;keep-alive&gt;</span>
+  <span class="tag">&lt;component</span> <span class="attr">:is</span>=<span class="str">"vistaActual"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;/keep-alive&gt;</span>
+
+<span class="cm">&lt;!-- Sin keep-alive: el componente se destruye
+     al cambiar de vista — se pierde el estado.
+     Con keep-alive: el componente se "pausa"
+     y su estado se conserva. --&gt;</span></pre>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Slots — contenido personalizable</p>
+        <pre style="font-size:.73rem"><span class="cm">&lt;!-- Componente hijo Tarjeta.vue --&gt;</span>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"tarjeta"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;header&gt;</span>
+      <span class="tag">&lt;slot</span> <span class="attr">name</span>=<span class="str">"cabecera"</span><span class="tag">&gt;</span>
+        Título por defecto
+      <span class="tag">&lt;/slot&gt;</span>
+    <span class="tag">&lt;/header&gt;</span>
+    <span class="tag">&lt;main&gt;</span>
+      <span class="tag">&lt;slot</span><span class="tag">&gt;</span>Contenido por defecto<span class="tag">&lt;/slot&gt;</span>
+    <span class="tag">&lt;/main&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>
+      <span class="tag">&lt;slot</span> <span class="attr">name</span>=<span class="str">"pie"</span><span class="tag">&gt;&lt;/slot&gt;</span>
+    <span class="tag">&lt;/footer&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="cm">&lt;!-- Uso desde el padre --&gt;</span>
+<span class="tag">&lt;Tarjeta&gt;</span>
+  <span class="tag">&lt;template</span> <span class="attr">v-slot:cabecera</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>🎉 ¡Nuevo producto!<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;/template&gt;</span>
+  <span class="tag">&lt;p&gt;</span>Este es el contenido del cuerpo<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;template</span> <span class="attr">#pie</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;button&gt;</span>Comprar<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/template&gt;</span>
+<span class="tag">&lt;/Tarjeta&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 16 DEMO 4 ═══ -->
+<div class="slide demo-slide" data-i="16">
+  <div class="container">
+    <div class="demo-hdr">
+      <div class="demo-icon">💻</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
+          <span class="badge b-pri">DEMO 4</span>
+          <span class="badge b-sec">~15 min</span>
+        </div>
+        <h2 style="margin:0">Tabs con &lt;component :is=""&gt; · keep-alive · Slots</h2>
+      </div>
+    </div>
+    <div class="c2">
+      <div class="demo-steps">
+        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Crear <code class="il">TabLista.vue</code> con un input y una lista de items (estado local)</div></div>
+        <div class="d-step"><div class="d-num">2</div><div class="d-txt">Crear <code class="il">TabConfig.vue</code> con un formulario de preferencias (estado local)</div></div>
+        <div class="d-step"><div class="d-num">3</div><div class="d-txt">En <code class="il">App.vue</code>: botones para cambiar <code class="il">vistaActual</code></div></div>
+        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Usar <code class="il">&lt;component :is="vistaActual"&gt;</code> — ver que el estado se pierde al cambiar</div></div>
+        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Envolver en <code class="il">&lt;keep-alive&gt;</code> — ver que ahora el estado persiste</div></div>
+        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Agregar slot nombrado en <code class="il">ProductoCard</code> para mostrar badge "¡Nuevo!" desde el padre</div></div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">App.vue — tabs con keep-alive</p>
+        <pre style="font-size:.72rem"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;button</span>
+        <span class="attr">v-for</span>=<span class="str">"tab in tabs"</span> <span class="attr">:key</span>=<span class="str">"tab.nombre"</span>
+        <span class="attr">@click</span>=<span class="str">"vistaActual = tab.componente"</span>
+        <span class="attr">:class</span>=<span class="str">"{ activo: vistaActual === tab.componente }"</span>
+      <span class="tag">&gt;</span>{{ tab.label }}<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+
+    <span class="tag">&lt;keep-alive&gt;</span>
+      <span class="tag">&lt;component</span> <span class="attr">:is</span>=<span class="str">"vistaActual"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/keep-alive&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> TabLista <span class="kw">from</span> <span class="str">'./TabLista.vue'</span>
+<span class="kw">import</span> TabConfig <span class="kw">from</span> <span class="str">'./TabConfig.vue'</span>
+<span class="kw">export default</span> {
+  <span class="prop">components</span>: { TabLista, TabConfig },
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      <span class="prop">vistaActual</span>: <span class="str">'TabLista'</span>,
+      <span class="prop">tabs</span>: [
+        { <span class="prop">label</span>: <span class="str">'📋 Lista'</span>, <span class="prop">componente</span>: <span class="str">'TabLista'</span> },
+        { <span class="prop">label</span>: <span class="str">'⚙️ Config'</span>, <span class="prop">componente</span>: <span class="str">'TabConfig'</span> }
+      ]
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 17 ACTIVIDAD 2 ═══ -->
+<div class="slide" data-i="17">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem">
+      <span class="badge b-acc">ACTIVIDAD 2</span>
+      <h2 style="margin:0">Catálogo de Productos con Vista Dinámica</h2>
+    </div>
+    <div class="act-grid">
+      <div>
+        <div class="timer-card" id="tc2">
+          <div class="t-lbl">⏱ tiempo disponible</div>
+          <div class="t-disp" id="t2">35:00</div>
+          <div class="t-status" id="t2s">Listo para iniciar</div>
+          <div class="t-ctrls">
+            <button class="t-btn tb-s" onclick="startT('t2',35)">▶ Iniciar</button>
+            <button class="t-btn tb-p" onclick="pauseT('t2')">⏸ Pausar</button>
+            <button class="t-btn tb-r" onclick="resetT('t2',35)">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="act-card">
+        <p style="margin-bottom:.3rem">Construí un catálogo que use <strong>ProductoCard</strong> con slots, alternación de vistas con <strong>&lt;component :is=""&gt;</strong> y <strong>keep-alive</strong>.</p>
+        <div class="act-steps">
+          <div class="a-step"><div class="a-num">1</div><div class="a-txt">Crear <code class="il">ProductoCard.vue</code> con props <code class="il">nombre, precio, imagen</code> y un <strong>slot nombrado</strong> para badge</div></div>
+          <div class="a-step"><div class="a-num">2</div><div class="a-txt"><code class="il">v-for</code> para renderizar la lista como tarjetas. Pasar datos por props</div></div>
+          <div class="a-step"><div class="a-num">3</div><div class="a-txt">Desde el padre, usar el slot para mostrar <code class="il">"¡Nuevo!"</code> o <code class="il">"🔥 Oferta"</code> en algunos productos</div></div>
+          <div class="a-step"><div class="a-num">4</div><div class="a-txt">Crear <code class="il">GrillaProductos.vue</code> y <code class="il">DetalleProducto.vue</code> (vistas distintas)</div></div>
+          <div class="a-step"><div class="a-num">5</div><div class="a-txt">Alternar con <code class="il">&lt;component :is="vistaActual"&gt;</code> — sin keep-alive primero, ver que se pierde el estado</div></div>
+          <div class="a-step"><div class="a-num">6</div><div class="a-txt">Agregar <code class="il">&lt;keep-alive&gt;</code> y comprobar que el estado persiste</div></div>
+          <div class="a-step"><div class="a-num">7</div><div class="a-txt">⭐ Bonus: usar <code class="il">v-html</code> en la descripción del producto con una advertencia visible</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 18 MODIFICADORES AVANZADOS ═══ -->
+<div class="slide" data-i="18">
+  <div class="container">
+    <h2>Modificadores Avanzados</h2>
+    <div class="grid3">
+      <div class="card">
+        <h3>Teclado</h3>
+        <pre style="font-size:.72rem"><span class="cm">&lt;!-- Teclas específicas --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keyup.enter</span>=<span class="str">"enviar"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keyup.esc</span>=<span class="str">"cancelar"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keyup.space</span>=<span class="str">"accion"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">@keydown.tab</span>=<span class="str">"navegar"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- Combinaciones --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">@keyup.ctrl.enter</span>=<span class="str">"guardar"</span> <span class="tag">/&gt;</span></pre>
+      </div>
+      <div class="card">
+        <h3>Ratón</h3>
+        <pre style="font-size:.72rem"><span class="cm">&lt;!-- Botones del mouse --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">@click.right</span>=<span class="str">"contextMenu"</span><span class="tag">&gt;</span>
+  Click derecho
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">@click.middle</span>=<span class="str">"abrirTab"</span><span class="tag">&gt;</span>
+  Rueda
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Exacto (sin otras teclas) --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">@click.exact</span>=<span class="str">"solo"</span><span class="tag">&gt;</span>
+  Solo este click
+<span class="tag">&lt;/div&gt;</span></pre>
+      </div>
+      <div class="card">
+        <h3>v-model</h3>
+        <pre style="font-size:.72rem"><span class="cm">&lt;!-- .lazy: on:change en vez de on:input --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">v-model.lazy</span>=<span class="str">"busqueda"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- .number: auto-convierte a Number --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"precio"</span>
+       <span class="attr">type</span>=<span class="str">"number"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- .trim: elimina espacios --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"nombre"</span> <span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- combinados --&gt;</span>
+<span class="tag">&lt;button</span>
+  <span class="attr">@click.stop.prevent</span>=<span class="str">"accion"</span>
+<span class="tag">&gt;</span>Detener todo<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
+    </div>
+    <div class="hl" style="margin-top:.9rem">
+      <p style="font-size:.9rem">💡 Los modificadores se <strong>encadenan</strong> en orden: <code class="il">@click.stop.prevent</code> primero detiene la propagación, luego previene el default. El orden importa.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 19 CLASES Y ESTILOS DINÁMICOS ═══ -->
+<div class="slide" data-i="19">
+  <div class="container">
+    <h2>Clases y Estilos Dinámicos</h2>
+    <div class="c2">
+      <div>
+        <p class="muted" style="margin-bottom:.6rem;font-size:.8rem">:class — OBJETO</p>
+        <pre style="font-size:.72rem;margin-bottom:.8rem"><span class="cm">&lt;!-- La clase se aplica si el valor es truthy --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">:class</span>=<span class="str">"{ activo: esActivo, error: tieneError }"</span><span class="tag">&gt;</span>
+
+<span class="cm">&lt;!-- Combinado con clase estática --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"btn"</span> <span class="attr">:class</span>=<span class="str">"{ 'btn-primary': primario }"</span><span class="tag">&gt;</span>
+
+<span class="cm">&lt;!-- O con array --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">:class</span>=<span class="str">"[claseBase, condicion ? 'a' : 'b']"</span><span class="tag">&gt;</span></pre>
+
+        <p class="muted" style="margin-bottom:.6rem;font-size:.8rem">:style — OBJETO</p>
+        <pre style="font-size:.72rem"><span class="cm">&lt;!-- camelCase para propiedades CSS --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"{ color: colorTexto, fontSize: size + 'px' }"</span><span class="tag">&gt;</span>
+
+<span class="cm">&lt;!-- Array de objetos de estilo --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"[estiloBase, { color: colorActivo }]"</span><span class="tag">&gt;</span>
+
+<span class="cm">// En data:</span>
+<span class="prop">estiloBase</span>: { <span class="prop">padding</span>: <span class="str">'1rem'</span>, <span class="prop">borderRadius</span>: <span class="str">'8px'</span> }</pre>
+      </div>
+      <div>
+        <p class="muted" style="margin-bottom:.6rem;font-size:.8rem">Atributos dinámicos con v-bind</p>
+        <pre style="font-size:.72rem;margin-bottom:.8rem"><span class="cm">&lt;!-- Atributos individuales --&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">:src</span>=<span class="str">"imagen"</span> <span class="attr">:alt</span>=<span class="str">"descripcion"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">:href</span>=<span class="str">"url"</span> <span class="attr">:target</span>=<span class="str">"target"</span><span class="tag">&gt;</span>Link<span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Múltiples atributos de un objeto --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">v-bind</span>=<span class="str">"todosLosAtributos"</span><span class="tag">&gt;</span>
+
+<span class="cm">// En data:</span>
+<span class="prop">todosLosAtributos</span>: {
+  <span class="prop">id</span>: <span class="str">'mi-id'</span>,
+  <span class="prop">class</span>: <span class="str">'mi-clase'</span>,
+  <span class="prop">tabindex</span>: <span class="val">0</span>
+}</pre>
+        <div class="hl">
+          <p style="font-size:.85rem">Usar <code class="il">v-bind</code> sin argumento para pasar un objeto completo de atributos es muy útil al construir componentes genéricos de alto orden.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 20 CIERRE ═══ -->
+<div class="slide" data-i="20">
+  <div class="container">
+    <h2>Resumen de la Clase</h2>
+    <div class="grid2" style="margin-bottom:1rem">
+      <div>
+        <p class="muted" style="font-size:.78rem;letter-spacing:.05em;margin-bottom:.55rem">✅ PARTE I — TEMPLATES BÁSICOS</p>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Templates declarativos: interpolaciones <code class="il">{{ }}</code> y expresiones JS</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Directivas: <code class="il">v-bind (:)</code>, <code class="il">v-on (@)</code>, <code class="il">v-model</code> y sus modificadores</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">v-if</code> vs <code class="il">v-show</code>: cuándo eliminar del DOM vs ocultar</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">v-for</code> con <code class="il">:key</code> · no mezclar con <code class="il">v-if</code> · usar computed</p></div>
+      </div>
+      <div>
+        <p class="muted" style="font-size:.78rem;letter-spacing:.05em;margin-bottom:.55rem">✅ PARTE II — RENDERING AVANZADO</p>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">v-for</code> con componentes, objetos, listas anidadas y claves compuestas</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">v-html</code> · <code class="il">v-text</code> · directivas personalizadas (<code class="il">v-focus</code>)</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">&lt;component :is=""&gt;</code> + <code class="il">&lt;keep-alive&gt;</code> para componentes dinámicos</p></div>
+        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Slots por defecto y nombrados para componentes reutilizables</p></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <div class="hl" style="flex:1">
+        <p style="font-size:.88rem">📚 <strong>Próxima clase:</strong> Binding de formularios en Vue · validaciones · select, checkbox, radio con v-model</p>
+      </div>
+      <div class="hl hl-warn" style="flex:1">
+        <p style="font-size:.88rem">🏆 <strong>Para practicar:</strong> Completar Actividad 2 · agregar filtro de búsqueda al catálogo · slot con scoped</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#slides -->
+
+<!-- FOOTER -->
+<footer>
+  <button class="nav-btn" id="bp" onclick="nav(-1)">← Anterior</button>
+  <span class="ft-hint">← → teclado · Espacio para avanzar</span>
+  <button class="nav-btn" id="bn" onclick="nav(1)">Siguiente →</button>
+</footer>
+
+</div><!-- /#app -->
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  document.getElementById('tot').textContent = total;
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active');
+    ui();
+  }
+  function nav(d) { goTo(cur + d); }
+  function ui() {
+    document.getElementById('ctr').innerHTML = `<strong>${cur+1}</strong> / <span id="tot">${total}</span>`;
+    document.getElementById('pf').style.width = `${((cur+1)/total)*100}%`;
+    document.getElementById('bp').disabled = cur === 0;
+    document.getElementById('bn').disabled = cur === total - 1;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nav(1);
+    if (e.key === 'ArrowLeft') nav(-1);
+  });
+  ui();
+
+  // ── TIMERS ──
+  const TS = {};
+  function els(id) {
+    return {
+      d: document.getElementById(id),
+      s: document.getElementById(id+'s'),
+      c: document.getElementById('tc'+id.slice(-1) === 'b' ? 'b' : id.slice(-1))
+    };
+  }
+  function fmt(s) {
+    return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+  }
+  function renderT(id) {
+    const st = TS[id]; if (!st) return;
+    const d = document.getElementById(id);
+    const s = document.getElementById(id+'s');
+    // card id: tc1, tc2, tcb
+    const cid = id === 'tb' ? 'tcb' : 'tc' + id.slice(-1);
+    const c = document.getElementById(cid);
+    d.textContent = fmt(st.rem);
+    d.className = 't-disp';
+    if (c) c.className = 'timer-card';
+    if (st.rem <= 60) {
+      d.classList.add('td');
+      if (c) c.classList.add('tc-danger');
+      s.textContent = '⚠️ ¡Menos de 1 minuto!';
+    } else if (st.rem <= 300) {
+      d.classList.add('tw');
+      if (c) c.classList.add('tc-warn');
+      s.textContent = '⏳ Menos de 5 minutos';
+    } else {
+      s.textContent = st.running ? '🟢 En curso...' : (st.rem === st.total ? 'Listo para iniciar' : '⏸ Pausado');
+    }
+  }
+  function startT(id, min) {
+    if (!TS[id]) TS[id] = { rem: min*60, total: min*60, running: false, iv: null };
+    const st = TS[id];
+    if (st.running) return;
+    st.running = true;
+    st.iv = setInterval(() => {
+      st.rem--;
+      renderT(id);
+      if (st.rem <= 0) {
+        clearInterval(st.iv); st.running = false;
+        document.getElementById(id+'s').textContent = '🏁 ¡Tiempo terminado!';
+        beep();
+      }
+    }, 1000);
+    renderT(id);
+  }
+  function pauseT(id) {
+    const st = TS[id]; if (!st) return;
+    clearInterval(st.iv); st.running = false; renderT(id);
+  }
+  function resetT(id, min) {
+    if (TS[id]) { clearInterval(TS[id].iv); }
+    TS[id] = { rem: min*60, total: min*60, running: false, iv: null };
+    renderT(id);
+    document.getElementById(id+'s').textContent = 'Listo para iniciar';
+  }
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0,.15,.3].forEach(t => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='sine'; o.frequency.value=880;
+        g.gain.setValueAtTime(.4, ctx.currentTime+t);
+        g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+t+.25);
+        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+.3);
+      });
+    } catch(e){}
+  }
+</script>
+</body>
+</html>

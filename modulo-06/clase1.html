@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducción a Vue.js — Clase Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2D5BFF;
+    --secondary: #00D4AA;
+    --accent: #FF6B6B;
+    --dark: #1A1A2E;
+    --light: #F8F9FA;
+    --warning: #FFA500;
+    --bg: #0F0F1E;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #E8EAF6;
+    --text-muted: rgba(232,234,246,0.55);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    font-family: 'Sora', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ─── LAYOUT ─────────────────────────────────── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    width: 100%; height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 2rem;
+    background: rgba(15,15,30,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  .header-logo {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-weight: 700; font-size: 0.9rem; letter-spacing: 0.05em;
+    color: var(--secondary);
+  }
+  .header-logo span { color: var(--text-muted); font-weight: 400; }
+
+  .slide-counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .slide-counter strong { color: var(--primary); font-size: 1rem; }
+
+  .header-nav {
+    display: flex; gap: 0.5rem;
+  }
+  .header-nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .header-nav button:hover { background: var(--primary); border-color: var(--primary); }
+
+  /* ─── PROGRESS BAR ───────────────────────────── */
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.4s ease;
+  }
+
+  /* ─── SLIDES CONTAINER ───────────────────────── */
+  #slides {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 2rem;
+    animation: slideIn 0.5s ease-out;
+  }
+  .slide.active { display: flex; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .container {
+    width: 100%; max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ─── TYPOGRAPHY ─────────────────────────────── */
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #fff 30%, var(--secondary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  h3 { font-size: 1.3rem; font-weight: 600; color: var(--secondary); margin-bottom: 0.6rem; }
+  p, li { font-size: 1.1rem; line-height: 1.8; color: var(--text); }
+  .text-muted { color: var(--text-muted); font-size: 1rem; }
+
+  /* ─── BADGE / TAG ─────────────────────────────── */
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-primary { background: rgba(45,91,255,0.18); color: var(--primary); border: 1px solid var(--primary); }
+  .badge-secondary { background: rgba(0,212,170,0.18); color: var(--secondary); border: 1px solid var(--secondary); }
+  .badge-accent { background: rgba(255,107,107,0.18); color: var(--accent); border: 1px solid var(--accent); }
+  .badge-warning { background: rgba(255,165,0,0.18); color: var(--warning); border: 1px solid var(--warning); }
+
+  /* ─── CARDS ──────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 32px rgba(45,91,255,0.15);
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+
+  /* ─── CODE BLOCK ─────────────────────────────── */
+  pre, code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+  }
+  pre {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(45,91,255,0.3);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .kw { color: #9580ff; }
+  .str { color: #00D4AA; }
+  .fn { color: #50fa7b; }
+  .comment { color: #6272a4; }
+  .prop { color: #ffb86c; }
+  .tag { color: #FF6B6B; }
+  .attr { color: #8be9fd; }
+  .val { color: #f1fa8c; }
+
+  /* ─── TITLE SLIDE ─────────────────────────────── */
+  .slide-title {
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(45,91,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,212,170,0.1) 0%, transparent 50%),
+      var(--bg);
+  }
+  .title-eyebrow {
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em;
+    color: var(--secondary); text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .title-sub {
+    font-size: 1.15rem; color: var(--text-muted);
+    margin-top: 0.8rem; font-weight: 400;
+  }
+  .title-tags { display: flex; gap: 0.6rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  .title-meta {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+    margin-top: 2rem;
+  }
+  .title-meta-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem; text-align: center;
+  }
+  .title-meta-item .number {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem; font-weight: 700; color: var(--primary);
+  }
+  .title-meta-item .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+  /* ─── AGENDA SLIDE ───────────────────────────── */
+  .agenda-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+  }
+  .agenda-block:hover { border-color: var(--primary); transform: translateX(4px); }
+  .agenda-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem; color: var(--secondary);
+    min-width: 55px; font-weight: 700;
+  }
+  .agenda-title { font-size: 1rem; font-weight: 600; }
+  .agenda-sub { font-size: 0.82rem; color: var(--text-muted); }
+  .agenda-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .agenda-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  /* ─── DEMO SLIDE ──────────────────────────────── */
+  .demo-slide {
+    background:
+      radial-gradient(ellipse at 80% 80%, rgba(45,91,255,0.08) 0%, transparent 60%),
+      var(--bg);
+  }
+  .demo-header {
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+  }
+  .demo-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+  .demo-steps {
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .demo-step {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.7rem 1rem;
+  }
+  .demo-step-num {
+    min-width: 24px; height: 24px;
+    background: var(--primary); border-radius: 50%;
+    font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .demo-step-text { font-size: 0.95rem; line-height: 1.5; }
+  code.inline {
+    background: rgba(45,91,255,0.15); color: var(--secondary);
+    padding: 0.1rem 0.4rem; border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  /* ─── ACTIVITY LAYOUT ────────────────────────── */
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  /* Timer */
+  .timer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem 1.5rem;
+    text-align: center;
+    transition: border-color 0.4s ease;
+  }
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(3.5rem, 6vw, 5.5rem);
+    font-weight: 700;
+    color: var(--secondary);
+    text-shadow: 0 0 30px rgba(0,212,170,0.4);
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin: 0.5rem 0;
+  }
+  .timer-display.warn { color: var(--warning); text-shadow: 0 0 30px rgba(255,165,0,0.5); }
+  .timer-display.danger {
+    color: var(--accent); text-shadow: 0 0 30px rgba(255,107,107,0.6);
+    animation: pulse 0.8s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity: 0.65; } }
+  .timer-card.danger { border-color: var(--accent); }
+  .timer-card.warn { border-color: var(--warning); }
+
+  .timer-title { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
+  .timer-status { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; min-height: 1.2rem; }
+  .timer-controls {
+    display: flex; justify-content: center; gap: 0.8rem; margin-top: 1rem;
+  }
+  .timer-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; border: 1px solid; transition: all 0.2s ease;
+  }
+  .btn-start { background: rgba(0,212,170,0.15); border-color: var(--secondary); color: var(--secondary); }
+  .btn-start:hover { background: var(--secondary); color: var(--dark); }
+  .btn-pause { background: rgba(255,165,0,0.15); border-color: var(--warning); color: var(--warning); }
+  .btn-pause:hover { background: var(--warning); color: var(--dark); }
+  .btn-reset { background: rgba(255,107,107,0.15); border-color: var(--accent); color: var(--accent); }
+  .btn-reset:hover { background: var(--accent); color: #fff; }
+
+  /* Activity instructions */
+  .activity-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .activity-steps {
+    display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;
+  }
+  .activity-step {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-text { font-size: 0.9rem; line-height: 1.5; }
+
+  /* ─── BREAK SLIDE ─────────────────────────────── */
+  .break-slide {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(0,212,170,0.08) 0%, transparent 70%),
+      var(--bg);
+    text-align: center;
+  }
+  .break-big {
+    font-size: clamp(4rem, 8vw, 7rem);
+    line-height: 1;
+    margin: 0.5rem 0;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+  }
+
+  /* ─── CONCEPT SLIDE ──────────────────────────── */
+  .concept-layout {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;
+  }
+
+  ul { list-style: none; }
+  ul li { padding-left: 1.4rem; position: relative; margin-bottom: 0.5rem; }
+  ul li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--secondary); font-weight: 700;
+  }
+
+  .divider {
+    height: 1px; background: var(--border); margin: 1rem 0;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(45,91,255,0.1), rgba(0,212,170,0.1));
+    border: 1px solid rgba(45,91,255,0.3);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+  }
+
+  /* Two-column list */
+  .two-col-list {
+    columns: 2; column-gap: 2rem;
+  }
+  .two-col-list li { break-inside: avoid; }
+
+  /* ─── TABLE ───────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th {
+    background: rgba(45,91,255,0.2); padding: 0.7rem 1rem;
+    text-align: left; font-weight: 600; color: var(--primary);
+    border-bottom: 1px solid rgba(45,91,255,0.3);
+  }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+
+  /* ─── ICON ROW ─────────────────────────────────── */
+  .icon-row { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 0.4rem; }
+  .icon-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+
+  /* ─── VUEX FLOW ──────────────────────────────── */
+  .flow-row {
+    display: flex; align-items: center; gap: 0.8rem;
+    flex-wrap: nowrap; justify-content: center; margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.7rem 1.2rem;
+    text-align: center; font-size: 0.9rem; font-weight: 600;
+  }
+  .flow-arrow { color: var(--text-muted); font-size: 1.2rem; }
+  .flow-primary { border-color: var(--primary); color: var(--primary); }
+  .flow-secondary { border-color: var(--secondary); color: var(--secondary); }
+  .flow-accent { border-color: var(--accent); color: var(--accent); }
+  .flow-warning { border-color: var(--warning); color: var(--warning); }
+
+  /* ─── SUMMARY ─────────────────────────────────── */
+  .check-item {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    padding: 0.7rem 1rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 0.5rem;
+  }
+  .check-icon { color: var(--secondary); font-size: 1.1rem; flex-shrink: 0; }
+
+  /* ─── FOOTER NAV ──────────────────────────────── */
+  footer {
+    display: flex; justify-content: center; align-items: center;
+    gap: 1.5rem; padding: 0.6rem 2rem;
+    background: rgba(15,15,30,0.9);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    padding: 0.45rem 1.4rem;
+    border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Sora', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .nav-btn:hover { background: var(--primary); border-color: var(--primary); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { background: var(--surface); border-color: var(--border); }
+  .footer-hint { font-size: 0.75rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-logo">
+      <span style="font-size:1.3rem">🔷</span>
+      Vue.js <span>/ Clase Completa</span>
+    </div>
+    <div class="slide-counter" id="counterDisplay">
+      <strong>1</strong> / <span id="totalSlides">21</span>
+    </div>
+    <div class="header-nav">
+      <button onclick="goTo(0)">Inicio</button>
+      <button onclick="goTo(10)">☕ Break</button>
+      <button onclick="goTo(20)">Fin</button>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <!-- SLIDES -->
+  <div id="slides">
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 0: TÍTULO -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide slide-title active" data-idx="0">
+      <div class="container">
+        <div class="title-eyebrow">Desarrollo de Aplicaciones Front-end Trainee</div>
+        <h1>Introducción al<br>Framework Vue.js</h1>
+        <p class="title-sub">Clase de 3 horas · Partes I y II · Demo-first 🔥</p>
+        <div class="title-tags">
+          <span class="badge badge-primary">Vue.js</span>
+          <span class="badge badge-secondary">Componentes</span>
+          <span class="badge badge-secondary">Reactividad</span>
+          <span class="badge badge-accent">Vue Router</span>
+          <span class="badge badge-warning">Vuex</span>
+          <span class="badge badge-primary">SPA</span>
+        </div>
+        <div class="title-meta">
+          <div class="title-meta-item">
+            <div class="number">3 hs</div>
+            <div class="label">Duración total</div>
+          </div>
+          <div class="title-meta-item">
+            <div class="number">5</div>
+            <div class="label">Live demos</div>
+          </div>
+          <div class="title-meta-item">
+            <div class="number">2</div>
+            <div class="label">Ejercicios prácticos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 1: AGENDA -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="1">
+      <div class="container">
+        <h2>Agenda del día</h2>
+        <p class="text-muted" style="margin-bottom:1.2rem">3 horas · 1 break de 20 minutos · prioridad: demos en vivo</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 2.5rem">
+          <div class="agenda-list">
+            <div class="agenda-block">
+              <div class="agenda-icon">🎯</div>
+              <div>
+                <div class="agenda-time">00:00</div>
+                <div class="agenda-title">Intro · ¿Qué es Vue.js?</div>
+                <div class="agenda-sub">Framework progresivo, componentes, reactividad</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">💻</div>
+              <div>
+                <div class="agenda-time">00:15</div>
+                <div class="agenda-title">Demo 1 — Vue vía CDN</div>
+                <div class="agenda-sub">data, interpolación, v-bind, v-if, v-for</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">💻</div>
+              <div>
+                <div class="agenda-time">00:40</div>
+                <div class="agenda-title">Demo 2 — Componente con Props</div>
+                <div class="agenda-sub">props, $emit, comunicación padre-hijo</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">🧪</div>
+              <div>
+                <div class="agenda-time">01:00</div>
+                <div class="agenda-title">Actividad 1 — Lista de tareas</div>
+                <div class="agenda-sub">25 min · reactividad + componentes</div>
+              </div>
+            </div>
+            <div class="agenda-block" style="border-color:var(--secondary)">
+              <div class="agenda-icon">☕</div>
+              <div>
+                <div class="agenda-time" style="color:var(--accent)">01:25</div>
+                <div class="agenda-title">Break</div>
+                <div class="agenda-sub">20 minutos</div>
+              </div>
+            </div>
+          </div>
+          <div class="agenda-list">
+            <div class="agenda-block">
+              <div class="agenda-icon">⚙️</div>
+              <div>
+                <div class="agenda-time">01:45</div>
+                <div class="agenda-title">Vue CLI + Lifecycle</div>
+                <div class="agenda-sub">package.json, ciclo de vida, computed, watchers</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">💻</div>
+              <div>
+                <div class="agenda-time">01:55</div>
+                <div class="agenda-title">Demo 3 — Computed + Watchers</div>
+                <div class="agenda-sub">propiedades computadas en acción</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">💻</div>
+              <div>
+                <div class="agenda-time">02:15</div>
+                <div class="agenda-title">Demo 4 — Vue Router SPA</div>
+                <div class="agenda-sub">rutas, router-link, router-view</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">💻</div>
+              <div>
+                <div class="agenda-time">02:35</div>
+                <div class="agenda-title">Demo 5 — Vuex Store</div>
+                <div class="agenda-sub">state, mutations, actions, getters</div>
+              </div>
+            </div>
+            <div class="agenda-block">
+              <div class="agenda-icon">🧪</div>
+              <div>
+                <div class="agenda-time">02:50</div>
+                <div class="agenda-title">Actividad 2 + Cierre</div>
+                <div class="agenda-sub">SPA con Vuex · preguntas finales</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 2: QUÉ ES VUE.JS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="2">
+      <div class="container">
+        <h2>¿Qué es Vue.js?</h2>
+        <div class="concept-layout">
+          <div>
+            <div class="card" style="margin-bottom:1rem">
+              <h3>Framework progresivo</h3>
+              <p>Puede adoptarse de forma gradual — desde un simple <code class="inline">&lt;script&gt;</code> en HTML hasta una SPA completa.</p>
+            </div>
+            <div class="card" style="margin-bottom:1rem">
+              <h3>Basado en componentes</h3>
+              <p>Cada pieza de la UI es un componente con su propio <strong>template</strong>, <strong>script</strong> y <strong>style</strong> encapsulados.</p>
+            </div>
+            <div class="card">
+              <h3>Reactivo por diseño</h3>
+              <p>Cuando los datos cambian, Vue actualiza el DOM automáticamente. Sin manipulación manual.</p>
+            </div>
+          </div>
+          <div>
+            <div style="margin-bottom:1rem">
+              <p class="text-muted" style="margin-bottom:0.8rem;font-size:0.85rem">COMPARATIVA RÁPIDA</p>
+              <table>
+                <thead>
+                  <tr><th>Característica</th><th>React</th><th>Angular</th><th style="color:var(--secondary)">Vue</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Curva aprendizaje</td><td>Media</td><td>Alta</td><td style="color:var(--secondary)">Baja ✓</td></tr>
+                  <tr><td>Lenguaje base</td><td>JSX</td><td>TypeScript</td><td style="color:var(--secondary)">HTML + JS ✓</td></tr>
+                  <tr><td>Enrutamiento</td><td>Externo</td><td>Integrado</td><td style="color:var(--secondary)">Integrado ✓</td></tr>
+                  <tr><td>Estado</td><td>Externo</td><td>Integrado</td><td style="color:var(--secondary)">Integrado ✓</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="highlight-box">
+              <p style="font-size:0.95rem">Empresas: <strong>Alibaba</strong>, <strong>Xiaomi</strong>, <strong>GitLab</strong>, <strong>Nintendo</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 3: COMPONENTES Y ESTRUCTURA -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="3">
+      <div class="container">
+        <h2>Estructura de un Componente Vue</h2>
+        <div class="concept-layout">
+          <div>
+            <div class="grid-3" style="margin-bottom:1.2rem">
+              <div class="card" style="border-color:var(--accent)">
+                <div style="font-size:1.5rem;margin-bottom:0.4rem">📄</div>
+                <h3 style="color:var(--accent)">&lt;template&gt;</h3>
+                <p style="font-size:0.85rem">HTML declarativo. Lo que se renderiza en pantalla.</p>
+              </div>
+              <div class="card" style="border-color:var(--primary)">
+                <div style="font-size:1.5rem;margin-bottom:0.4rem">⚙️</div>
+                <h3 style="color:var(--primary)">&lt;script&gt;</h3>
+                <p style="font-size:0.85rem">Lógica, datos, métodos, props, lifecycle hooks.</p>
+              </div>
+              <div class="card" style="border-color:var(--secondary)">
+                <div style="font-size:1.5rem;margin-bottom:0.4rem">🎨</div>
+                <h3 style="color:var(--secondary)">&lt;style&gt;</h3>
+                <p style="font-size:0.85rem">CSS encapsulado con <code class="inline">scoped</code>.</p>
+              </div>
+            </div>
+            <div class="highlight-box">
+              <p style="font-size:0.9rem">Comunicación: <strong style="color:var(--primary)">props</strong> (padre→hijo) · <strong style="color:var(--accent)">$emit</strong> (hijo→padre) · <strong style="color:var(--secondary)">slots</strong> (contenido dinámico)</p>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">MiComponente.vue</p>
+            <pre><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"mi-componente"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>{{ <span class="prop">titulo</span> }}<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"saludar"</span><span class="tag">&gt;</span>Hola<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="prop">props</span>: [<span class="str">'titulo'</span>],
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { <span class="prop">contador</span>: <span class="val">0</span> }
+  },
+  <span class="prop">methods</span>: {
+    <span class="fn">saludar</span>() {
+      <span class="kw">this</span>.<span class="fn">$emit</span>(<span class="str">'click-btn'</span>)
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+
+<span class="tag">&lt;style</span> <span class="attr">scoped</span><span class="tag">&gt;</span>
+<span class="prop">h2</span> { <span class="attr">color</span>: <span class="val">#00D4AA</span>; }
+<span class="tag">&lt;/style&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 4: DEMO 1 — VUE VÍA CDN -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide demo-slide" data-idx="4">
+      <div class="container">
+        <div class="demo-header">
+          <div class="demo-icon">💻</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+              <span class="badge badge-primary">DEMO 1</span>
+              <span class="badge badge-secondary">~20 min</span>
+            </div>
+            <h2 style="margin:0">Vue vía CDN — Primer contacto</h2>
+          </div>
+        </div>
+        <div class="concept-layout">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="demo-step-num">1</div>
+              <div class="demo-step-text">Crear <code class="inline">index.html</code> e incluir CDN de Vue 2: <code class="inline">cdn.jsdelivr.net/npm/vue@2.6.14</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">2</div>
+              <div class="demo-step-text">Crear instancia <code class="inline">new Vue({ el, data })</code> · mostrar con <code class="inline">{{ mensaje }}</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">3</div>
+              <div class="demo-step-text">Agregar input con <code class="inline">v-model</code> · observar sincronización en tiempo real</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">4</div>
+              <div class="demo-step-text">Usar <code class="inline">v-bind:class</code> y <code class="inline">v-if / v-else</code> para condicional visual</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">5</div>
+              <div class="demo-step-text">Renderizar lista con <code class="inline">v-for="item in items" :key="item"</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">6</div>
+              <div class="demo-step-text">Agregar <code class="inline">methods</code> y botón con <code class="inline">@click</code> para incrementar contador</div>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">index.html — esqueleto inicial</p>
+            <pre><span class="tag">&lt;!-- CDN Vue 2 --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"app"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h2&gt;</span>{{ <span class="prop">mensaje</span> }}<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"mensaje"</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"mostrar"</span><span class="tag">&gt;</span>¡Visible!<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"f in frutas"</span> <span class="attr">:key</span>=<span class="str">"f"</span><span class="tag">&gt;</span>{{ <span class="prop">f</span> }}<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"contar"</span><span class="tag">&gt;</span>{{ <span class="prop">contador</span> }}<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">new</span> <span class="fn">Vue</span>({
+  <span class="prop">el</span>: <span class="str">'#app'</span>,
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      <span class="prop">mensaje</span>: <span class="str">'¡Hola Vue!'</span>,
+      <span class="prop">mostrar</span>: <span class="val">true</span>,
+      <span class="prop">frutas</span>: [<span class="str">'🍎'</span>,<span class="str">'🍌'</span>,<span class="str">'🍊'</span>],
+      <span class="prop">contador</span>: <span class="val">0</span>
+    }
+  },
+  <span class="prop">methods</span>: {
+    <span class="fn">contar</span>() { <span class="kw">this</span>.<span class="prop">contador</span>++ }
+  }
+})
+<span class="tag">&lt;/script&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 5: REACTIVIDAD -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="5">
+      <div class="container">
+        <h2>Reactividad en Vue.js</h2>
+        <div class="concept-layout">
+          <div>
+            <p style="margin-bottom:1.2rem">La <strong style="color:var(--secondary)">reactividad</strong> es la capacidad de Vue para actualizar automáticamente el DOM cuando cambian los datos — sin manipulación manual del DOM.</p>
+            <div style="display:flex;flex-direction:column;gap:0.7rem">
+              <div class="card" style="padding:1rem">
+                <div class="icon-row"><div class="icon-circle">👁️</div><h3 style="margin:0">1. Observación</h3></div>
+                <p style="font-size:0.9rem">Vue intercepta lecturas y escrituras sobre las propiedades del objeto <code class="inline">data</code>.</p>
+              </div>
+              <div class="card" style="padding:1rem">
+                <div class="icon-row"><div class="icon-circle">✏️</div><h3 style="margin:0">2. Modificación</h3></div>
+                <p style="font-size:0.9rem">Cuando un dato cambia, Vue registra la modificación.</p>
+              </div>
+              <div class="card" style="padding:1rem">
+                <div class="icon-row"><div class="icon-circle">🔔</div><h3 style="margin:0">3. Notificación + Update</h3></div>
+                <p style="font-size:0.9rem">Todos los componentes que dependen del dato son notificados y la UI se actualiza.</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="flow-row">
+              <div class="flow-box flow-primary">data()</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box flow-secondary">Sistema reactivo</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box flow-accent">DOM actualizado</div>
+            </div>
+            <div class="highlight-box" style="margin-bottom:1rem">
+              <p style="font-size:0.9rem">El patrón MVVM: <strong>Model</strong> (data) · <strong>View</strong> (template) · <strong>ViewModel</strong> (instancia Vue)</p>
+            </div>
+            <pre><span class="comment">// data() = modelo</span>
+<span class="fn">data</span>() {
+  <span class="kw">return</span> { <span class="prop">contador</span>: <span class="val">0</span> }
+}
+
+<span class="comment">// template = vista</span>
+<span class="tag">&lt;p&gt;</span>{{ <span class="prop">contador</span> }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"contador++"</span><span class="tag">&gt;</span>+1<span class="tag">&lt;/button&gt;</span>
+
+<span class="comment">// Sin tocar el DOM — Vue lo hace por ti</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 6: DEMO 2 — COMPONENTE CON PROPS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide demo-slide" data-idx="6">
+      <div class="container">
+        <div class="demo-header">
+          <div class="demo-icon">💻</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+              <span class="badge badge-primary">DEMO 2</span>
+              <span class="badge badge-secondary">~15 min</span>
+            </div>
+            <h2 style="margin:0">Componente con Props y Eventos</h2>
+          </div>
+        </div>
+        <div class="concept-layout">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="demo-step-num">1</div>
+              <div class="demo-step-text">Definir componente <code class="inline">TareaItem</code> con <code class="inline">Vue.component()</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">2</div>
+              <div class="demo-step-text">Declarar prop <code class="inline">texto: String</code> y mostrarlo en el template</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">3</div>
+              <div class="demo-step-text">Agregar botón "Eliminar" que emita <code class="inline">$emit('eliminar')</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">4</div>
+              <div class="demo-step-text">En el padre, escuchar el evento: <code class="inline">@eliminar="quitarTarea(i)"</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">5</div>
+              <div class="demo-step-text">Mostrar lista reactiva: agregar y eliminar tareas en tiempo real</div>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">componente hijo + padre</p>
+            <pre><span class="comment">// Componente global</span>
+<span class="fn">Vue</span>.<span class="fn">component</span>(<span class="str">'tarea-item'</span>, {
+  <span class="prop">props</span>: [<span class="str">'texto'</span>],
+  <span class="prop">template</span>: <span class="str">`
+    &lt;li&gt;
+      {{ texto }}
+      &lt;button @click="$emit('eliminar')"&gt;
+        🗑️
+      &lt;/button&gt;
+    &lt;/li&gt;
+  `</span>
+})
+
+<span class="comment">// En el padre</span>
+<span class="tag">&lt;tarea-item</span>
+  <span class="attr">v-for</span>=<span class="str">"(t, i) in tareas"</span>
+  <span class="attr">:texto</span>=<span class="str">"t"</span>
+  <span class="attr">:key</span>=<span class="str">"i"</span>
+  <span class="attr">@eliminar</span>=<span class="str">"tareas.splice(i,1)"</span>
+<span class="tag">/&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 7: ACTIVIDAD 1 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="7">
+      <div class="container">
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem">
+          <span class="badge badge-accent">ACTIVIDAD 1</span>
+          <h2 style="margin:0">Lista de Tareas con Reactividad</h2>
+        </div>
+        <div class="activity-grid">
+          <!-- TIMER -->
+          <div>
+            <div class="timer-card" id="timer1card">
+              <div class="timer-title">⏱ tiempo disponible</div>
+              <div class="timer-display" id="timer1">25:00</div>
+              <div class="timer-status" id="timer1status">Listo para iniciar</div>
+              <div class="timer-controls">
+                <button class="timer-btn btn-start" onclick="startTimer('timer1',25)">▶ Iniciar</button>
+                <button class="timer-btn btn-pause" onclick="pauseTimer('timer1')">⏸ Pausar</button>
+                <button class="timer-btn btn-reset" onclick="resetTimer('timer1',25)">↺ Reiniciar</button>
+              </div>
+            </div>
+          </div>
+          <!-- INSTRUCTIONS -->
+          <div class="activity-card">
+            <p style="margin-bottom:0.3rem"><strong>Construí</strong> una app Vue donde se puedan agregar y eliminar tareas, usando un componente hijo para representar cada tarea.</p>
+            <div class="activity-steps">
+              <div class="activity-step"><div class="step-num">1</div><div class="step-text">Crear instancia Vue con <code class="inline">data: { nuevaTarea, tareas[] }</code></div></div>
+              <div class="activity-step"><div class="step-num">2</div><div class="step-text">Formulario con <code class="inline">v-model</code> en el input y botón <code class="inline">@click</code> para agregar</div></div>
+              <div class="activity-step"><div class="step-num">3</div><div class="step-text">Método <code class="inline">agregar()</code>: push al array y limpiar el input</div></div>
+              <div class="activity-step"><div class="step-num">4</div><div class="step-text">Renderizar con <code class="inline">v-for</code> + <code class="inline">:key</code></div></div>
+              <div class="activity-step"><div class="step-num">5</div><div class="step-text">Componente <code class="inline">TareaItem</code> que recibe prop <code class="inline">texto</code> y emite evento <code class="inline">eliminar</code></div></div>
+              <div class="activity-step"><div class="step-num">6</div><div class="step-text">Padre escucha el evento y hace <code class="inline">splice(i,1)</code> del array</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 8: CORRECCIÓN ACTIVIDAD 1 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="8">
+      <div class="container">
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1rem">
+          <span class="badge badge-secondary">CORRECCIÓN</span>
+          <h2 style="margin:0">Lista de Tareas — Solución</h2>
+        </div>
+        <div class="concept-layout">
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">TareaItem.vue / componente global</p>
+            <pre><span class="fn">Vue</span>.<span class="fn">component</span>(<span class="str">'tarea-item'</span>, {
+  <span class="prop">props</span>: { <span class="prop">texto</span>: <span class="kw">String</span> },
+  <span class="prop">template</span>: <span class="str">`
+    &lt;li class="tarea"&gt;
+      &lt;span&gt;{{ texto }}&lt;/span&gt;
+      &lt;button @click="$emit('eliminar')"&gt;
+        🗑️
+      &lt;/button&gt;
+    &lt;/li&gt;
+  `</span>
+})</pre>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">App padre</p>
+            <pre><span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"app"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"nueva"</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"agregar"</span><span class="tag">&gt;</span>Agregar<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;tarea-item</span>
+      <span class="attr">v-for</span>=<span class="str">"(t,i) in tareas"</span>
+      <span class="attr">:key</span>=<span class="str">"i"</span> <span class="attr">:texto</span>=<span class="str">"t"</span>
+      <span class="attr">@eliminar</span>=<span class="str">"tareas.splice(i,1)"</span>
+    <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="fn">new Vue</span>({
+  <span class="prop">el</span>: <span class="str">'#app'</span>,
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { <span class="prop">nueva</span>: <span class="str">''</span>, <span class="prop">tareas</span>: [] }
+  },
+  <span class="prop">methods</span>: {
+    <span class="fn">agregar</span>() {
+      <span class="kw">if</span> (<span class="kw">this</span>.<span class="prop">nueva</span>.<span class="fn">trim</span>()) {
+        <span class="kw">this</span>.<span class="prop">tareas</span>.<span class="fn">push</span>(<span class="kw">this</span>.<span class="prop">nueva</span>)
+        <span class="kw">this</span>.<span class="prop">nueva</span> = <span class="str">''</span>
+      }
+    }
+  }
+})</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 9: TRANSICIÓN AL BREAK (timing check) -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="9">
+      <div class="container" style="text-align:center">
+        <h2 style="margin-bottom:1rem">Antes del break...</h2>
+        <div class="grid-3" style="margin-bottom:1.5rem">
+          <div class="card" style="border-color:var(--secondary)">
+            <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
+            <h3>Vue CDN</h3>
+            <p style="font-size:0.9rem">data, v-model, v-if, v-for, @click</p>
+          </div>
+          <div class="card" style="border-color:var(--secondary)">
+            <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
+            <h3>Componentes</h3>
+            <p style="font-size:0.9rem">props, $emit, comunicación padre-hijo</p>
+          </div>
+          <div class="card" style="border-color:var(--secondary)">
+            <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
+            <h3>Reactividad</h3>
+            <p style="font-size:0.9rem">DOM actualizado automáticamente</p>
+          </div>
+        </div>
+        <div class="highlight-box" style="max-width:600px;margin:0 auto">
+          <p>Después del break: <strong style="color:var(--primary)">Vue CLI</strong> · <strong style="color:var(--secondary)">lifecycle</strong> · <strong style="color:var(--accent)">Router</strong> · <strong style="color:var(--warning)">Vuex</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 10: BREAK -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide break-slide" data-idx="10">
+      <div class="container" style="text-align:center">
+        <div style="font-size:4rem;margin-bottom:0.5rem">☕</div>
+        <div class="break-big">BREAK</div>
+        <p style="font-size:1.1rem;color:var(--text-muted);margin:0.8rem 0 1.5rem">20 minutos · volvemos con Vue CLI, Router y Vuex</p>
+        <div class="timer-card" style="max-width:340px;margin:0 auto">
+          <div class="timer-title">⏱ tiempo de descanso</div>
+          <div class="timer-display" id="timerBreak">20:00</div>
+          <div class="timer-status" id="timerBreakStatus">¡Tomá un descanso!</div>
+          <div class="timer-controls">
+            <button class="timer-btn btn-start" onclick="startTimer('timerBreak',20)">▶ Iniciar</button>
+            <button class="timer-btn btn-pause" onclick="pauseTimer('timerBreak')">⏸ Pausar</button>
+            <button class="timer-btn btn-reset" onclick="resetTimer('timerBreak',20)">↺ Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 11: VUE CLI + ESTRUCTURA -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="11">
+      <div class="container">
+        <h2>Vue CLI y Estructura del Proyecto</h2>
+        <div class="concept-layout">
+          <div>
+            <div class="card" style="margin-bottom:1rem">
+              <h3>¿Qué es Vue CLI?</h3>
+              <p style="font-size:0.9rem">Scaffolding oficial de Vue. Crea la estructura del proyecto con Webpack, Babel, ESLint, Vue Router, Vuex y más — configurados desde el inicio.</p>
+            </div>
+            <pre style="margin-bottom:1rem"><span class="comment"># Instalar globalmente</span>
+<span class="fn">npm</span> install -g @vue/cli
+
+<span class="comment"># Crear nuevo proyecto</span>
+<span class="fn">vue</span> create mi-app
+
+<span class="comment"># Seleccionar: Router + Vuex</span>
+<span class="fn">cd</span> mi-app &amp;&amp; <span class="fn">npm</span> run serve</pre>
+            <div class="highlight-box">
+              <p style="font-size:0.85rem"><strong>package.json</strong>: dependencias de producción (<code class="inline">vue</code>, <code class="inline">vue-router</code>, <code class="inline">vuex</code>) y dev (<code class="inline">@vue/cli-service</code>, <code class="inline">babel</code>, <code class="inline">eslint</code>)</p>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">Estructura generada</p>
+            <pre><span class="prop">mi-app/</span>
+├── <span class="prop">src/</span>
+│   ├── <span class="str">main.js</span>        <span class="comment">← entrada</span>
+│   ├── <span class="str">App.vue</span>        <span class="comment">← root component</span>
+│   ├── <span class="prop">components/</span>
+│   │   └── <span class="str">HelloWorld.vue</span>
+│   ├── <span class="prop">views/</span>
+│   │   ├── <span class="str">Home.vue</span>
+│   │   └── <span class="str">About.vue</span>
+│   ├── <span class="prop">router/</span>
+│   │   └── <span class="str">index.js</span>
+│   └── <span class="prop">store/</span>
+│       └── <span class="str">index.js</span>
+├── <span class="str">package.json</span>
+└── <span class="str">vue.config.js</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 12: CICLO DE VIDA + COMPUTED + WATCHERS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="12">
+      <div class="container">
+        <h2>Lifecycle · Computed · Watchers</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Ciclo de Vida</h3>
+            <ul style="font-size:0.85rem">
+              <li><code class="inline">beforeCreate</code> — antes de init</li>
+              <li><code class="inline">created</code> — data lista, no DOM</li>
+              <li><code class="inline">mounted</code> — DOM disponible ⭐</li>
+              <li><code class="inline">updated</code> — tras cambio DOM</li>
+              <li><code class="inline">beforeDestroy</code> — cleanup</li>
+              <li><code class="inline">destroyed</code> — fin</li>
+            </ul>
+            <pre style="margin-top:0.7rem;font-size:0.72rem"><span class="fn">mounted</span>() {
+  <span class="comment">// llamada AJAX aquí</span>
+  <span class="fn">fetch</span>(<span class="str">'/api/data'</span>)...
+}</pre>
+          </div>
+          <div class="card">
+            <h3>Computed</h3>
+            <p style="font-size:0.85rem;margin-bottom:0.6rem">Valores derivados con <strong>caché</strong>. Solo se recalculan si sus dependencias cambian.</p>
+            <pre style="font-size:0.72rem"><span class="prop">computed</span>: {
+  <span class="fn">nombreCompleto</span>() {
+    <span class="kw">return</span> <span class="str">`</span>${<span class="kw">this</span>.<span class="prop">nombre</span>}<span class="str"> </span>
+${<span class="kw">this</span>.<span class="prop">apellido</span>}<span class="str">`</span>
+  },
+  <span class="fn">tareasCompletas</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">tareas</span>
+      .<span class="fn">filter</span>(t => t.<span class="prop">done</span>)
+      .<span class="prop">length</span>
+  }
+}</pre>
+          </div>
+          <div class="card">
+            <h3>Watchers</h3>
+            <p style="font-size:0.85rem;margin-bottom:0.6rem">Reaccionan a cambios en una propiedad. Ideales para operaciones async.</p>
+            <pre style="font-size:0.72rem"><span class="prop">watch</span>: {
+  <span class="fn">busqueda</span>(nuevo) {
+    <span class="kw">this</span>.<span class="fn">buscar</span>(nuevo)
+  },
+  <span class="str">'usuario.nombre'</span>: {
+    <span class="fn">handler</span>(val) {
+      <span class="fn">console</span>.<span class="fn">log</span>(val)
+    },
+    <span class="prop">deep</span>: <span class="val">true</span>,
+    <span class="prop">immediate</span>: <span class="val">true</span>
+  }
+}</pre>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top:1rem">
+          <p style="font-size:0.9rem">💡 <strong>Regla práctica:</strong> usá <code class="inline">computed</code> para derivar datos → usá <code class="inline">watch</code> para reaccionar a cambios y ejecutar lógica async</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 13: DEMO 3 — COMPUTED + WATCHERS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide demo-slide" data-idx="13">
+      <div class="container">
+        <div class="demo-header">
+          <div class="demo-icon">💻</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+              <span class="badge badge-primary">DEMO 3</span>
+              <span class="badge badge-secondary">~15 min</span>
+            </div>
+            <h2 style="margin:0">Computed Properties + Watchers en Acción</h2>
+          </div>
+        </div>
+        <div class="concept-layout">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="demo-step-num">1</div>
+              <div class="demo-step-text">Crear componente con <code class="inline">nombre</code> y <code class="inline">apellido</code> en data</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">2</div>
+              <div class="demo-step-text">Computed <code class="inline">nombreCompleto</code> que los concatena — mostrar diferencia con método</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">3</div>
+              <div class="demo-step-text">Computed <code class="inline">tareasCompletas</code> sobre array de objetos <code class="inline">{ texto, done }</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">4</div>
+              <div class="demo-step-text">Watcher sobre <code class="inline">busqueda</code> que simula una llamada async con <code class="inline">setTimeout</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">5</div>
+              <div class="demo-step-text">Hook <code class="inline">mounted()</code> para cargar datos iniciales con <code class="inline">fetch</code> (JSONPlaceholder)</div>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">código de demo</p>
+            <pre><span class="prop">computed</span>: {
+  <span class="fn">nombreCompleto</span>() {
+    <span class="kw">return</span> <span class="str">`</span>${<span class="kw">this</span>.<span class="prop">nombre</span>} ${<span class="kw">this</span>.<span class="prop">apellido</span>}<span class="str">`</span>
+  }
+},
+<span class="prop">watch</span>: {
+  <span class="fn">busqueda</span>(nuevo) {
+    <span class="fn">clearTimeout</span>(<span class="kw">this</span>.<span class="prop">_timer</span>)
+    <span class="kw">this</span>.<span class="prop">_timer</span> = <span class="fn">setTimeout</span>(() => {
+      <span class="kw">this</span>.<span class="prop">resultados</span> = <span class="kw">this</span>.<span class="prop">items</span>
+        .<span class="fn">filter</span>(i =>
+          i.<span class="fn">includes</span>(nuevo)
+        )
+    }, <span class="val">400</span>)
+  }
+},
+<span class="fn">mounted</span>() {
+  <span class="fn">fetch</span>(<span class="str">'https://jsonplaceholder.typicode.com/todos?_limit=5'</span>)
+    .<span class="fn">then</span>(r => r.<span class="fn">json</span>())
+    .<span class="fn">then</span>(data => {
+      <span class="kw">this</span>.<span class="prop">items</span> = data
+    })
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 14: VUE ROUTER -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="14">
+      <div class="container">
+        <h2>Vue Router — Navegación SPA</h2>
+        <div class="concept-layout">
+          <div>
+            <p style="margin-bottom:1rem">Vue Router permite navegar entre vistas <strong>sin recargar la página</strong>. La URL cambia, pero el HTML base es siempre el mismo.</p>
+            <div class="grid-2" style="margin-bottom:1rem">
+              <div class="card" style="padding:1rem">
+                <h3 style="font-size:1rem">router-link</h3>
+                <pre style="font-size:0.72rem"><span class="tag">&lt;router-link</span>
+  <span class="attr">to</span>=<span class="str">"/"</span><span class="tag">&gt;</span>Inicio<span class="tag">&lt;/router-link&gt;</span>
+<span class="tag">&lt;router-link</span>
+  <span class="attr">:to</span>=<span class="str">"{ name:'About' }"</span>
+<span class="tag">&gt;</span>About<span class="tag">&lt;/router-link&gt;</span></pre>
+              </div>
+              <div class="card" style="padding:1rem">
+                <h3 style="font-size:1rem">router-view</h3>
+                <pre style="font-size:0.72rem"><span class="comment">&lt;!-- App.vue --&gt;</span>
+<span class="tag">&lt;nav&gt;</span>...links...<span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;router-view</span> <span class="tag">/&gt;</span>
+<span class="comment">&lt;!-- aquí se renderiza --&gt;
+&lt;!-- la vista activa     --&gt;</span></pre>
+              </div>
+            </div>
+            <div class="card" style="padding:1rem">
+              <h3 style="font-size:1rem">Navegación programática</h3>
+              <pre style="font-size:0.72rem"><span class="kw">this</span>.<span class="prop">$router</span>.<span class="fn">push</span>(<span class="str">'/about'</span>)
+<span class="kw">this</span>.<span class="prop">$router</span>.<span class="fn">push</span>({ <span class="prop">name</span>: <span class="str">'User'</span>, <span class="prop">params</span>: { <span class="prop">id</span>: <span class="val">42</span> } })
+<span class="kw">this</span>.<span class="prop">$route</span>.<span class="prop">params</span>.<span class="prop">id</span>  <span class="comment">// leer parámetro</span></pre>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">router/index.js</p>
+            <pre><span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> VueRouter <span class="kw">from</span> <span class="str">'vue-router'</span>
+<span class="kw">import</span> Home <span class="kw">from</span> <span class="str">'../views/Home.vue'</span>
+<span class="kw">import</span> About <span class="kw">from</span> <span class="str">'../views/About.vue'</span>
+
+<span class="fn">Vue</span>.<span class="fn">use</span>(VueRouter)
+
+<span class="kw">const</span> <span class="prop">routes</span> = [
+  { <span class="prop">path</span>: <span class="str">'/'</span>, <span class="prop">component</span>: Home },
+  { <span class="prop">path</span>: <span class="str">'/about'</span>, <span class="prop">component</span>: About },
+  {
+    <span class="prop">path</span>: <span class="str">'/user/:id'</span>,
+    <span class="prop">component</span>: () => <span class="kw">import</span>(<span class="str">'../views/User.vue'</span>)
+    <span class="comment">// lazy-loading ⚡</span>
+  }
+]
+
+<span class="kw">export default new</span> <span class="fn">VueRouter</span>({ <span class="prop">routes</span> })</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 15: DEMO 4 — VUE ROUTER -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide demo-slide" data-idx="15">
+      <div class="container">
+        <div class="demo-header">
+          <div class="demo-icon">💻</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+              <span class="badge badge-primary">DEMO 4</span>
+              <span class="badge badge-secondary">~15 min</span>
+            </div>
+            <h2 style="margin:0">SPA con Vue Router — 2 Rutas</h2>
+          </div>
+        </div>
+        <div class="concept-layout">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="demo-step-num">1</div>
+              <div class="demo-step-text">Crear proyecto Vue CLI: <code class="inline">vue create demo-router</code> — seleccionar Vue Router</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">2</div>
+              <div class="demo-step-text">Revisar <code class="inline">router/index.js</code> y las rutas generadas. Ver <code class="inline">main.js</code>: cómo se inyecta el router</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">3</div>
+              <div class="demo-step-text">Crear <code class="inline">Tareas.vue</code> con formulario para agregar tareas y listado</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">4</div>
+              <div class="demo-step-text">Crear <code class="inline">Estadisticas.vue</code> que muestre total y cantidad completada</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">5</div>
+              <div class="demo-step-text">Agregar las 2 rutas y <code class="inline">&lt;router-link&gt;</code> en App.vue para navegar</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">6</div>
+              <div class="demo-step-text">Probar en el browser — ver cómo cambia la URL sin recarga</div>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">App.vue — navegación</p>
+            <pre><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;router-link</span> <span class="attr">to</span>=<span class="str">"/"</span><span class="tag">&gt;</span>Tareas<span class="tag">&lt;/router-link&gt;</span>
+      <span class="tag">&lt;router-link</span>
+        <span class="attr">to</span>=<span class="str">"/estadisticas"</span>
+      <span class="tag">&gt;</span>📊 Stats<span class="tag">&lt;/router-link&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+    <span class="tag">&lt;router-view</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></pre>
+            <div class="highlight-box" style="margin-top:0.8rem">
+              <p style="font-size:0.85rem">⚠️ El estado se pierde al navegar entre rutas — <strong>solución:</strong> Vuex (next slide)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 16: VUEX -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="16">
+      <div class="container">
+        <h2>Vuex — Gestión de Estado Centralizado</h2>
+        <div style="margin-bottom:1rem">
+          <div class="flow-row">
+            <div class="flow-box flow-primary">Componente<br><small>dispatch(action)</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box flow-warning">Action<br><small>async / fetch</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box flow-accent">Mutation<br><small>síncrona</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box flow-secondary">State<br><small>reactivo</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box flow-primary">Componente<br><small>se actualiza</small></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <pre style="font-size:0.75rem"><span class="comment">// store/index.js</span>
+<span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> Vuex <span class="kw">from</span> <span class="str">'vuex'</span>
+<span class="fn">Vue</span>.<span class="fn">use</span>(Vuex)
+
+<span class="kw">export default new</span> <span class="fn">Vuex</span>.<span class="fn">Store</span>({
+  <span class="prop">state</span>: {
+    <span class="prop">tareas</span>: [],
+    <span class="prop">contador</span>: <span class="val">0</span>
+  },
+  <span class="prop">mutations</span>: {
+    <span class="fn">AGREGAR_TAREA</span>(state, texto) {
+      state.<span class="prop">tareas</span>.<span class="fn">push</span>({ texto, <span class="prop">done</span>: <span class="val">false</span> })
+    },
+    <span class="fn">INCREMENTAR</span>(state) {
+      state.<span class="prop">contador</span>++
+    }
+  },
+  <span class="prop">actions</span>: {
+    <span class="fn">agregarTarea</span>({ commit }, texto) {
+      commit(<span class="str">'AGREGAR_TAREA'</span>, texto)
+    }
+  },
+  <span class="prop">getters</span>: {
+    <span class="fn">totalDone</span>: state =>
+      state.<span class="prop">tareas</span>.<span class="fn">filter</span>(t => t.<span class="prop">done</span>).<span class="prop">length</span>
+  }
+})</pre>
+          </div>
+          <div>
+            <pre style="font-size:0.75rem"><span class="comment">// En un componente</span>
+<span class="kw">import</span> { mapState, mapGetters, mapActions } <span class="kw">from</span> <span class="str">'vuex'</span>
+
+<span class="kw">export default</span> {
+  <span class="prop">computed</span>: {
+    ...<span class="fn">mapState</span>([<span class="str">'tareas'</span>, <span class="str">'contador'</span>]),
+    ...<span class="fn">mapGetters</span>([<span class="str">'totalDone'</span>])
+  },
+  <span class="prop">methods</span>: {
+    ...<span class="fn">mapActions</span>([<span class="str">'agregarTarea'</span>]),
+    <span class="fn">agregar</span>() {
+      <span class="kw">this</span>.<span class="fn">agregarTarea</span>(<span class="kw">this</span>.<span class="prop">input</span>)
+    }
+  }
+}</pre>
+            <div class="highlight-box" style="margin-top:0.8rem">
+              <p style="font-size:0.85rem">Regla: <strong>mutations son síncronas</strong> · <strong>actions pueden ser async</strong><br>Solo las mutations modifican el state.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 17: DEMO 5 — VUEX -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide demo-slide" data-idx="17">
+      <div class="container">
+        <div class="demo-header">
+          <div class="demo-icon">💻</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+              <span class="badge badge-primary">DEMO 5</span>
+              <span class="badge badge-secondary">~12 min</span>
+            </div>
+            <h2 style="margin:0">Vuex en Acción — Estado Global Compartido</h2>
+          </div>
+        </div>
+        <div class="concept-layout">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="demo-step-num">1</div>
+              <div class="demo-step-text">Agregar Vuex al proyecto anterior (<code class="inline">vue add vuex</code> o ya incluido en CLI)</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">2</div>
+              <div class="demo-step-text">Definir <code class="inline">state: { tareas: [] }</code> en el store</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">3</div>
+              <div class="demo-step-text">Crear mutations: <code class="inline">AGREGAR</code>, <code class="inline">ELIMINAR</code>, <code class="inline">TOGGLE_DONE</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">4</div>
+              <div class="demo-step-text">En <code class="inline">Tareas.vue</code>: usar <code class="inline">mapState</code> y <code class="inline">mapMutations</code></div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">5</div>
+              <div class="demo-step-text">En <code class="inline">Estadisticas.vue</code>: consumir el mismo state — ver que los datos persisten al navegar</div>
+            </div>
+            <div class="demo-step">
+              <div class="demo-step-num">6</div>
+              <div class="demo-step-text">Abrir <strong>Vue Devtools</strong> — inspeccionar mutations en tiempo real, time-travel debugging</div>
+            </div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.78rem;margin-bottom:0.5rem">store/index.js — completo</p>
+            <pre style="font-size:0.75rem"><span class="kw">export default new</span> <span class="fn">Vuex</span>.<span class="fn">Store</span>({
+  <span class="prop">state</span>: { <span class="prop">tareas</span>: [] },
+  <span class="prop">mutations</span>: {
+    <span class="fn">AGREGAR</span>(state, texto) {
+      state.<span class="prop">tareas</span>.<span class="fn">push</span>({ texto, <span class="prop">done</span>: <span class="val">false</span> })
+    },
+    <span class="fn">ELIMINAR</span>(state, idx) {
+      state.<span class="prop">tareas</span>.<span class="fn">splice</span>(idx, <span class="val">1</span>)
+    },
+    <span class="fn">TOGGLE</span>(state, idx) {
+      state.<span class="prop">tareas</span>[idx].<span class="prop">done</span> =
+        !state.<span class="prop">tareas</span>[idx].<span class="prop">done</span>
+    }
+  },
+  <span class="prop">getters</span>: {
+    <span class="fn">total</span>: s => s.<span class="prop">tareas</span>.<span class="prop">length</span>,
+    <span class="fn">done</span>: s => s.<span class="prop">tareas</span>.<span class="fn">filter</span>(t => t.<span class="prop">done</span>).<span class="prop">length</span>
+  }
+})</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 18: ACTIVIDAD 2 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="18">
+      <div class="container">
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem">
+          <span class="badge badge-accent">ACTIVIDAD 2</span>
+          <h2 style="margin:0">SPA de Tareas con Vuex + Router</h2>
+        </div>
+        <div class="activity-grid">
+          <!-- TIMER -->
+          <div>
+            <div class="timer-card" id="timer2card">
+              <div class="timer-title">⏱ tiempo disponible</div>
+              <div class="timer-display" id="timer2">20:00</div>
+              <div class="timer-status" id="timer2status">Listo para iniciar</div>
+              <div class="timer-controls">
+                <button class="timer-btn btn-start" onclick="startTimer('timer2',20)">▶ Iniciar</button>
+                <button class="timer-btn btn-pause" onclick="pauseTimer('timer2')">⏸ Pausar</button>
+                <button class="timer-btn btn-reset" onclick="resetTimer('timer2',20)">↺ Reiniciar</button>
+              </div>
+            </div>
+          </div>
+          <!-- INSTRUCTIONS -->
+          <div class="activity-card">
+            <p style="margin-bottom:0.3rem">Expandí la app de la demo para conectar Vuex con las 2 vistas. Las tareas deben <strong>persistir al navegar</strong> entre rutas.</p>
+            <div class="activity-steps">
+              <div class="activity-step"><div class="step-num">1</div><div class="step-text">Definir state con <code class="inline">tareas: []</code> en el store Vuex</div></div>
+              <div class="activity-step"><div class="step-num">2</div><div class="step-text">Crear mutations: <code class="inline">AGREGAR</code>, <code class="inline">ELIMINAR</code>, <code class="inline">TOGGLE_DONE</code></div></div>
+              <div class="activity-step"><div class="step-num">3</div><div class="step-text"><code class="inline">Tareas.vue</code>: formulario para agregar + listado con checkbox done y botón eliminar</div></div>
+              <div class="activity-step"><div class="step-num">4</div><div class="step-text"><code class="inline">Estadisticas.vue</code>: mostrar total, completadas y pendientes usando getters</div></div>
+              <div class="activity-step"><div class="step-num">5</div><div class="step-text">Navegar entre vistas y verificar que los datos persisten</div></div>
+              <div class="activity-step"><div class="step-num">6</div><div class="step-text">⭐ Bonus: Inspeccionar mutations en Vue Devtools</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 19: VUE DEVTOOLS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="19">
+      <div class="container">
+        <h2>Vue Devtools — Debug en Tiempo Real</h2>
+        <div class="concept-layout">
+          <div>
+            <p style="margin-bottom:1rem">Extensión para Chrome y Firefox. Permite inspeccionar la app Vue sin tocar el código.</p>
+            <div style="display:flex;flex-direction:column;gap:0.7rem">
+              <div class="card" style="padding:1rem;border-color:var(--primary)">
+                <div class="icon-row"><div class="icon-circle">🌳</div><h3 style="margin:0">Component Tree</h3></div>
+                <p style="font-size:0.85rem">Jerarquía de componentes, props actuales y estado local de cada uno.</p>
+              </div>
+              <div class="card" style="padding:1rem;border-color:var(--warning)">
+                <div class="icon-row"><div class="icon-circle">🗄️</div><h3 style="margin:0">Vuex Inspector</h3></div>
+                <p style="font-size:0.85rem">Historial de mutations, state actual, time-travel debugging.</p>
+              </div>
+              <div class="card" style="padding:1rem;border-color:var(--secondary)">
+                <div class="icon-row"><div class="icon-circle">🛣️</div><h3 style="margin:0">Routes</h3></div>
+                <p style="font-size:0.85rem">Ruta activa, parámetros y meta-información del router.</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="highlight-box" style="margin-bottom:1rem">
+              <h3 style="margin-bottom:0.5rem">Instalación</h3>
+              <p style="font-size:0.9rem">Chrome Web Store → "Vue.js devtools"<br>Requiere la versión de <strong>desarrollo</strong> de Vue (no minificada)</p>
+            </div>
+            <div class="card" style="margin-bottom:1rem">
+              <h3>Time-travel debugging</h3>
+              <p style="font-size:0.88rem">En la pestaña Vuex podés hacer click en cualquier mutation anterior y volver el estado de la app a ese momento. Ideal para debuggear flujos complejos.</p>
+            </div>
+            <div class="card">
+              <h3>Tip para la demo</h3>
+              <p style="font-size:0.88rem">Al agregar una tarea en la app, vas a ver en Devtools la mutation <code class="inline">AGREGAR</code> aparecer en tiempo real con el payload.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SLIDE 20: CIERRE Y RESUMEN -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="slide" data-idx="20">
+      <div class="container">
+        <h2>Resumen de la Clase</h2>
+        <div class="grid-2" style="margin-bottom:1.2rem">
+          <div>
+            <p class="text-muted" style="font-size:0.8rem;letter-spacing:0.05em;margin-bottom:0.6rem">✅ PARTE I</p>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Vue.js como framework progresivo y sus ventajas vs React/Angular</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Estructura de componentes: template, script, style · props · $emit · slots</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Reactividad: data(), v-model, v-bind, v-if, v-for, @click</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Demo CDN → app completa sin build tools</p></div>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:0.8rem;letter-spacing:0.05em;margin-bottom:0.6rem">✅ PARTE II</p>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Vue CLI: scaffolding profesional y package.json</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Ciclo de vida · computed · watchers</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Vue Router: SPA con múltiples rutas sin recarga</p></div>
+            <div class="check-item"><span class="check-icon">✅</span><p style="font-size:0.9rem">Vuex: state, mutations, actions, getters · estado global</p></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem">
+          <div class="highlight-box" style="flex:1">
+            <p style="font-size:0.9rem">📚 <strong>Próxima clase:</strong> Templates y rendering en Vue · directivas avanzadas · slots con nombre</p>
+          </div>
+          <div class="highlight-box" style="flex:1;background:linear-gradient(135deg,rgba(255,107,107,0.1),rgba(255,165,0,0.1));border-color:rgba(255,107,107,0.3)">
+            <p style="font-size:0.9rem">🏆 <strong>Para practicar:</strong> Completar Actividad 2 · agregar localStorage al store · estilizar con CSS scoped</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#slides -->
+
+  <!-- FOOTER -->
+  <footer>
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Anterior</button>
+    <span class="footer-hint">← → Teclado · Espacio para avanzar</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Siguiente →</button>
+  </footer>
+
+</div><!-- /#app -->
+
+<script>
+  // ─── STATE ───────────────────────────────────
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  document.getElementById('totalSlides').textContent = total;
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function navigate(dir) { goTo(current + dir); }
+
+  function updateUI() {
+    document.getElementById('counterDisplay').innerHTML =
+      `<strong>${current + 1}</strong> / <span id="totalSlides">${total}</span>`;
+    document.getElementById('progressFill').style.width =
+      `${((current + 1) / total) * 100}%`;
+    document.getElementById('btnPrev').disabled = current === 0;
+    document.getElementById('btnNext').disabled = current === total - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') navigate(1);
+    if (e.key === 'ArrowLeft') navigate(-1);
+  });
+
+  updateUI();
+
+  // ─── TIMERS ──────────────────────────────────
+  const timerState = {};
+
+  function getTimerEls(id) {
+    return {
+      display: document.getElementById(id),
+      status:  document.getElementById(id + 'status'),
+      card:    document.getElementById(id + 'card')
+    };
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2,'0');
+    const ss = (s % 60).toString().padStart(2,'0');
+    return `${m}:${ss}`;
+  }
+
+  function updateTimerDisplay(id) {
+    const s = timerState[id];
+    if (!s) return;
+    const el = getTimerEls(id);
+    el.display.textContent = formatTime(s.remaining);
+
+    el.display.className = 'timer-display';
+    if (el.card) el.card.className = 'timer-card';
+
+    if (s.remaining <= 60) {
+      el.display.classList.add('danger');
+      if (el.card) el.card.classList.add('danger');
+      el.status.textContent = '⚠️ ¡Menos de 1 minuto!';
+    } else if (s.remaining <= 300) {
+      el.display.classList.add('warn');
+      if (el.card) el.card.classList.add('warn');
+      el.status.textContent = '⏳ Menos de 5 minutos';
+    } else {
+      el.status.textContent = s.running ? '🟢 En curso...' : (s.remaining === s.total ? 'Listo para iniciar' : '⏸ Pausado');
+    }
+  }
+
+  function startTimer(id, minutes) {
+    if (!timerState[id]) {
+      timerState[id] = { remaining: minutes * 60, total: minutes * 60, running: false, interval: null };
+    }
+    const s = timerState[id];
+    if (s.running) return;
+    s.running = true;
+    s.interval = setInterval(() => {
+      s.remaining--;
+      updateTimerDisplay(id);
+      if (s.remaining <= 0) {
+        clearInterval(s.interval);
+        s.running = false;
+        getTimerEls(id).status.textContent = '🏁 ¡Tiempo terminado!';
+        beep();
+      }
+    }, 1000);
+    updateTimerDisplay(id);
+  }
+
+  function pauseTimer(id) {
+    const s = timerState[id];
+    if (!s) return;
+    clearInterval(s.interval);
+    s.running = false;
+    updateTimerDisplay(id);
+  }
+
+  function resetTimer(id, minutes) {
+    const s = timerState[id];
+    if (s) {
+      clearInterval(s.interval);
+      s.running = false;
+      s.remaining = minutes * 60;
+      s.total = minutes * 60;
+    } else {
+      timerState[id] = { remaining: minutes * 60, total: minutes * 60, running: false, interval: null };
+    }
+    updateTimerDisplay(id);
+    const el = getTimerEls(id);
+    el.status.textContent = 'Listo para iniciar';
+  }
+
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0,0.15,0.3].forEach(t => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine'; o.frequency.value = 880;
+        g.gain.setValueAtTime(0.4, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
+        o.start(ctx.currentTime + t);
+        o.stop(ctx.currentTime + t + 0.3);
+      });
+    } catch(e) {}
+  }
+</script>
+</body>
+</html>

@@ -54,7 +54,7 @@ h2{font-size:1.8rem;font-weight:700;line-height:1.1;
 h3{font-size:1.3rem;font-weight:600;color:var(--s);margin-bottom:.4rem;}
 h4{font-size:1rem;font-weight:600;color:var(--s);margin-bottom:.3rem;}
 p,li{font-size:.95rem;line-height:1.6;}
-.sm{font-size:.82rem!important;line-height:1.5!important;}
+.sm{font-size:1rem!important;line-height:1.5!important;}
 .mu{color:var(--mu);}
 ul{list-style:none;}
 ul li{padding-left:1.3rem;position:relative;margin-bottom:.28rem;}
@@ -80,8 +80,11 @@ ul li::before{content:'→';position:absolute;left:0;color:var(--s);font-weight:
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
 .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem;}
-.c2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;width:100%;}
+.c2{display:grid;grid-template-columns:0.65fr 1fr;gap:1.2rem;align-items:start;width:100%;}
 
+/* CODE COLS — two pres side by side */
+.code-cols{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+.code-cols pre{margin:0;height:100%;}
 /* CODE */
 pre,code{font-family:'Space Mono',monospace;}
 pre{background:rgba(0,0,0,.55);border:1px solid rgba(45,91,255,.3);border-radius:10px;
@@ -100,9 +103,9 @@ code.il{background:rgba(45,91,255,.15);color:var(--s);padding:.1rem .38rem;
 .dsteps{display:flex;flex-direction:column;gap:.28rem;}
 .dstep{display:flex;align-items:flex-start;gap:.55rem;background:rgba(255,255,255,.04);
   border:1px solid var(--bor);border-radius:7px;padding:.38rem .75rem;}
-.dnum{min-width:21px;height:21px;background:var(--p);border-radius:50%;font-size:.67rem;
+.dnum{min-width:24px;height:24px;background:var(--p);border-radius:50%;font-size:.9rem;
   font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
-.dtxt{font-size:.8rem;line-height:1.42;}
+.dtxt{font-size:1rem;line-height:1.5;}
 
 /* TITLE SLIDE */
 .tslide{background:radial-gradient(ellipse at 18% 50%,rgba(45,91,255,.12) 0%,transparent 58%),
@@ -117,9 +120,12 @@ code.il{background:rgba(45,91,255,.15);color:var(--s);padding:.1rem .38rem;
 .ttags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem;}
 
 /* ACTIVITY / TIMER */
-.actg{display:grid;grid-template-columns:1fr 1.9fr;gap:1.8rem;align-items:start;}
+.actg{display:grid;grid-template-columns:1fr;gap:1.4rem;align-items:start;}
 .tcard{background:var(--sur);border:1px solid var(--bor);border-radius:14px;
-  padding:1.2rem 1rem;text-align:center;transition:border-color .4s;}
+  padding:.9rem 1.2rem;display:flex;align-items:center;gap:2rem;transition:border-color .4s;}
+.tcard > *{flex-shrink:0;}
+.tcard .tdisp{margin:.1rem 0;}
+.tcard .tctrl{margin-top:0;}
 .tcard.tw{border-color:var(--w);}
 .tcard.td{border-color:var(--ac);}
 .tlbl{font-size:.7rem;font-weight:600;letter-spacing:.12em;color:var(--mu);text-transform:uppercase;}
@@ -141,11 +147,11 @@ code.il{background:rgba(45,91,255,.15);color:var(--s);padding:.1rem .38rem;
 .tbtn.tr:hover{background:var(--ac);color:#fff;}
 .acard{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:1.1rem;}
 .asteps{display:flex;flex-direction:column;gap:.28rem;margin-top:.5rem;}
-.astep{display:flex;align-items:flex-start;gap:.5rem;padding:.35rem .7rem;
+.astep{display:flex;align-items:flex-start;gap:.7rem;padding:.5rem .9rem;
   background:rgba(255,255,255,.025);border:1px solid var(--bor);border-radius:8px;}
-.anum{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));
-  font-size:.64rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
-.atxt{font-size:.8rem;line-height:1.45;}
+.anum{width:25px;height:25px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));
+  font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+.atxt{font-size:1.05rem;line-height:1.5;}
 
 /* BREAK */
 .brk{background:radial-gradient(ellipse at 50% 50%,rgba(0,212,170,.09) 0%,transparent 62%),var(--bg);text-align:center;
@@ -251,39 +257,44 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
     </div>
     <div>
       <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — código clave</p>
-      <pre><span class="cm">// data() — estructura base</span>
+      <div class="code-cols">
+        <pre><span class="cm">// data() — todos los campos</span>
 <span class="fn">data</span>() {
   <span class="kw">return</span> {
-    nombre: <span class="str">''</span>,        <span class="cm">// text → v-model.trim</span>
-    email:  <span class="str">''</span>,        <span class="cm">// email</span>
-    edad:   <span class="val">null</span>,       <span class="cm">// number → v-model.number</span>
-    genero: <span class="str">''</span>,        <span class="cm">// radio buttons</span>
-    skills: [],         <span class="cm">// checkboxes → array</span>
-    nivel:  <span class="str">'junior'</span>,  <span class="cm">// select → valor por defecto</span>
-    bio:    <span class="str">''</span>         <span class="cm">// textarea → v-model.trim</span>
+    nombre: <span class="str">''</span>,       <span class="cm">// v-model.trim</span>
+    email:  <span class="str">''</span>,       <span class="cm">// v-model.trim</span>
+    edad:   <span class="val">null</span>,      <span class="cm">// v-model.number</span>
+    genero: <span class="str">''</span>,       <span class="cm">// radio buttons</span>
+    skills: [],        <span class="cm">// checkboxes → array</span>
+    nivel:  <span class="str">'junior'</span>, <span class="cm">// select</span>
+    bio:    <span class="str">''</span>        <span class="cm">// textarea</span>
   }
 }
 
-<span class="cm">&lt;!-- radio: mismo v-model, cada opción su value --&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span> <span class="attr">value</span>=<span class="str">"M"</span><span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span> <span class="attr">value</span>=<span class="str">"F"</span><span class="tag">/&gt;</span>
+<span class="cm">&lt;!-- radio: mismo v-model, value distinto --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span>
+       <span class="attr">value</span>=<span class="str">"M"</span><span class="tag">/&gt;</span> Masculino
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span>
+       <span class="attr">value</span>=<span class="str">"F"</span><span class="tag">/&gt;</span> Femenino</pre>
+        <pre><span class="cm">&lt;!-- checkboxes → agregan al array --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span>
+       <span class="attr">value</span>=<span class="str">"vue"</span><span class="tag">/&gt;</span> Vue
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span>
+       <span class="attr">value</span>=<span class="str">"react"</span><span class="tag">/&gt;</span> React
 
-<span class="cm">&lt;!-- checkboxes → array: Vue agrega/quita el value --&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span> <span class="attr">value</span>=<span class="str">"vue"</span><span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span> <span class="attr">value</span>=<span class="str">"react"</span><span class="tag">/&gt;</span>
-
-<span class="cm">&lt;!-- select: v-model en el &lt;select&gt;, no en &lt;option&gt; --&gt;</span>
+<span class="cm">&lt;!-- select: v-model en el &lt;select&gt; --&gt;</span>
 <span class="tag">&lt;select</span> <span class="attr">v-model</span>=<span class="str">"nivel"</span><span class="tag">&gt;</span>
   <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"junior"</span><span class="tag">&gt;</span>Junior<span class="tag">&lt;/option&gt;</span>
   <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"senior"</span><span class="tag">&gt;</span>Senior<span class="tag">&lt;/option&gt;</span>
 <span class="tag">&lt;/select&gt;</span>
 
-<span class="cm">&lt;!-- textarea: igual que input, pero tag de cierre --&gt;</span>
+<span class="cm">&lt;!-- textarea: tag de cierre obligatorio --&gt;</span>
 <span class="tag">&lt;textarea</span> <span class="attr">v-model.trim</span>=<span class="str">"bio"</span><span class="tag">&gt;&lt;/textarea&gt;</span>
 <span class="tag">&lt;small&gt;</span>{{ bio.length }}/150<span class="tag">&lt;/small&gt;</span>
 
-<span class="cm">&lt;!-- preview: binding reactivo directo --&gt;</span>
+<span class="cm">&lt;!-- preview en tiempo real --&gt;</span>
 <span class="tag">&lt;pre&gt;</span>{{ $data }}<span class="tag">&lt;/pre&gt;</span></pre>
+      </div>
     </div>
   </div>
 </div>
@@ -322,36 +333,58 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
     </div>
     <div>
       <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — validaciones</p>
-      <pre><span class="cm">// data()</span>
+      <div class="code-cols">
+        <pre><span class="cm">// data()</span>
 <span class="fn">data</span>() {
   <span class="kw">return</span> {
-    form: { <span class="prop">email</span>:<span class="str">''</span>, <span class="prop">password</span>:<span class="str">''</span>, <span class="prop">confirm</span>:<span class="str">''</span> },
-    errores: { <span class="prop">email</span>:<span class="str">''</span>, <span class="prop">password</span>:<span class="str">''</span>, <span class="prop">confirm</span>:<span class="str">''</span> }
+    form: {
+      <span class="prop">email</span>: <span class="str">''</span>,
+      <span class="prop">password</span>: <span class="str">''</span>,
+      <span class="prop">confirm</span>: <span class="str">''</span>
+    },
+    errores: {
+      <span class="prop">email</span>: <span class="str">''</span>,
+      <span class="prop">password</span>: <span class="str">''</span>,
+      <span class="prop">confirm</span>: <span class="str">''</span>
+    }
   }
 },
 
-<span class="cm">// computed — se recalculan solos</span>
+<span class="cm">// computed — reactivos</span>
 <span class="prop">computed</span>: {
   <span class="fn">emailValido</span>() {
-    <span class="kw">return</span> /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(<span class="kw">this</span>.form.email)
+    <span class="kw">return</span> /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+             .test(<span class="kw">this</span>.form.email)
   },
-  <span class="fn">passwordValido</span>() { <span class="kw">return this</span>.form.password.length >= <span class="num">6</span> },
+  <span class="fn">passwordValido</span>() {
+    <span class="kw">return this</span>.form.password.length >= <span class="num">6</span>
+  },
   <span class="fn">confirmacionValida</span>() {
-    <span class="kw">return this</span>.form.password === <span class="kw">this</span>.form.confirm
-      && <span class="kw">this</span>.form.confirm !== <span class="str">''</span>
+    <span class="kw">return this</span>.form.password
+             === <span class="kw">this</span>.form.confirm
+           && <span class="kw">this</span>.form.confirm !== <span class="str">''</span>
   },
   <span class="fn">formularioValido</span>() {
-    <span class="kw">return this</span>.emailValido && <span class="kw">this</span>.passwordValido && <span class="kw">this</span>.confirmacionValida
+    <span class="kw">return this</span>.emailValido
+      && <span class="kw">this</span>.passwordValido
+      && <span class="kw">this</span>.confirmacionValida
   }
-},
-
-<span class="cm">// @blur — solo valida al salir del campo</span>
+},</pre>
+        <pre><span class="cm">// @blur — valida al salir del campo</span>
 <span class="fn">validarEmail</span>() {
-  <span class="kw">this</span>.errores.email = <span class="kw">this</span>.emailValido
-    ? <span class="str">''</span> : <span class="str">'Email inválido'</span>
+  <span class="kw">this</span>.errores.email =
+    <span class="kw">this</span>.emailValido
+      ? <span class="str">''</span>
+      : <span class="str">'Email inválido'</span>
+},
+<span class="fn">validarPassword</span>() {
+  <span class="kw">this</span>.errores.password =
+    <span class="kw">this</span>.passwordValido
+      ? <span class="str">''</span>
+      : <span class="str">'Mínimo 6 caracteres'</span>
 },
 
-<span class="cm">&lt;!-- borde dinámico rojo/verde --&gt;</span>
+<span class="cm">&lt;!-- borde dinámico --&gt;</span>
 <span class="tag">&lt;input</span>
   <span class="attr">v-model</span>=<span class="str">"form.email"</span>
   <span class="attr">@blur</span>=<span class="str">"validarEmail"</span>
@@ -362,10 +395,15 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
         ? '#00D4AA' : ''
   }"</span>
 <span class="tag">/&gt;</span>
-<span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"errores.email"</span><span class="tag">&gt;</span>{{ errores.email }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"errores.email"</span><span class="tag">&gt;</span>
+  {{ errores.email }}
+<span class="tag">&lt;/p&gt;</span>
 
 <span class="cm">&lt;!-- botón deshabilitado --&gt;</span>
-<span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!formularioValido"</span><span class="tag">&gt;</span>Entrar<span class="tag">&lt;/button&gt;</span></pre>
+<span class="tag">&lt;button</span>
+  <span class="attr">:disabled</span>=<span class="str">"!formularioValido"</span>
+<span class="tag">&gt;</span>Entrar<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
     </div>
   </div>
 </div>
@@ -418,7 +456,7 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
   <div style="font-size:3.8rem;margin-bottom:.4rem">☕</div>
   <div class="brkttl">BREAK</div>
   <p class="mu" style="font-size:1.1rem;margin:.7rem 0 1.3rem">20 minutos · volvemos con formularios multipaso y arrays dinámicos</p>
-  <div class="tcard" style="max-width:310px;margin:0 auto" id="tcb">
+  <div class="tcard" style="max-width:400px;margin:0 auto; flex-direction: column; " id="tcb">
     <div class="tlbl">⏱ descanso</div>
     <div class="tdisp" id="tb">20:00</div>
     <div class="tstat" id="tbs">¡A descansar!</div>
@@ -465,13 +503,15 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
     </div>
     <div>
       <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — lógica de navegación</p>
-      <pre><span class="cm">// data()</span>
+      <div class="code-cols">
+        <pre><span class="cm">// data()</span>
 <span class="fn">data</span>() {
   <span class="kw">return</span> {
     <span class="prop">pasoActual</span>: <span class="num">1</span>,
     <span class="prop">totalPasos</span>: <span class="num">4</span>,
     <span class="prop">encuesta</span>: {
-      <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span>,
+      <span class="prop">nombre</span>: <span class="str">''</span>,
+      <span class="prop">email</span>: <span class="str">''</span>,
       <span class="prop">intereses</span>: [],
       <span class="prop">satisfaccion</span>: <span class="num">5</span>,
       <span class="prop">recomendaria</span>: <span class="val">null</span>
@@ -479,37 +519,59 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
   }
 },
 
-<span class="cm">// computed</span>
-<span class="prop">computed</span>: {
-  <span class="fn">progreso</span>() {
-    <span class="kw">return</span> (<span class="kw">this</span>.pasoActual / <span class="kw">this</span>.totalPasos) * <span class="num">100</span>
-  },
-  <span class="fn">pasoValido</span>() {
-    <span class="kw">switch</span>(<span class="kw">this</span>.pasoActual) {
-      <span class="kw">case</span> <span class="num">1</span>: <span class="kw">return this</span>.encuesta.nombre && <span class="kw">this</span>.encuesta.email
-      <span class="kw">case</span> <span class="num">2</span>: <span class="kw">return this</span>.encuesta.intereses.length > <span class="num">0</span>
-      <span class="kw">case</span> <span class="num">3</span>: <span class="kw">return this</span>.encuesta.recomendaria !== <span class="val">null</span>
-      <span class="kw">default</span>: <span class="kw">return true</span>
-    }
-  }
+<span class="cm">// computed progreso</span>
+<span class="fn">progreso</span>() {
+  <span class="kw">return</span> (
+    <span class="kw">this</span>.pasoActual
+    / <span class="kw">this</span>.totalPasos
+  ) * <span class="num">100</span>
 },
 
 <span class="cm">// methods</span>
 <span class="fn">siguientePaso</span>() {
-  <span class="kw">if</span>(<span class="kw">this</span>.pasoValido && <span class="kw">this</span>.pasoActual < <span class="kw">this</span>.totalPasos)
+  <span class="kw">if</span>(<span class="kw">this</span>.pasoValido
+    && <span class="kw">this</span>.pasoActual < <span class="kw">this</span>.totalPasos)
     <span class="kw">this</span>.pasoActual++
 },
 <span class="fn">anteriorPaso</span>() {
-  <span class="kw">if</span>(<span class="kw">this</span>.pasoActual > <span class="num">1</span>) <span class="kw">this</span>.pasoActual--
+  <span class="kw">if</span>(<span class="kw">this</span>.pasoActual > <span class="num">1</span>)
+    <span class="kw">this</span>.pasoActual--
+},</pre>
+        <pre><span class="cm">// pasoValido — un caso por paso</span>
+<span class="fn">pasoValido</span>() {
+  <span class="kw">switch</span>(<span class="kw">this</span>.pasoActual) {
+    <span class="kw">case</span> <span class="num">1</span>:
+      <span class="kw">return this</span>.encuesta.nombre
+          && <span class="kw">this</span>.encuesta.email
+    <span class="kw">case</span> <span class="num">2</span>:
+      <span class="kw">return this</span>.encuesta
+               .intereses.length > <span class="num">0</span>
+    <span class="kw">case</span> <span class="num">3</span>:
+      <span class="kw">return this</span>.encuesta
+               .recomendaria !== <span class="val">null</span>
+    <span class="kw">default</span>: <span class="kw">return true</span>
+  }
 },
 
 <span class="cm">&lt;!-- barra de progreso --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"{ width: progreso + '%' }"</span><span class="tag">&gt;&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"barra-bg"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span>
+    <span class="attr">class</span>=<span class="str">"barra-fill"</span>
+    <span class="attr">:style</span>=<span class="str">"{ width: progreso+'%' }"</span>
+  <span class="tag">&gt;&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
 
-<span class="cm">&lt;!-- botón deshabilitado si paso no válido --&gt;</span>
-<span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!pasoValido"</span> <span class="attr">@click</span>=<span class="str">"siguientePaso"</span><span class="tag">&gt;</span>
-  Siguiente →
-<span class="tag">&lt;/button&gt;</span></pre>
+<span class="cm">&lt;!-- nav buttons --&gt;</span>
+<span class="tag">&lt;button</span>
+  <span class="attr">v-if</span>=<span class="str">"pasoActual &lt; totalPasos"</span>
+  <span class="attr">:disabled</span>=<span class="str">"!pasoValido"</span>
+  <span class="attr">@click</span>=<span class="str">"siguientePaso"</span>
+<span class="tag">&gt;</span>Siguiente →<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;button</span>
+  <span class="attr">v-if</span>=<span class="str">"pasoActual === totalPasos"</span>
+  <span class="attr">@click</span>=<span class="str">"enviar"</span>
+<span class="tag">&gt;</span>✅ Enviar<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
     </div>
   </div>
 </div>
@@ -548,50 +610,70 @@ footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding
     </div>
     <div>
       <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — arrays y componente</p>
-      <pre><span class="cm">// data() — ítems del pedido</span>
+      <div class="code-cols">
+        <pre><span class="cm">// data() — pedido con ítems</span>
 <span class="fn">data</span>() {
   <span class="kw">return</span> {
     pedido: {
       cliente: <span class="str">''</span>,
-      items: [{ producto:<span class="str">''</span>, cantidad:<span class="num">1</span>, precio:<span class="num">0</span> }]
+      items: [{
+        producto: <span class="str">''</span>,
+        cantidad: <span class="num">1</span>,
+        precio: <span class="num">0</span>
+      }]
     }
   }
 },
 
-<span class="cm">// computed — total automático</span>
-<span class="prop">computed</span>: {
-  <span class="fn">total</span>() {
-    <span class="kw">return this</span>.pedido.items.reduce((sum, item) =>
-      sum + (item.cantidad * item.precio), <span class="num">0</span>
-    )
-  }
+<span class="cm">// total = reduce sobre el array</span>
+<span class="fn">total</span>() {
+  <span class="kw">return this</span>.pedido.items
+    .reduce((sum, item) =>
+      sum + (item.cantidad * item.precio)
+    , <span class="num">0</span>)
 },
 
-<span class="cm">// methods</span>
+<span class="cm">// push y splice mantienen reactividad</span>
 <span class="fn">agregarItem</span>() {
-  <span class="kw">this</span>.pedido.items.push({ producto:<span class="str">''</span>, cantidad:<span class="num">1</span>, precio:<span class="num">0</span> })
+  <span class="kw">this</span>.pedido.items.push({
+    producto:<span class="str">''</span>, cantidad:<span class="num">1</span>, precio:<span class="num">0</span>
+  })
 },
 <span class="fn">eliminarItem</span>(i) {
   <span class="kw">if</span>(<span class="kw">this</span>.pedido.items.length > <span class="num">1</span>)
     <span class="kw">this</span>.pedido.items.splice(i, <span class="num">1</span>)
-}
-
-<span class="cm">// ── CampoTexto.vue ──</span>
+}</pre>
+        <pre><span class="cm">// ── CampoTexto.vue ──
+// Componente que acepta v-model</span>
 <span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;input</span>
-    <span class="attr">:value</span>=<span class="str">"modelValue"</span>
-    <span class="attr">@input</span>=<span class="str">"$emit('update:modelValue', $event.target.value)"</span>
-  <span class="tag">/&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">v-if</span>=<span class="str">"label"</span><span class="tag">&gt;</span>
+      {{ label }}
+    <span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span>
+      <span class="attr">:value</span>=<span class="str">"modelValue"</span>
+      <span class="attr">@input</span>=<span class="str">"$emit(
+        'update:modelValue',
+        $event.target.value)"</span>
+      <span class="attr">:placeholder</span>=<span class="str">"placeholder"</span>
+    <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
 <span class="tag">&lt;/template&gt;</span>
 <span class="tag">&lt;script&gt;</span>
 <span class="kw">export default</span> {
-  props: [<span class="str">'modelValue'</span>],
+  props: [<span class="str">'modelValue'</span>, <span class="str">'label'</span>,
+          <span class="str">'placeholder'</span>],
   emits: [<span class="str">'update:modelValue'</span>]
 }
 <span class="tag">&lt;/script&gt;</span>
 
-<span class="cm">&lt;!-- uso: igual que un input nativo --&gt;</span>
-<span class="tag">&lt;CampoTexto</span> <span class="attr">v-model</span>=<span class="str">"pedido.cliente"</span><span class="tag">/&gt;</span></pre>
+<span class="cm">&lt;!-- uso idéntico a input nativo --&gt;</span>
+<span class="tag">&lt;CampoTexto</span>
+  <span class="attr">v-model</span>=<span class="str">"pedido.cliente"</span>
+  <span class="attr">label</span>=<span class="str">"Cliente"</span>
+  <span class="attr">placeholder</span>=<span class="str">"Nombre..."</span>
+<span class="tag">/&gt;</span></pre>
+      </div>
     </div>
   </div>
 </div>

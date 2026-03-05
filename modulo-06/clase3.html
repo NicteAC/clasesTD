@@ -3,1462 +3,731 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Binding de Formularios — Vue.js · Clase Completa</title>
+<title>Binding de Formularios — Demos y Actividades</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --primary:#2D5BFF;--secondary:#00D4AA;--accent:#FF6B6B;
-    --dark:#1A1A2E;--light:#F8F9FA;--warning:#FFA500;
-    --bg:#0F0F1E;--surface:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
-    --text:#E8EAF6;--muted:rgba(232,234,246,.55);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;height:100%;background:var(--bg);font-family:'Sora',sans-serif;color:var(--text);overflow:hidden;}
-  #app{display:flex;flex-direction:column;width:100%;height:100vh;}
+:root{
+  --p:#2D5BFF;--s:#00D4AA;--ac:#FF6B6B;--dk:#1A1A2E;--lt:#F8F9FA;--w:#FFA500;
+  --bg:#0F0F1E;--sur:rgba(255,255,255,.05);--bor:rgba(255,255,255,.09);
+  --tx:#E8EAF6;--mu:rgba(232,234,246,.55);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Sora',sans-serif;color:var(--tx);}
+.tslide h1{font-size:3.4rem;margin-bottom:.8rem;}
+.brk .brkttl{font-size:5rem;}
+.brk p{font-size:1.1rem;}
+#app{display:flex;flex-direction:column;width:100%;height:100vh;}
 
-  /* ── HEADER ── */
-  header{display:flex;align-items:center;justify-content:space-between;padding:.55rem 2rem;background:rgba(15,15,30,.97);border-bottom:1px solid var(--border);flex-shrink:0;}
-  .h-logo{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:.85rem;letter-spacing:.05em;color:var(--secondary);}
-  .h-logo span{color:var(--muted);font-weight:400;}
-  .h-ctr{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--muted);letter-spacing:.1em;}
-  .h-ctr strong{color:var(--primary);font-size:.95rem;}
-  .h-btns{display:flex;gap:.4rem;}
-  .h-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.3rem .85rem;border-radius:6px;font-family:'Sora',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;}
-  .h-btn:hover{background:var(--primary);border-color:var(--primary);}
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:.38rem 1.8rem;
+  background:rgba(15,15,30,.98);border-bottom:1px solid var(--bor);flex-shrink:0;z-index:10;}
+.hbrand{font-size:.82rem;font-weight:700;color:var(--s);display:flex;align-items:center;gap:.4rem;}
+.hbrand span{color:var(--mu);font-weight:400;}
+.hctr{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--mu);letter-spacing:.12em;}
+.hctr strong{color:var(--p);font-size:.95rem;}
+.hnav{display:flex;gap:.4rem;}
+.hjmp{background:var(--sur);border:1px solid var(--bor);color:var(--tx);padding:.26rem .78rem;
+  border-radius:6px;font-family:'Sora',sans-serif;font-size:.73rem;cursor:pointer;transition:all .2s;}
+.hjmp:hover{background:var(--p);border-color:var(--p);}
 
-  /* ── PROGRESS ── */
-  .prog{height:3px;background:rgba(255,255,255,.05);flex-shrink:0;}
-  .prog-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .4s ease;}
+/* PROGRESS */
+.pbar{height:3px;background:rgba(255,255,255,.05);flex-shrink:0;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--p),var(--s));transition:width .4s ease;}
 
-  /* ── SLIDES ── */
-  #slides{flex:1;overflow:hidden;position:relative;}
-  .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:1.2rem 2rem;animation:sIn .5s ease-out;}
-  .slide.active{display:flex;}
-  @keyframes sIn{from{opacity:0;transform:translateX(28px);}to{opacity:1;transform:translateX(0);}}
-  .container{width:100%;max-width:1200px;margin:0 auto;}
+/* SLIDES */
+#wrap{flex:1;overflow:hidden;position:relative;}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  padding:.6rem 2rem;animation:sIn .55s ease-out;overflow-y:auto;}
+.slide.dslide,.slide.wide{align-items:flex-start;padding:.5rem 1.2rem;}
+.slide.active{display:flex;}
+@keyframes sIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.cnt{width:100%;max-width:1200px;margin:0 auto;padding:.3rem 0;}
+.cnt.wide{max-width:100%;padding:.3rem .5rem;}
 
-  /* ── TYPE ── */
-  h1{font-size:clamp(2rem,3.8vw,3.5rem);font-weight:800;line-height:1.15;background:linear-gradient(135deg,#fff 30%,var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem;}
-  h2{font-size:clamp(1.4rem,2.4vw,2.2rem);font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.9rem;}
-  h3{font-size:1.25rem;font-weight:600;color:var(--secondary);margin-bottom:.5rem;}
-  p,li{font-size:1.05rem;line-height:1.8;}
-  .muted{color:var(--muted);font-size:.9rem;}
-  ul{list-style:none;}
-  ul li{padding-left:1.3rem;position:relative;margin-bottom:.4rem;}
-  ul li::before{content:'→';position:absolute;left:0;color:var(--secondary);font-weight:700;}
+/* TYPE */
+h1{font-size:2.6rem;font-weight:800;line-height:1.1;
+  background:linear-gradient(135deg,#fff 25%,var(--s));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.7rem;}
+h2{font-size:1.8rem;font-weight:700;line-height:1.1;
+  background:linear-gradient(135deg,var(--p),var(--s));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.7rem;}
+h3{font-size:1.3rem;font-weight:600;color:var(--s);margin-bottom:.4rem;}
+h4{font-size:1rem;font-weight:600;color:var(--s);margin-bottom:.3rem;}
+p,li{font-size:.95rem;line-height:1.6;}
+.sm{font-size:.82rem!important;line-height:1.5!important;}
+.mu{color:var(--mu);}
+ul{list-style:none;}
+ul li{padding-left:1.3rem;position:relative;margin-bottom:.28rem;}
+ul li::before{content:'→';position:absolute;left:0;color:var(--s);font-weight:700;}
 
-  /* ── BADGES ── */
-  .badge{display:inline-block;padding:.18rem .75rem;border-radius:50px;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
-  .b-pri{background:rgba(45,91,255,.18);color:var(--primary);border:1px solid var(--primary);}
-  .b-sec{background:rgba(0,212,170,.18);color:var(--secondary);border:1px solid var(--secondary);}
-  .b-acc{background:rgba(255,107,107,.18);color:var(--accent);border:1px solid var(--accent);}
-  .b-warn{background:rgba(255,165,0,.18);color:var(--warning);border:1px solid var(--warning);}
+/* BADGES */
+.badge{display:inline-block;padding:.18rem .72rem;border-radius:50px;
+  font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.bp{background:rgba(45,91,255,.18);color:var(--p);border:1px solid var(--p);}
+.bs{background:rgba(0,212,170,.18);color:var(--s);border:1px solid var(--s);}
+.ba{background:rgba(255,107,107,.18);color:var(--ac);border:1px solid var(--ac);}
+.bw{background:rgba(255,165,0,.18);color:var(--w);border:1px solid var(--w);}
 
-  /* ── CARDS ── */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all .3s ease;}
-  .card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 32px rgba(45,91,255,.15);}
-  .card.no-hover:hover{transform:none;border-color:var(--border);box-shadow:none;}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
-  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem;}
+/* CARDS */
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:1rem;
+  transition:transform .3s,border-color .3s,box-shadow .3s;}
+.card:hover{transform:translateY(-5px);border-color:var(--p);box-shadow:0 8px 32px rgba(45,91,255,.18);}
+.nh:hover{transform:none!important;border-color:var(--bor)!important;box-shadow:none!important;}
+.ca{border-color:rgba(0,212,170,.4)!important;}
+.cred{border-color:rgba(255,107,107,.4)!important;}
 
-  /* ── CODE ── */
-  pre,code{font-family:'Space Mono',monospace;font-size:.76rem;line-height:1.7;}
-  pre{background:rgba(0,0,0,.55);border:1px solid rgba(45,91,255,.28);border-radius:10px;padding:.9rem 1.1rem;overflow-x:auto;white-space:pre;}
-  code.il{background:rgba(45,91,255,.15);color:var(--secondary);padding:.1rem .38rem;border-radius:4px;font-size:.82em;}
-  .kw{color:#9580ff;}.str{color:#00D4AA;}.fn{color:#50fa7b;}.cm{color:#6272a4;}
-  .prop{color:#ffb86c;}.tag{color:#FF6B6B;}.attr{color:#8be9fd;}.val{color:#f1fa8c;}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem;}
+.c2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;width:100%;}
 
-  /* ── TITLE SLIDE ── */
-  .title-slide{background:radial-gradient(ellipse at 20% 50%,rgba(45,91,255,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,212,170,.1) 0%,transparent 50%),var(--bg);}
-  .eyebrow{font-size:.82rem;font-weight:600;letter-spacing:.15em;color:var(--secondary);text-transform:uppercase;margin-bottom:.9rem;}
-  .title-tags{display:flex;gap:.55rem;margin-top:1.3rem;flex-wrap:wrap;}
-  .title-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-top:1.8rem;}
-  .meta-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.9rem;text-align:center;}
-  .meta-num{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--primary);}
-  .meta-lbl{font-size:.78rem;color:var(--muted);margin-top:.15rem;}
+/* CODE */
+pre,code{font-family:'Space Mono',monospace;}
+pre{background:rgba(0,0,0,.55);border:1px solid rgba(45,91,255,.3);border-radius:10px;
+  padding:.65rem .9rem;font-size:.71rem;line-height:1.55;overflow-x:auto;white-space:pre;}
+code.il{background:rgba(45,91,255,.15);color:var(--s);padding:.1rem .38rem;
+  border-radius:4px;font-size:.83em;font-family:'Space Mono',monospace;}
+.kw{color:#9580ff;}.str{color:#00D4AA;}.fn{color:#50fa7b;}.cm{color:#6272a4;font-style:italic;}
+.prop{color:#ffb86c;}.tag{color:#FF6B6B;}.attr{color:#8be9fd;}.val{color:#f1fa8c;}.num{color:#bd93f9;}
+.say{color:#ffd700;font-style:italic;} /* "lo que decís" en amarillo */
 
-  /* ── AGENDA ── */
-  .ag-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.8rem 1.1rem;display:flex;align-items:center;gap:.9rem;transition:all .3s;}
-  .ag-item:hover{border-color:var(--primary);transform:translateX(4px);}
-  .ag-time{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--secondary);min-width:52px;font-weight:700;}
-  .ag-icon{font-size:1.2rem;flex-shrink:0;}
-  .ag-title{font-size:.92rem;font-weight:600;}
-  .ag-sub{font-size:.76rem;color:var(--muted);}
-  .ag-list{display:flex;flex-direction:column;gap:.4rem;}
+/* DEMO SLIDES */
+.dslide{background:radial-gradient(ellipse at 75% 80%,rgba(45,91,255,.07) 0%,transparent 55%),var(--bg);}
+.dhdr{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem;}
+.dico{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--p),var(--s));
+  display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0;}
+.dsteps{display:flex;flex-direction:column;gap:.28rem;}
+.dstep{display:flex;align-items:flex-start;gap:.55rem;background:rgba(255,255,255,.04);
+  border:1px solid var(--bor);border-radius:7px;padding:.38rem .75rem;}
+.dnum{min-width:21px;height:21px;background:var(--p);border-radius:50%;font-size:.67rem;
+  font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+.dtxt{font-size:.8rem;line-height:1.42;}
 
-  /* ── DEMO ── */
-  .demo-slide{background:radial-gradient(ellipse at 80% 80%,rgba(45,91,255,.07) 0%,transparent 60%),var(--bg);}
-  .demo-hdr{display:flex;align-items:center;gap:.9rem;margin-bottom:1.2rem;}
-  .demo-icon{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
-  .demo-steps{display:flex;flex-direction:column;gap:.42rem;}
-  .d-step{display:flex;align-items:flex-start;gap:.7rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .9rem;}
-  .d-num{min-width:21px;height:21px;background:var(--primary);border-radius:50%;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
-  .d-txt{font-size:.88rem;line-height:1.5;}
+/* TITLE SLIDE */
+.tslide{background:radial-gradient(ellipse at 18% 50%,rgba(45,91,255,.12) 0%,transparent 58%),
+  radial-gradient(ellipse at 82% 22%,rgba(0,212,170,.09) 0%,transparent 52%),var(--bg);
+  justify-content:center;align-items:center;}
+.ey{font-size:.78rem;font-weight:600;letter-spacing:.16em;color:var(--s);text-transform:uppercase;margin-bottom:1rem;}
+.tmetag{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.2rem;}
+.mbox{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:.9rem .6rem;text-align:center;}
+.mnum{font-family:'Space Mono',monospace;font-size:1.35rem;font-weight:700;color:var(--p);
+  text-shadow:0 0 18px rgba(45,91,255,.4);}
+.mlbl{font-size:.74rem;color:var(--mu);margin-top:.12rem;}
+.ttags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem;}
 
-  /* ── LAYOUT ── */
-  .c2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
-  .c2-60{display:grid;grid-template-columns:1.1fr 1fr;gap:2rem;align-items:start;}
+/* ACTIVITY / TIMER */
+.actg{display:grid;grid-template-columns:1fr 1.9fr;gap:1.8rem;align-items:start;}
+.tcard{background:var(--sur);border:1px solid var(--bor);border-radius:14px;
+  padding:1.2rem 1rem;text-align:center;transition:border-color .4s;}
+.tcard.tw{border-color:var(--w);}
+.tcard.td{border-color:var(--ac);}
+.tlbl{font-size:.7rem;font-weight:600;letter-spacing:.12em;color:var(--mu);text-transform:uppercase;}
+.tdisp{font-family:'Space Mono',monospace;font-size:4.5rem;font-weight:700;line-height:1;
+  color:var(--s);text-shadow:0 0 30px rgba(0,212,170,.45);
+  transition:color .4s,text-shadow .4s;letter-spacing:.02em;margin:.38rem 0;}
+.tdisp.tw{color:var(--w);text-shadow:0 0 28px rgba(255,165,0,.5);}
+.tdisp.td{color:var(--ac);text-shadow:0 0 28px rgba(255,107,107,.6);animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.tstat{font-size:.78rem;color:var(--mu);margin-top:.38rem;min-height:1.1rem;}
+.tctrl{display:flex;justify-content:center;gap:.8rem;margin-top:.85rem;}
+.tbtn{padding:.36rem .88rem;border-radius:7px;font-family:'Sora',sans-serif;font-size:.75rem;
+  font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;}
+.tbtn.ts{background:rgba(0,212,170,.15);border-color:var(--s);color:var(--s);}
+.tbtn.ts:hover{background:var(--s);color:var(--dk);}
+.tbtn.tp{background:rgba(255,165,0,.15);border-color:var(--w);color:var(--w);}
+.tbtn.tp:hover{background:var(--w);color:var(--dk);}
+.tbtn.tr{background:rgba(255,107,107,.15);border-color:var(--ac);color:var(--ac);}
+.tbtn.tr:hover{background:var(--ac);color:#fff;}
+.acard{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:1.1rem;}
+.asteps{display:flex;flex-direction:column;gap:.28rem;margin-top:.5rem;}
+.astep{display:flex;align-items:flex-start;gap:.5rem;padding:.35rem .7rem;
+  background:rgba(255,255,255,.025);border:1px solid var(--bor);border-radius:8px;}
+.anum{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));
+  font-size:.64rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
+.atxt{font-size:.8rem;line-height:1.45;}
 
-  /* ── HIGHLIGHT ── */
-  .hl{background:linear-gradient(135deg,rgba(45,91,255,.1),rgba(0,212,170,.1));border:1px solid rgba(45,91,255,.3);border-radius:10px;padding:.9rem 1.1rem;margin-top:.9rem;}
-  .hl-warn{background:linear-gradient(135deg,rgba(255,107,107,.1),rgba(255,165,0,.1));border-color:rgba(255,107,107,.3);}
-  .hl-sec{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(45,91,255,.05));border-color:rgba(0,212,170,.35);}
+/* BREAK */
+.brk{background:radial-gradient(ellipse at 50% 50%,rgba(0,212,170,.09) 0%,transparent 62%),var(--bg);text-align:center;
+  justify-content:center;align-items:center;}
+.brkttl{font-size:4.5rem;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,var(--s),var(--p));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
-  /* ── TABLE ── */
-  table{width:100%;border-collapse:collapse;font-size:.86rem;}
-  th{background:rgba(45,91,255,.2);padding:.58rem .9rem;text-align:left;font-weight:600;color:var(--primary);border-bottom:1px solid rgba(45,91,255,.3);}
-  td{padding:.52rem .9rem;border-bottom:1px solid var(--border);}
-  tr:last-child td{border-bottom:none;}
-  tr:hover td{background:rgba(255,255,255,.02);}
+/* HIGHLIGHT BOXES */
+.hl{background:linear-gradient(135deg,rgba(45,91,255,.1),rgba(0,212,170,.08));
+  border:1px solid rgba(45,91,255,.3);border-radius:10px;padding:.6rem .85rem;}
+.hlg{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(45,91,255,.05));
+  border:1px solid rgba(0,212,170,.35);border-radius:10px;padding:.6rem .85rem;}
+.hlr{background:linear-gradient(135deg,rgba(255,107,107,.1),rgba(255,165,0,.07));
+  border:1px solid rgba(255,107,107,.35);border-radius:10px;padding:.6rem .85rem;}
 
-  /* ── ACTIVITY ── */
-  .act-grid{display:grid;grid-template-columns:1fr 1.9fr;gap:3rem;align-items:start;}
-  .t-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem 1.3rem;text-align:center;transition:border-color .4s;}
-  .t-card.tw{border-color:var(--warning);}
-  .t-card.td{border-color:var(--accent);}
-  .t-lbl{font-size:.75rem;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
-  .t-disp{font-family:'Space Mono',monospace;font-size:clamp(3rem,5.5vw,4.8rem);font-weight:700;color:var(--secondary);text-shadow:0 0 28px rgba(0,212,170,.4);transition:color .4s,text-shadow .4s;letter-spacing:.04em;line-height:1;margin:.4rem 0;}
-  .t-disp.tw{color:var(--warning);text-shadow:0 0 28px rgba(255,165,0,.5);}
-  .t-disp.td{color:var(--accent);text-shadow:0 0 28px rgba(255,107,107,.6);animation:pulse .8s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
-  .t-status{font-size:.8rem;color:var(--muted);margin-top:.4rem;min-height:1.1rem;}
-  .t-ctrls{display:flex;justify-content:center;gap:.8rem;margin-top:.85rem;}
-  .t-btn{padding:.37rem .92rem;border-radius:7px;font-family:'Sora',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;}
-  .tb-s{background:rgba(0,212,170,.15);border-color:var(--secondary);color:var(--secondary);}
-  .tb-s:hover{background:var(--secondary);color:var(--dark);}
-  .tb-p{background:rgba(255,165,0,.15);border-color:var(--warning);color:var(--warning);}
-  .tb-p:hover{background:var(--warning);color:var(--dark);}
-  .tb-r{background:rgba(255,107,107,.15);border-color:var(--accent);color:var(--accent);}
-  .tb-r:hover{background:var(--accent);color:#fff;}
-  .act-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
-  .act-steps{display:flex;flex-direction:column;gap:.42rem;margin-top:.85rem;}
-  .a-step{display:flex;align-items:flex-start;gap:.68rem;padding:.52rem .82rem;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;}
-  .a-num{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;}
-  .a-txt{font-size:.86rem;line-height:1.5;}
+/* COLUMN LISTS */
+.tcl{columns:2;column-gap:3rem;}
+.tcl li{break-inside:avoid;}
 
-  /* ── BREAK ── */
-  .break-slide{background:radial-gradient(ellipse at 50% 50%,rgba(0,212,170,.08) 0%,transparent 70%),var(--bg);text-align:center;}
-  .break-big{font-size:clamp(3.5rem,7vw,6.5rem);font-weight:800;line-height:1;background:linear-gradient(135deg,var(--secondary),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.5rem 0;}
-
-  /* ── CHECK ── */
-  .check-item{display:flex;align-items:flex-start;gap:.72rem;padding:.58rem .88rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:.42rem;}
-  .ch-ico{color:var(--secondary);font-size:.95rem;flex-shrink:0;}
-
-  /* ── FLOW ── */
-  .flow{display:flex;align-items:center;gap:.7rem;justify-content:center;margin:.8rem 0;flex-wrap:wrap;}
-  .fbox{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.6rem 1rem;text-align:center;font-size:.82rem;font-weight:600;}
-  .farr{color:var(--muted);font-size:1.1rem;}
-  .f-pri{border-color:var(--primary);color:var(--primary);}
-  .f-sec{border-color:var(--secondary);color:var(--secondary);}
-  .f-acc{border-color:var(--accent);color:var(--accent);}
-  .f-warn{border-color:var(--warning);color:var(--warning);}
-
-  /* ── TWO-COL LIST ── */
-  .two-col{columns:2;column-gap:2.5rem;}
-  .two-col li{break-inside:avoid;}
-
-  /* ── FOOTER ── */
-  footer{display:flex;justify-content:center;align-items:center;gap:1.4rem;padding:.52rem 2rem;background:rgba(15,15,30,.9);border-top:1px solid var(--border);flex-shrink:0;}
-  .nav-btn{padding:.38rem 1.3rem;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;}
-  .nav-btn:hover{background:var(--primary);border-color:var(--primary);}
-  .nav-btn:disabled{opacity:.3;cursor:default;}
-  .nav-btn:disabled:hover{background:var(--surface);border-color:var(--border);}
-  .ft-hint{font-size:.72rem;color:var(--muted);}
-
-  /* ── STEP FLOW ── */
-  .step-flow{display:flex;flex-direction:column;gap:.55rem;}
-  .sf-item{display:flex;align-items:flex-start;gap:.85rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
-  .sf-num{min-width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .sf-content h3{font-size:1rem;margin-bottom:.25rem;}
-  .sf-content p{font-size:.85rem;color:var(--muted);}
+/* FOOTER */
+footer{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:.38rem 2rem;
+  background:rgba(15,15,30,.92);border-top:1px solid var(--bor);flex-shrink:0;}
+.navbtn{padding:.36rem 1.35rem;border-radius:8px;background:var(--sur);border:1px solid var(--bor);
+  color:var(--tx);font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .25s;}
+.navbtn:hover{background:var(--p);border-color:var(--p);}
+.navbtn:disabled{opacity:.3;cursor:default;pointer-events:none;}
+.nhint{font-size:.72rem;color:var(--mu);}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- HEADER -->
 <header>
-  <div class="h-logo">📋 Binding de Formularios <span>/ Vue.js</span></div>
-  <div class="h-ctr" id="ctr"><strong>1</strong> / <span id="tot">22</span></div>
-  <div class="h-btns">
-    <button class="h-btn" onclick="goTo(0)">Inicio</button>
-    <button class="h-btn" onclick="goTo(12)">☕ Break</button>
-    <button class="h-btn" onclick="goTo(21)">Fin</button>
+  <div class="hbrand">📋 Binding de Formularios <span>/ Demos y Actividades</span></div>
+  <div class="hctr"><strong id="cn">1</strong> / <span id="tn">8</span></div>
+  <div class="hnav">
+    <button class="hjmp" onclick="goTo(0)">Inicio</button>
+    <button class="hjmp" onclick="goTo(4)">☕ Break</button>
+    <button class="hjmp" onclick="goTo(7)">Actividad 2</button>
   </div>
 </header>
-<div class="prog"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+<div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
 
-<!-- SLIDES -->
-<div id="slides">
+<div id="wrap">
 
-<!-- ═══ 0 TÍTULO ═══ -->
-<div class="slide title-slide active" data-i="0">
-  <div class="container">
-    <div class="eyebrow">Desarrollo de Aplicaciones Front-end Trainee · Lección 3</div>
-    <h1>Binding de<br>Formularios en Vue.js</h1>
-    <p style="color:var(--muted);font-size:1.05rem;margin-top:.4rem">Clase de 3 horas · formularios interactivos, validaciones y componentes reutilizables</p>
-    <div class="title-tags">
-      <span class="badge b-pri">v-model</span>
-      <span class="badge b-sec">Two-way Binding</span>
-      <span class="badge b-sec">Validaciones</span>
-      <span class="badge b-acc">Formulario multipaso</span>
-      <span class="badge b-warn">Arrays dinámicos</span>
-      <span class="badge b-pri">Componentes custom</span>
-    </div>
-    <div class="title-meta">
-      <div class="meta-item"><div class="meta-num">3 hs</div><div class="meta-lbl">Duración total</div></div>
-      <div class="meta-item"><div class="meta-num">4</div><div class="meta-lbl">Demos en vivo</div></div>
-      <div class="meta-item"><div class="meta-num">2</div><div class="meta-lbl">Actividades prácticas</div></div>
-      <div class="meta-item"><div class="meta-num">1</div><div class="meta-lbl">Break de 20 min</div></div>
-    </div>
+<!-- ══════════════════════════════════════════
+     SLIDE 0 — TÍTULO
+══════════════════════════════════════════ -->
+<div class="slide tslide active" data-i="0">
+<div class="cnt" style="max-width:900px;">
+  <div class="ey">Desarrollo de Aplicaciones Front-end Trainee · Lección 3</div>
+  <h1>Binding de Formularios<br>en Vue.js</h1>
+  <p class="mu sm">Clase de 3 horas · demos en vivo con código anotado · actividades prácticas distintas</p>
+  <div class="ttags">
+    <span class="badge bp">v-model</span>
+    <span class="badge bs">Modificadores</span>
+    <span class="badge bs">Validaciones</span>
+    <span class="badge ba">Formulario multipaso</span>
+    <span class="badge bw">Arrays dinámicos</span>
+    <span class="badge bp">Componente custom</span>
+  </div>
+  <div class="tmetag">
+    <div class="mbox"><div class="mnum">3 hs</div><div class="mlbl">Duración total</div></div>
+    <div class="mbox"><div class="mnum">4</div><div class="mlbl">Demos en vivo</div></div>
+    <div class="mbox"><div class="mnum">2</div><div class="mlbl">Actividades</div></div>
+    <div class="mbox"><div class="mnum">20 min</div><div class="mlbl">Break</div></div>
   </div>
 </div>
-
-<!-- ═══ 1 AGENDA ═══ -->
-<div class="slide" data-i="1">
-  <div class="container">
-    <h2>Agenda del día</h2>
-    <p class="muted" style="margin-bottom:1rem">3 horas · demo-first · práctica real</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem 2.5rem">
-      <div class="ag-list">
-        <div class="ag-item"><div class="ag-icon">🎯</div><div><div class="ag-time">00:00</div><div class="ag-title">¿Qué es form binding?</div><div class="ag-sub">two-way binding, v-model interno</div></div></div>
-        <div class="ag-item"><div class="ag-icon">📝</div><div><div class="ag-time">00:12</div><div class="ag-title">v-model en todos los inputs</div><div class="ag-sub">text, checkbox, radio, select, textarea</div></div></div>
-        <div class="ag-item"><div class="ag-icon">💻</div><div><div class="ag-time">00:25</div><div class="ag-title">Demo 1 — Formulario de registro</div><div class="ag-sub">todos los tipos de input + modificadores</div></div></div>
-        <div class="ag-item"><div class="ag-icon">✅</div><div><div class="ag-time">00:50</div><div class="ag-title">Validaciones básicas</div><div class="ag-sub">computed, @blur, mensajes de error</div></div></div>
-        <div class="ag-item"><div class="ag-icon">💻</div><div><div class="ag-time">01:00</div><div class="ag-title">Demo 2 — Validaciones en tiempo real</div><div class="ag-sub">regex, botón deshabilitado, feedback</div></div></div>
-        <div class="ag-item"><div class="ag-icon">🧪</div><div><div class="ag-time">01:15</div><div class="ag-title">Actividad 1 — Pedido con validaciones</div><div class="ag-sub">40 min · todos los tipos de campo</div></div></div>
-      </div>
-      <div class="ag-list">
-        <div class="ag-item" style="border-color:var(--secondary)"><div class="ag-icon">☕</div><div><div class="ag-time" style="color:var(--accent)">01:55</div><div class="ag-title">Break</div><div class="ag-sub">20 minutos</div></div></div>
-        <div class="ag-item"><div class="ag-icon">🔄</div><div><div class="ag-time">02:15</div><div class="ag-title">Formulario multipaso</div><div class="ag-sub">pasos, navegación, validación por paso</div></div></div>
-        <div class="ag-item"><div class="ag-icon">💻</div><div><div class="ag-time">02:30</div><div class="ag-title">Demo 3 — Encuesta multipaso</div><div class="ag-sub">4 pasos, sliders, resumen final</div></div></div>
-        <div class="ag-item"><div class="ag-icon">⚡</div><div><div class="ag-time">02:50</div><div class="ag-title">Arrays dinámicos + componente custom</div><div class="ag-sub">ítems dinámicos, v-model personalizado</div></div></div>
-        <div class="ag-item"><div class="ag-icon">💻</div><div><div class="ag-time">02:55</div><div class="ag-title">Demo 4 — Pedido con ítems dinámicos</div><div class="ag-sub">agregar/eliminar ítems, total reactivo</div></div></div>
-        <div class="ag-item"><div class="ag-icon">🧪</div><div><div class="ag-time">03:10</div><div class="ag-title">Actividad 2 + Cierre</div><div class="ag-sub">formulario de pedido completo</div></div></div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ═══ 2 QUÉ ES FORM BINDING ═══ -->
-<div class="slide" data-i="2">
-  <div class="container">
-    <h2>¿Qué es Form Binding?</h2>
-    <div class="c2">
-      <div>
-        <p style="margin-bottom:1rem"><strong style="color:var(--secondary)">Binding</strong> es la conexión automática entre los datos del componente y los campos del formulario. En Vue usamos <code class="il">v-model</code> para la conexión <strong>bidireccional</strong>.</p>
-        <div class="flow" style="margin-bottom:1rem">
-          <div class="fbox f-pri">data()<br><small>modelo</small></div>
-          <div class="farr">⇄</div>
-          <div class="fbox f-sec">v-model<br><small>puente</small></div>
-          <div class="farr">⇄</div>
-          <div class="fbox f-acc">input<br><small>vista</small></div>
-        </div>
-        <div class="hl" style="margin-bottom:.9rem">
-          <p style="font-size:.9rem"><code class="il">v-model</code> es azúcar sintáctica para:<br><code class="il">:value="dato"</code> + <code class="il">@input="dato = $event.target.value"</code></p>
-        </div>
-        <div class="card no-hover" style="padding:1rem">
-          <h3 style="font-size:1rem;margin-bottom:.6rem">Modificadores clave</h3>
-          <table>
-            <thead><tr><th>Modificador</th><th>Efecto</th></tr></thead>
-            <tbody>
-              <tr><td><code class="il">.lazy</code></td><td>Sincroniza en <code class="il">change</code>, no en <code class="il">input</code></td></tr>
-              <tr><td><code class="il">.number</code></td><td>Convierte el valor a Number</td></tr>
-              <tr><td><code class="il">.trim</code></td><td>Elimina espacios al inicio y fin</td></tr>
-            </tbody>
-          </table>
-        </div>
+<!-- ══════════════════════════════════════════
+     SLIDE 1 — DEMO 1: v-model todos los tipos
+══════════════════════════════════════════ -->
+<div class="slide dslide" data-i="1">
+<div class="cnt wide">
+  <div class="dhdr">
+    <div class="dico">💻</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.18rem">
+        <span class="badge bp">DEMO 1</span><span class="badge bs">~25 min</span><span class="badge bw">Vos codeas y explicás</span>
       </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">v-model equivale a esto</p>
-        <pre><span class="cm">&lt;!-- Lo que escribís --&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"nombre"</span> <span class="tag">/&gt;</span>
-
-<span class="cm">&lt;!-- Lo que Vue hace internamente --&gt;</span>
-<span class="tag">&lt;input</span>
-  <span class="attr">:value</span>=<span class="str">"nombre"</span>
-  <span class="attr">@input</span>=<span class="str">"nombre = $event.target.value"</span>
-<span class="tag">/&gt;</span>
-
-<span class="cm">&lt;!-- Con modificadores --&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"nombre"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"edad"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">v-model.lazy</span>=<span class="str">"busqueda"</span> <span class="tag">/&gt;</span>
-
-<span class="cm">// Verificar tipos en la consola:
-// Sin .number → typeof edad === 'string'
-// Con .number → typeof edad === 'number'</span></pre>
-      </div>
+      <h2 style="margin:0">Formulario de Perfil — v-model en todos los tipos de campo</h2>
     </div>
   </div>
-</div>
-
-<!-- ═══ 3 TIPOS DE CAMPOS ═══ -->
-<div class="slide" data-i="3">
-  <div class="container">
-    <h2>v-model en Todos los Tipos de Campo</h2>
-    <div class="c2">
-      <div>
-        <div style="display:flex;flex-direction:column;gap:.6rem">
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Input / Textarea → <span style="color:var(--primary)">string</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"nombre"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;textarea</span> <span class="attr">v-model</span>=<span class="str">"descripcion"</span><span class="tag">&gt;&lt;/textarea&gt;</span></pre>
-          </div>
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Checkbox booleano → <span style="color:var(--primary)">boolean</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"aceptaTerminos"</span> <span class="tag">/&gt;</span>
-<span class="cm">// true si marcado, false si no</span></pre>
-          </div>
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Checkbox múltiple → <span style="color:var(--primary)">array</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-       <span class="attr">v-model</span>=<span class="str">"intereses"</span>
-       <span class="attr">value</span>=<span class="str">"tecnologia"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-       <span class="attr">v-model</span>=<span class="str">"intereses"</span>
-       <span class="attr">value</span>=<span class="str">"deportes"</span> <span class="tag">/&gt;</span>
-<span class="cm">// intereses = ['tecnologia', 'deportes']</span></pre>
-          </div>
-        </div>
+  <div class="c2">
+    <div>
+      <p class="mu sm" style="margin-bottom:.5rem">QUÉ VAS A CONSTRUIR</p>
+      <div class="card nh ca" style="padding:1rem;margin-bottom:.8rem">
+        <p class="sm">Un formulario de perfil de usuario con <strong style="color:var(--s)">todos los tipos de input</strong> enlazados con v-model: texto, email, número, radio, checkboxes, select y textarea. Incluye una sección de preview en tiempo real.</p>
       </div>
-      <div>
-        <div style="display:flex;flex-direction:column;gap:.6rem">
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Radio → <span style="color:var(--primary)">valor único</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span>
-       <span class="attr">v-model</span>=<span class="str">"envio"</span>
-       <span class="attr">value</span>=<span class="str">"estandar"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span>
-       <span class="attr">v-model</span>=<span class="str">"envio"</span>
-       <span class="attr">value</span>=<span class="str">"express"</span> <span class="tag">/&gt;</span>
-<span class="cm">// envio = 'estandar' o 'express'</span></pre>
-          </div>
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Select simple → <span style="color:var(--primary)">valor único</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;select</span> <span class="attr">v-model</span>=<span class="str">"pais"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"cl"</span><span class="tag">&gt;</span>Chile<span class="tag">&lt;/option&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"ar"</span><span class="tag">&gt;</span>Argentina<span class="tag">&lt;/option&gt;</span>
-<span class="tag">&lt;/select&gt;</span></pre>
-          </div>
-          <div class="card no-hover" style="padding:.9rem">
-            <h3 style="font-size:.95rem">Select múltiple → <span style="color:var(--primary)">array</span></h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;select</span> <span class="attr">v-model</span>=<span class="str">"seleccionados"</span> <span class="attr">multiple</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">v-for</span>=<span class="str">"op in opciones"</span>
-          <span class="attr">:key</span>=<span class="str">"op"</span> <span class="attr">:value</span>=<span class="str">"op"</span><span class="tag">&gt;</span>
-    {{ op }}
-  <span class="tag">&lt;/option&gt;</span>
-<span class="tag">&lt;/select&gt;</span></pre>
-          </div>
-        </div>
+      <p class="mu sm" style="margin-bottom:.5rem">PASOS EN ORDEN</p>
+      <div class="dsteps">
+        <div class="dstep"><div class="dnum">1</div><div class="dtxt">Crear <code class="il">data()</code> con todos los campos del formulario</div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dtxt"><code class="il">v-model</code> en text e email · mostrar doble binding en vivo</div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dtxt"><code class="il">v-model.number</code> en el campo edad · demostrar <code class="il">typeof</code></div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dtxt">Radio buttons con v-model compartido · <code class="il">value</code> por opción</div></div>
+        <div class="dstep"><div class="dnum">5</div><div class="dtxt">Checkboxes múltiples enlazados a un array</div></div>
+        <div class="dstep"><div class="dnum">6</div><div class="dtxt"><code class="il">&lt;select&gt;</code> con v-model · valor por defecto</div></div>
+        <div class="dstep"><div class="dnum">7</div><div class="dtxt">Textarea con <code class="il">v-model.trim</code> y contador de chars</div></div>
+        <div class="dstep"><div class="dnum">8</div><div class="dtxt">Sección preview que muestra todos los valores en tiempo real</div></div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ═══ 4 DEMO 1 — REGISTRO ═══ -->
-<div class="slide demo-slide" data-i="4">
-  <div class="container">
-    <div class="demo-hdr">
-      <div class="demo-icon">💻</div>
-      <div>
-        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
-          <span class="badge b-pri">DEMO 1</span>
-          <span class="badge b-sec">~20 min</span>
-        </div>
-        <h2 style="margin:0">Formulario de Registro — Todos los Tipos de Input</h2>
-      </div>
-    </div>
-    <div class="c2">
-      <div class="demo-steps">
-        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Crear objeto <code class="il">usuario</code> con: <code class="il">nombre, email, edad, genero, intereses[], aceptaTerminos</code></div></div>
-        <div class="d-step"><div class="d-num">2</div><div class="d-txt">Input texto con <code class="il">v-model.trim</code> · Input email · Input number con <code class="il">v-model.number</code></div></div>
-        <div class="d-step"><div class="d-num">3</div><div class="d-txt">Radio buttons para género con <code class="il">v-model="usuario.genero"</code></div></div>
-        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Checkboxes para intereses usando array: <code class="il">v-model="usuario.intereses" :value="opcion"</code></div></div>
-        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Select de país con <code class="il">v-for</code> sobre array de opciones</div></div>
-        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Checkbox de términos vinculado a booleano</div></div>
-        <div class="d-step"><div class="d-num">7</div><div class="d-txt">Sección de "Preview en tiempo real" con interpolaciones que muestran el objeto</div></div>
-        <div class="d-step"><div class="d-num">8</div><div class="d-txt"><code class="il">@submit.prevent</code> que loguea el objeto y muestra <code class="il">typeof edad</code> en consola</div></div>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">RegistroForm.vue — data y template base</p>
-        <pre style="font-size:.72rem"><span class="fn">data</span>() {
+    <div>
+      <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — código clave</p>
+      <pre><span class="cm">// data() — estructura base</span>
+<span class="fn">data</span>() {
   <span class="kw">return</span> {
-    <span class="prop">usuario</span>: {
-      <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span>,
-      <span class="prop">edad</span>: <span class="kw">null</span>, <span class="prop">genero</span>: <span class="str">''</span>,
-      <span class="prop">pais</span>: <span class="str">''</span>, <span class="prop">intereses</span>: [],
-      <span class="prop">aceptaTerminos</span>: <span class="val">false</span>
-    },
-    <span class="prop">paises</span>: [<span class="str">'Chile'</span>,<span class="str">'Argentina'</span>,<span class="str">'México'</span>,<span class="str">'España'</span>],
-    <span class="prop">opcionesInteres</span>: [<span class="str">'Tech'</span>,<span class="str">'Deportes'</span>,<span class="str">'Música'</span>,<span class="str">'Viajes'</span>]
+    nombre: <span class="str">''</span>,        <span class="cm">// text → v-model.trim</span>
+    email:  <span class="str">''</span>,        <span class="cm">// email</span>
+    edad:   <span class="val">null</span>,       <span class="cm">// number → v-model.number</span>
+    genero: <span class="str">''</span>,        <span class="cm">// radio buttons</span>
+    skills: [],         <span class="cm">// checkboxes → array</span>
+    nivel:  <span class="str">'junior'</span>,  <span class="cm">// select → valor por defecto</span>
+    bio:    <span class="str">''</span>         <span class="cm">// textarea → v-model.trim</span>
   }
-},
+}
 
-<span class="cm">&lt;!-- template --&gt;</span>
-<span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"registrar"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"usuario.nombre"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"usuario.edad"</span>
-         <span class="attr">type</span>=<span class="str">"number"</span> <span class="tag">/&gt;</span>
-  <span class="cm">&lt;!-- radio buttons --&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span>
-         <span class="attr">v-model</span>=<span class="str">"usuario.genero"</span>
-         <span class="attr">value</span>=<span class="str">"M"</span> <span class="tag">/&gt;</span>
-  <span class="cm">&lt;!-- checkboxes array --&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-         <span class="attr">v-model</span>=<span class="str">"usuario.intereses"</span>
-         <span class="attr">:value</span>=<span class="str">"op"</span>
-         <span class="attr">v-for</span>=<span class="str">"op in opcionesInteres"</span>
-         <span class="attr">:key</span>=<span class="str">"op"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;/form&gt;</span>
-<span class="cm">&lt;!-- preview reactivo --&gt;</span>
-<span class="tag">&lt;pre&gt;</span>{{ usuario }}<span class="tag">&lt;/pre&gt;</span></pre>
-      </div>
-    </div>
-  </div>
-</div>
+<span class="cm">&lt;!-- radio: mismo v-model, cada opción su value --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span> <span class="attr">value</span>=<span class="str">"M"</span><span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"genero"</span> <span class="attr">value</span>=<span class="str">"F"</span><span class="tag">/&gt;</span>
 
-<!-- ═══ 5 VALIDACIONES ═══ -->
-<div class="slide" data-i="5">
-  <div class="container">
-    <h2>Validaciones — Tres Momentos Clave</h2>
-    <div class="step-flow" style="margin-bottom:1rem">
-      <div class="sf-item">
-        <div class="sf-num">1</div>
-        <div class="sf-content">
-          <h3>Computed — validación derivada en tiempo real</h3>
-          <p>Computed properties que devuelven <code class="il">true/false</code>. Se recalculan automáticamente cuando el dato cambia. Usá para saber si el form es válido antes del submit.</p>
-        </div>
-      </div>
-      <div class="sf-item">
-        <div class="sf-num">2</div>
-        <div class="sf-content">
-          <h3>@blur — validar al salir del campo</h3>
-          <p>El evento <code class="il">blur</code> se dispara cuando el input pierde el foco. Ideal para mostrar el error solo después de que el usuario terminó de escribir — no en cada tecla.</p>
-        </div>
-      </div>
-      <div class="sf-item">
-        <div class="sf-num">3</div>
-        <div class="sf-content">
-          <h3>@submit — validación completa al enviar</h3>
-          <p>Llaman a un método que valida todos los campos y solo procesa si todo es válido. Acumulan errores en un objeto <code class="il">errores</code> con propiedades por campo.</p>
-        </div>
-      </div>
-    </div>
-    <div class="grid2">
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Patrón de validación con objeto de errores</p>
-        <pre style="font-size:.72rem"><span class="prop">data</span>() {
-  <span class="kw">return</span> {
-    <span class="prop">form</span>: { <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span> },
-    <span class="prop">errores</span>: { <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span> }
-  }
-},
-<span class="prop">methods</span>: {
-  <span class="fn">validarNombre</span>() {
-    <span class="kw">this</span>.<span class="prop">errores</span>.<span class="prop">nombre</span> =
-      !<span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">nombre</span>.<span class="fn">trim</span>()
-        ? <span class="str">'El nombre es requerido'</span>
-        : <span class="str">''</span>
-  },
-  <span class="fn">validarEmail</span>() {
-    <span class="kw">const</span> ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      .<span class="fn">test</span>(<span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">email</span>)
-    <span class="kw">this</span>.<span class="prop">errores</span>.<span class="prop">email</span> = ok ? <span class="str">''</span> : <span class="str">'Email inválido'</span>
-  }
-}</pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Template con mensajes de error</p>
-        <pre style="font-size:.72rem"><span class="tag">&lt;div&gt;</span>
-  <span class="tag">&lt;input</span>
-    <span class="attr">v-model.trim</span>=<span class="str">"form.nombre"</span>
-    <span class="attr">@blur</span>=<span class="str">"validarNombre"</span>
-    <span class="attr">:class</span>=<span class="str">"{ 'error-input': errores.nombre }"</span>
-  <span class="tag">/&gt;</span>
-  <span class="tag">&lt;span</span>
-    <span class="attr">v-if</span>=<span class="str">"errores.nombre"</span>
-    <span class="attr">style</span>=<span class="str">"color:red;font-size:.85rem"</span>
-  <span class="tag">&gt;</span>
-    {{ errores.nombre }}
-  <span class="tag">&lt;/span&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
+<span class="cm">&lt;!-- checkboxes → array: Vue agrega/quita el value --&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span> <span class="attr">value</span>=<span class="str">"vue"</span><span class="tag">/&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span> <span class="attr">v-model</span>=<span class="str">"skills"</span> <span class="attr">value</span>=<span class="str">"react"</span><span class="tag">/&gt;</span>
 
-<span class="cm">&lt;!-- botón deshabilitado si hay errores --&gt;</span>
-<span class="tag">&lt;button</span>
-  <span class="attr">:disabled</span>=<span class="str">"!formularioValido"</span>
-<span class="tag">&gt;</span>Enviar<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm">// computed:</span>
-<span class="fn">formularioValido</span>() {
-  <span class="kw">return</span> !<span class="kw">this</span>.<span class="prop">errores</span>.<span class="prop">nombre</span>
-    &amp;&amp; !<span class="kw">this</span>.<span class="prop">errores</span>.<span class="prop">email</span>
-    &amp;&amp; <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">nombre</span>
-    &amp;&amp; <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">email</span>
-}</pre>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 6 DEMO 2 — VALIDACIONES ═══ -->
-<div class="slide demo-slide" data-i="6">
-  <div class="container">
-    <div class="demo-hdr">
-      <div class="demo-icon">💻</div>
-      <div>
-        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
-          <span class="badge b-pri">DEMO 2</span>
-          <span class="badge b-sec">~15 min</span>
-        </div>
-        <h2 style="margin:0">Formulario con Validaciones en Tiempo Real</h2>
-      </div>
-    </div>
-    <div class="c2">
-      <div class="demo-steps">
-        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Definir <code class="il">form: { nombre, email, password, confirmPassword }</code> y objeto <code class="il">errores</code> paralelo</div></div>
-        <div class="d-step"><div class="d-num">2</div><div class="d-txt">Método <code class="il">validarNombre()</code> activado con <code class="il">@blur</code> — campo vacío = error</div></div>
-        <div class="d-step"><div class="d-num">3</div><div class="d-txt">Método <code class="il">validarEmail()</code> con regex — muestra error en tiempo real</div></div>
-        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Computed <code class="il">passwordValido</code>: mínimo 6 caracteres</div></div>
-        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Computed <code class="il">confirmacionValida</code>: que coincida con password</div></div>
-        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Computed <code class="il">formularioValido</code> que combina todas las validaciones → deshabilita el botón</div></div>
-        <div class="d-step"><div class="d-num">7</div><div class="d-txt"><code class="il">:class</code> dinámico para pintar el borde del input en rojo/verde</div></div>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">código completo</p>
-        <pre style="font-size:.71rem"><span class="prop">computed</span>: {
-  <span class="fn">passwordValido</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">password</span>.<span class="prop">length</span> >= <span class="val">6</span>
-  },
-  <span class="fn">confirmacionValida</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">password</span> ===
-           <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">confirmPassword</span>
-           &amp;&amp; <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">confirmPassword</span> !== <span class="str">''</span>
-  },
-  <span class="fn">formularioValido</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">nombre</span>.<span class="fn">trim</span>() !== <span class="str">''</span>
-      &amp;&amp; /^[^\s@]+@[^\s@]+\.[^\s@]+$/.<span class="fn">test</span>(<span class="kw">this</span>.<span class="prop">form</span>.<span class="prop">email</span>)
-      &amp;&amp; <span class="kw">this</span>.<span class="fn">passwordValido</span>
-      &amp;&amp; <span class="kw">this</span>.<span class="fn">confirmacionValida</span>
-  }
-},
-
-<span class="cm">&lt;!-- template: campo con feedback visual --&gt;</span>
-<span class="tag">&lt;input</span>
-  <span class="attr">v-model</span>=<span class="str">"form.password"</span>
-  <span class="attr">type</span>=<span class="str">"password"</span>
-  <span class="attr">:style</span>=<span class="str">"{
-    borderColor: form.password.length === 0
-      ? '#ccc'
-      : passwordValido ? 'green' : 'red'
-  }"</span>
-<span class="tag">/&gt;</span>
-<span class="tag">&lt;small</span> <span class="attr">v-if</span>=<span class="str">"form.password && !passwordValido"</span>
-       <span class="attr">style</span>=<span class="str">"color:red"</span><span class="tag">&gt;</span>
-  Mínimo 6 caracteres
-<span class="tag">&lt;/small&gt;</span>
-
-<span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!formularioValido"</span><span class="tag">&gt;</span>
-  Registrar
-<span class="tag">&lt;/button&gt;</span></pre>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 7 ACTIVIDAD 1 ═══ -->
-<div class="slide" data-i="7">
-  <div class="container">
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem">
-      <span class="badge b-acc">ACTIVIDAD 1</span>
-      <h2 style="margin:0">Registro de Pedido con Selección Múltiple y Validaciones</h2>
-    </div>
-    <div class="act-grid">
-      <div>
-        <div class="t-card" id="tc1">
-          <div class="t-lbl">⏱ tiempo disponible</div>
-          <div class="t-disp" id="t1">40:00</div>
-          <div class="t-status" id="t1s">Listo para iniciar</div>
-          <div class="t-ctrls">
-            <button class="t-btn tb-s" onclick="startT('t1',40)">▶ Iniciar</button>
-            <button class="t-btn tb-p" onclick="pauseT('t1')">⏸ Pausar</button>
-            <button class="t-btn tb-r" onclick="resetT('t1',40)">↺ Reset</button>
-          </div>
-        </div>
-      </div>
-      <div class="act-card">
-        <p style="margin-bottom:.3rem">Formulario completo de pedido usando <strong>todos los tipos de campo</strong> con validaciones y resumen reactivo.</p>
-        <div class="act-steps">
-          <div class="a-step"><div class="a-num">1</div><div class="a-txt">Definir objeto <code class="il">pedido: { producto, cantidad, opciones[], direccion, metodoEnvio }</code></div></div>
-          <div class="a-step"><div class="a-num">2</div><div class="a-txt"><code class="il">select</code> con <code class="il">v-for</code> sobre array de productos · primera opción vacía "Seleccionar..."</div></div>
-          <div class="a-step"><div class="a-num">3</div><div class="a-txt">Input <code class="il">type="number"</code> con <code class="il">v-model.number</code> para cantidad</div></div>
-          <div class="a-step"><div class="a-num">4</div><div class="a-txt">Checkboxes para opciones adicionales (array): garantía, instalación, accesorios</div></div>
-          <div class="a-step"><div class="a-num">5</div><div class="a-txt"><code class="il">textarea</code> con <code class="il">v-model.trim</code> para dirección</div></div>
-          <div class="a-step"><div class="a-num">6</div><div class="a-txt">Radio buttons para método de envío: estándar / express</div></div>
-          <div class="a-step"><div class="a-num">7</div><div class="a-txt">Computed <code class="il">pedidoValido</code>: producto seleccionado y cantidad > 0</div></div>
-          <div class="a-step"><div class="a-num">8</div><div class="a-txt">Resumen reactivo del pedido con interpolaciones · botón deshabilitado si no es válido</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 8 CORRECCIÓN ACT 1 ═══ -->
-<div class="slide" data-i="8">
-  <div class="container">
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
-      <span class="badge b-sec">CORRECCIÓN</span>
-      <h2 style="margin:0">Pedido con Validaciones — Solución</h2>
-    </div>
-    <div class="c2">
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">data + computed</p>
-        <pre style="font-size:.71rem"><span class="fn">data</span>() {
-  <span class="kw">return</span> {
-    <span class="prop">pedido</span>: {
-      <span class="prop">producto</span>: <span class="str">''</span>,
-      <span class="prop">cantidad</span>: <span class="val">1</span>,
-      <span class="prop">opciones</span>: [],
-      <span class="prop">direccion</span>: <span class="str">''</span>,
-      <span class="prop">metodoEnvio</span>: <span class="str">'estandar'</span>
-    },
-    <span class="prop">productos</span>: [<span class="str">'Laptop'</span>, <span class="str">'Tablet'</span>, <span class="str">'Smartphone'</span>],
-    <span class="prop">opcionesExtra</span>: [<span class="str">'Garantía'</span>, <span class="str">'Instalación'</span>, <span class="str">'Accesorios'</span>]
-  }
-},
-<span class="prop">computed</span>: {
-  <span class="fn">pedidoValido</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">producto</span> !== <span class="str">''</span>
-      &amp;&amp; <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">cantidad</span> > <span class="val">0</span>
-  }
-},
-<span class="prop">methods</span>: {
-  <span class="fn">procesarPedido</span>() {
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="prop">pedidoValido</span>) {
-      <span class="fn">alert</span>(<span class="str">`Pedido: </span>${<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">producto</span>}<span class="str"> x</span>${<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">cantidad</span>}<span class="str">`</span>)
-    }
-  }
-}</pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">template</p>
-        <pre style="font-size:.71rem"><span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"procesarPedido"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;select</span> <span class="attr">v-model</span>=<span class="str">"pedido.producto"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">""</span><span class="tag">&gt;</span>Seleccionar...<span class="tag">&lt;/option&gt;</span>
-    <span class="tag">&lt;option</span> <span class="attr">v-for</span>=<span class="str">"p in productos"</span>
-            <span class="attr">:key</span>=<span class="str">"p"</span> <span class="attr">:value</span>=<span class="str">"p"</span><span class="tag">&gt;</span>{{ p }}<span class="tag">&lt;/option&gt;</span>
-  <span class="tag">&lt;/select&gt;</span>
-
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"number"</span>
-         <span class="attr">v-model.number</span>=<span class="str">"pedido.cantidad"</span>
-         <span class="attr">min</span>=<span class="str">"1"</span> <span class="tag">/&gt;</span>
-
-  <span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"op in opcionesExtra"</span> <span class="attr">:key</span>=<span class="str">"op"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-           <span class="attr">v-model</span>=<span class="str">"pedido.opciones"</span>
-           <span class="attr">:value</span>=<span class="str">"op"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;label&gt;</span>{{ op }}<span class="tag">&lt;/label&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-
-  <span class="tag">&lt;textarea</span> <span class="attr">v-model.trim</span>=<span class="str">"pedido.direccion"</span><span class="tag">&gt;&lt;/textarea&gt;</span>
-
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"pedido.metodoEnvio"</span>
-         <span class="attr">value</span>=<span class="str">"estandar"</span> <span class="tag">/&gt;</span> Estándar
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span> <span class="attr">v-model</span>=<span class="str">"pedido.metodoEnvio"</span>
-         <span class="attr">value</span>=<span class="str">"express"</span> <span class="tag">/&gt;</span> Express
-
-  <span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!pedidoValido"</span><span class="tag">&gt;</span>Realizar pedido<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/form&gt;</span></pre>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 9 RESUMEN PARTE I ═══ -->
-<div class="slide" data-i="9">
-  <div class="container" style="text-align:center">
-    <h2 style="margin-bottom:1.2rem">Primera parte completada ✅</h2>
-    <div class="grid3" style="margin-bottom:1.5rem">
-      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">🔗</div><h3>v-model</h3><p style="font-size:.88rem">binding bidireccional en todos los tipos de campo</p></div>
-      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">🔧</div><h3>Modificadores</h3><p style="font-size:.88rem">.trim, .number, .lazy en el momento correcto</p></div>
-      <div class="card" style="border-color:var(--secondary)"><div style="font-size:2rem;margin-bottom:.4rem">✅</div><h3>Validaciones</h3><p style="font-size:.88rem">computed + @blur + botón deshabilitado</p></div>
-    </div>
-    <div class="hl" style="max-width:650px;margin:0 auto">
-      <p>Después del break: <strong style="color:var(--primary)">formulario multipaso</strong> · <strong style="color:var(--secondary)">arrays dinámicos</strong> · <strong style="color:var(--accent)">componente custom con v-model</strong></p>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 10 CONFIGURADOR — PREVIEW ═══ -->
-<div class="slide" data-i="10">
-  <div class="container">
-    <h2>Caso práctico: Configurador de Producto</h2>
-    <div class="c2">
-      <div>
-        <p style="margin-bottom:.9rem">Los formularios con múltiples opciones conectadas a una <strong style="color:var(--secondary)">propiedad computed</strong> permiten calcular valores derivados en tiempo real — como el precio total de un configurador.</p>
-        <pre style="font-size:.72rem"><span class="fn">data</span>() {
-  <span class="kw">return</span> {
-    <span class="prop">config</span>: {
-      <span class="prop">modelo</span>: <span class="str">'basico'</span>,
-      <span class="prop">ram</span>: <span class="val">8</span>,
-      <span class="prop">extras</span>: []
-    },
-    <span class="prop">precios</span>: {
-      <span class="prop">modelos</span>: { <span class="prop">basico</span>:<span class="val">800</span>, <span class="prop">avanzado</span>:<span class="val">1200</span>, <span class="prop">premium</span>:<span class="val">1800</span> },
-      <span class="prop">ram</span>: { <span class="val">8</span>:<span class="val">0</span>, <span class="val">16</span>:<span class="val">100</span>, <span class="val">32</span>:<span class="val">250</span> },
-      <span class="prop">extras</span>: {
-        <span class="str">'GPU dedicada'</span>: <span class="val">300</span>,
-        <span class="str">'Pantalla táctil'</span>: <span class="val">200</span>
-      }
-    }
-  }
-},
-<span class="prop">computed</span>: {
-  <span class="fn">precioTotal</span>() {
-    <span class="kw">let</span> total = <span class="kw">this</span>.<span class="prop">precios</span>.<span class="prop">modelos</span>[<span class="kw">this</span>.<span class="prop">config</span>.<span class="prop">modelo</span>]
-    total += <span class="kw">this</span>.<span class="prop">precios</span>.<span class="prop">ram</span>[<span class="kw">this</span>.<span class="prop">config</span>.<span class="prop">ram</span>]
-    <span class="kw">this</span>.<span class="prop">config</span>.<span class="prop">extras</span>.<span class="fn">forEach</span>(e => {
-      total += <span class="kw">this</span>.<span class="prop">precios</span>.<span class="prop">extras</span>[e]
-    })
-    <span class="kw">return</span> total
-  }
-}</pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">template del configurador</p>
-        <pre style="font-size:.72rem"><span class="cm">&lt;!-- Radio para modelo --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"(precio, mod) in precios.modelos"</span>
-     <span class="attr">:key</span>=<span class="str">"mod"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"radio"</span>
-         <span class="attr">v-model</span>=<span class="str">"config.modelo"</span>
-         <span class="attr">:value</span>=<span class="str">"mod"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;label&gt;</span>{{ mod }} (+${{ precio }})<span class="tag">&lt;/label&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm">&lt;!-- Select para RAM --&gt;</span>
-<span class="tag">&lt;select</span> <span class="attr">v-model.number</span>=<span class="str">"config.ram"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">:value</span>=<span class="str">"8"</span><span class="tag">&gt;</span>8 GB<span class="tag">&lt;/option&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">:value</span>=<span class="str">"16"</span><span class="tag">&gt;</span>16 GB (+$100)<span class="tag">&lt;/option&gt;</span>
-  <span class="tag">&lt;option</span> <span class="attr">:value</span>=<span class="str">"32"</span><span class="tag">&gt;</span>32 GB (+$250)<span class="tag">&lt;/option&gt;</span>
+<span class="cm">&lt;!-- select: v-model en el &lt;select&gt;, no en &lt;option&gt; --&gt;</span>
+<span class="tag">&lt;select</span> <span class="attr">v-model</span>=<span class="str">"nivel"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"junior"</span><span class="tag">&gt;</span>Junior<span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;option</span> <span class="attr">value</span>=<span class="str">"senior"</span><span class="tag">&gt;</span>Senior<span class="tag">&lt;/option&gt;</span>
 <span class="tag">&lt;/select&gt;</span>
 
-<span class="cm">&lt;!-- Checkboxes para extras --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"(precio, extra) in precios.extras"</span>
-     <span class="attr">:key</span>=<span class="str">"extra"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-         <span class="attr">v-model</span>=<span class="str">"config.extras"</span>
-         <span class="attr">:value</span>=<span class="str">"extra"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;label&gt;</span>{{ extra }} (+${{ precio }})<span class="tag">&lt;/label&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
+<span class="cm">&lt;!-- textarea: igual que input, pero tag de cierre --&gt;</span>
+<span class="tag">&lt;textarea</span> <span class="attr">v-model.trim</span>=<span class="str">"bio"</span><span class="tag">&gt;&lt;/textarea&gt;</span>
+<span class="tag">&lt;small&gt;</span>{{ bio.length }}/150<span class="tag">&lt;/small&gt;</span>
 
-<span class="cm">&lt;!-- Total reactivo --&gt;</span>
-<span class="tag">&lt;h2&gt;</span>Total: ${{ precioTotal }}<span class="tag">&lt;/h2&gt;</span></pre>
-      </div>
+<span class="cm">&lt;!-- preview: binding reactivo directo --&gt;</span>
+<span class="tag">&lt;pre&gt;</span>{{ $data }}<span class="tag">&lt;/pre&gt;</span></pre>
     </div>
   </div>
 </div>
-
-<!-- ═══ 11 ANTES DEL BREAK ═══ -->
-<div class="slide" data-i="11">
-  <div class="container" style="text-align:center">
-    <h2 style="margin-bottom:.8rem">Antes del break — un tip</h2>
-    <div class="grid2" style="max-width:800px;margin:0 auto 1.2rem">
-      <div class="card" style="border-color:var(--accent);text-align:left">
-        <h3 style="color:var(--accent)">❌ No hacer</h3>
-        <pre style="font-size:.75rem"><span class="cm">&lt;!-- v-model directo sobre prop --&gt;</span>
-<span class="tag">&lt;input</span>
-  <span class="attr">v-model</span>=<span class="str">"$store.state.nombre"</span>
-<span class="tag">/&gt;</span>
-<span class="cm">&lt;!-- Vue 2: muta el store directamente
-     Vue 3: causa warning --&gt;</span></pre>
-      </div>
-      <div class="card" style="border-color:var(--secondary);text-align:left">
-        <h3 style="color:var(--secondary)">✅ Hacer</h3>
-        <pre style="font-size:.75rem"><span class="cm">&lt;!-- computed con getter/setter --&gt;</span>
-<span class="prop">nombre</span>: {
-  <span class="fn">get</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">$store</span>.<span class="prop">state</span>.<span class="prop">nombre</span>
-  },
-  <span class="fn">set</span>(val) {
-    <span class="kw">this</span>.<span class="prop">$store</span>.<span class="fn">commit</span>(<span class="str">'SET_NOMBRE'</span>, val)
-  }
-}</pre>
-      </div>
-    </div>
-    <div class="hl" style="max-width:700px;margin:0 auto">
-      <p>Para conectar <code class="il">v-model</code> con Vuex: usá <strong>computed con getter y setter</strong>. El getter lee del store, el setter hace el commit.</p>
-    </div>
-  </div>
 </div>
 
-<!-- ═══ 12 BREAK ═══ -->
-<div class="slide break-slide" data-i="12">
-  <div class="container" style="text-align:center">
-    <div style="font-size:3.5rem;margin-bottom:.4rem">☕</div>
-    <div class="break-big">BREAK</div>
-    <p style="font-size:1rem;color:var(--muted);margin:.7rem 0 1.3rem">20 minutos · volvemos con formularios multipaso y arrays dinámicos</p>
-    <div class="t-card" style="max-width:310px;margin:0 auto" id="tcb">
-      <div class="t-lbl">⏱ descanso</div>
-      <div class="t-disp" id="tb">20:00</div>
-      <div class="t-status" id="tbs">¡A descansar!</div>
-      <div class="t-ctrls">
-        <button class="t-btn tb-s" onclick="startT('tb',20)">▶ Iniciar</button>
-        <button class="t-btn tb-p" onclick="pauseT('tb')">⏸ Pausar</button>
-        <button class="t-btn tb-r" onclick="resetT('tb',20)">↺ Reset</button>
+<!-- ══════════════════════════════════════════
+     SLIDE 2 — DEMO 2: Validaciones
+══════════════════════════════════════════ -->
+<div class="slide dslide" data-i="2">
+<div class="cnt wide">
+  <div class="dhdr">
+    <div class="dico">💻</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.18rem">
+        <span class="badge bp">DEMO 2</span><span class="badge bs">~20 min</span><span class="badge bw">Vos codeas y explicás</span>
       </div>
+      <h2 style="margin:0">Validación en Tiempo Real — computed + @blur + submit</h2>
     </div>
   </div>
-</div>
-
-<!-- ═══ 13 FORMULARIO MULTIPASO ═══ -->
-<div class="slide" data-i="13">
-  <div class="container">
-    <h2>Formulario Multipaso</h2>
-    <div class="c2">
-      <div>
-        <p style="margin-bottom:.9rem">Un formulario multipaso divide los campos en <strong style="color:var(--secondary)">grupos lógicos</strong> mostrados con <code class="il">v-if</code> según el paso actual. Mejora la UX al no abrumar al usuario con todos los campos a la vez.</p>
-        <div style="display:flex;flex-direction:column;gap:.6rem">
-          <div class="card no-hover" style="padding:.95rem">
-            <h3 style="font-size:1rem">Estado del wizard</h3>
-            <pre style="font-size:.72rem"><span class="fn">data</span>() {
+  <div class="c2">
+    <div>
+      <p class="mu sm" style="margin-bottom:.5rem">QUÉ VAS A CONSTRUIR</p>
+      <div class="card nh ca" style="padding:1rem;margin-bottom:.8rem">
+        <p class="sm">Un formulario de login con <strong style="color:var(--s)">validación reactiva completa</strong>: email con regex, contraseña con fuerza, confirmación de contraseña. Bordes dinámicos verde/rojo, botón deshabilitado y mensaje de error.</p>
+      </div>
+      <p class="mu sm" style="margin-bottom:.5rem">PASOS EN ORDEN</p>
+      <div class="dsteps">
+        <div class="dstep"><div class="dnum">1</div><div class="dtxt">Crear <code class="il">data()</code>: form (email, password, confirm) + errores (objeto)</div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dtxt">Computed <code class="il">emailValido</code> con regex · computed <code class="il">passwordValido</code> (min 6)</div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dtxt">Computed <code class="il">confirmacionValida</code> (igualdad) · computed <code class="il">formularioValido</code></div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dtxt">Validar con <code class="il">@blur</code> en cada campo (solo al salir del input)</div></div>
+        <div class="dstep"><div class="dnum">5</div><div class="dtxt">Bordes dinámicos con <code class="il">:style</code> según estado de validación</div></div>
+        <div class="dstep"><div class="dnum">6</div><div class="dtxt">Botón submit <code class="il">:disabled="!formularioValido"</code></div></div>
+        <div class="dstep"><div class="dnum">7</div><div class="dtxt">Método <code class="il">enviar()</code> con <code class="il">@submit.prevent</code></div></div>
+      </div>
+    </div>
+    <div>
+      <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — validaciones</p>
+      <pre><span class="cm">// data()</span>
+<span class="fn">data</span>() {
   <span class="kw">return</span> {
-    <span class="prop">pasoActual</span>: <span class="val">1</span>,
-    <span class="prop">totalPasos</span>: <span class="val">4</span>,
-    <span class="prop">encuesta</span>: { <span class="cm">/* todos los campos */</span> }
+    form: { <span class="prop">email</span>:<span class="str">''</span>, <span class="prop">password</span>:<span class="str">''</span>, <span class="prop">confirm</span>:<span class="str">''</span> },
+    errores: { <span class="prop">email</span>:<span class="str">''</span>, <span class="prop">password</span>:<span class="str">''</span>, <span class="prop">confirm</span>:<span class="str">''</span> }
   }
-}</pre>
-          </div>
-          <div class="card no-hover" style="padding:.95rem">
-            <h3 style="font-size:1rem">Navegación</h3>
-            <pre style="font-size:.72rem"><span class="tag">&lt;button</span>
-  <span class="attr">v-if</span>=<span class="str">"pasoActual > 1"</span>
-  <span class="attr">@click</span>=<span class="str">"pasoActual--"</span>
-<span class="tag">&gt;</span>← Anterior<span class="tag">&lt;/button&gt;</span>
+},
 
-<span class="tag">&lt;button</span>
-  <span class="attr">v-if</span>=<span class="str">"pasoActual &lt; totalPasos"</span>
-  <span class="attr">@click</span>=<span class="str">"siguientePaso"</span>
-  <span class="attr">:disabled</span>=<span class="str">"!pasoValido"</span>
-<span class="tag">&gt;</span>Siguiente →<span class="tag">&lt;/button&gt;</span>
+<span class="cm">// computed — se recalculan solos</span>
+<span class="prop">computed</span>: {
+  <span class="fn">emailValido</span>() {
+    <span class="kw">return</span> /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(<span class="kw">this</span>.form.email)
+  },
+  <span class="fn">passwordValido</span>() { <span class="kw">return this</span>.form.password.length >= <span class="num">6</span> },
+  <span class="fn">confirmacionValida</span>() {
+    <span class="kw">return this</span>.form.password === <span class="kw">this</span>.form.confirm
+      && <span class="kw">this</span>.form.confirm !== <span class="str">''</span>
+  },
+  <span class="fn">formularioValido</span>() {
+    <span class="kw">return this</span>.emailValido && <span class="kw">this</span>.passwordValido && <span class="kw">this</span>.confirmacionValida
+  }
+},
 
-<span class="tag">&lt;button</span>
-  <span class="attr">v-if</span>=<span class="str">"pasoActual === totalPasos"</span>
-  <span class="attr">@click</span>=<span class="str">"enviar"</span>
-<span class="tag">&gt;</span>Enviar ✓<span class="tag">&lt;/button&gt;</span></pre>
-          </div>
+<span class="cm">// @blur — solo valida al salir del campo</span>
+<span class="fn">validarEmail</span>() {
+  <span class="kw">this</span>.errores.email = <span class="kw">this</span>.emailValido
+    ? <span class="str">''</span> : <span class="str">'Email inválido'</span>
+},
+
+<span class="cm">&lt;!-- borde dinámico rojo/verde --&gt;</span>
+<span class="tag">&lt;input</span>
+  <span class="attr">v-model</span>=<span class="str">"form.email"</span>
+  <span class="attr">@blur</span>=<span class="str">"validarEmail"</span>
+  <span class="attr">:style</span>=<span class="str">"{
+    borderColor: errores.email
+      ? '#FF6B6B'
+      : form.email && emailValido
+        ? '#00D4AA' : ''
+  }"</span>
+<span class="tag">/&gt;</span>
+<span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"errores.email"</span><span class="tag">&gt;</span>{{ errores.email }}<span class="tag">&lt;/p&gt;</span>
+
+<span class="cm">&lt;!-- botón deshabilitado --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!formularioValido"</span><span class="tag">&gt;</span>Entrar<span class="tag">&lt;/button&gt;</span></pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 3 — ACTIVIDAD 1
+══════════════════════════════════════════ -->
+<div class="slide wide" data-i="3">
+<div class="cnt wide">
+  <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.65rem">
+    <span class="badge ba">ACTIVIDAD 1</span>
+    <h2 style="margin:0">Formulario de Reserva de Hotel</h2>
+  </div>
+  <div class="actg">
+    <div>
+      <div class="tcard" id="tc1">
+        <div class="tlbl">⏱ tiempo disponible</div>
+        <div class="tdisp" id="t1">40:00</div>
+        <div class="tstat" id="t1s">Listo para iniciar</div>
+        <div class="tctrl">
+          <button class="tbtn ts" onclick="startT('t1',40)">▶ Iniciar</button>
+          <button class="tbtn tp" onclick="pauseT('t1')">⏸ Pausar</button>
+          <button class="tbtn tr" onclick="resetT('t1',40)">↺ Reset</button>
         </div>
       </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">estructura de pasos con v-if</p>
-        <pre style="font-size:.71rem"><span class="cm">&lt;!-- Barra de progreso --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"progress"</span><span class="tag">&gt;</span>
-  Paso {{ pasoActual }} de {{ totalPasos }}
-  <span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"{ width: (pasoActual/totalPasos*100)+'%' }"</span><span class="tag">&gt;&lt;/div&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm">&lt;!-- Paso 1: Datos personales --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"pasoActual === 1"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"encuesta.nombre"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"encuesta.email"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"encuesta.edad"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm">&lt;!-- Paso 2: Intereses --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"pasoActual === 2"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"i in opciones"</span> <span class="attr">:key</span>=<span class="str">"i"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"checkbox"</span>
-           <span class="attr">v-model</span>=<span class="str">"encuesta.intereses"</span>
-           <span class="attr">:value</span>=<span class="str">"i"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;label&gt;</span>{{ i }}<span class="tag">&lt;/label&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm">&lt;!-- Paso 3: Valoración con slider --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"pasoActual === 3"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"range"</span>
-         <span class="attr">v-model.number</span>=<span class="str">"encuesta.satisfaccion"</span>
-         <span class="attr">min</span>=<span class="str">"1"</span> <span class="attr">max</span>=<span class="str">"5"</span> <span class="tag">/&gt;</span>
-  <span class="tag">&lt;span&gt;</span>{{ encuesta.satisfaccion }}/5<span class="tag">&lt;/span&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm">&lt;!-- Paso 4: Resumen --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"pasoActual === 4"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;pre&gt;</span>{{ encuesta }}<span class="tag">&lt;/pre&gt;</span>
-<span class="tag">&lt;/div&gt;</span></pre>
+    </div>
+    <div class="acard">
+      <p class="sm" style="margin-bottom:.3rem"><strong>Contexto:</strong> Formluario de reserva de hotel. Combina todos los tipos de input vistos <em>en un contexto diferente</em>, con computed properties para calcular datos derivados.</p>
+      <div class="asteps">
+        <div class="astep"><div class="anum">1</div><div class="atxt">Crear <code class="il">data()</code>: huespedes (nombre, email, teléfono), fechas (checkIn, checkOut), tipo habitación (radio: simple/doble/suite), servicios extras (array checkboxes: desayuno, spa, parking)</div></div>
+        <div class="astep"><div class="anum">2</div><div class="atxt">Computed <code class="il">noches</code>: calcular diferencia entre <code class="il">checkIn</code> y <code class="il">checkOut</code> en días</div></div>
+        <div class="astep"><div class="anum">3</div><div class="atxt">Computed <code class="il">precioBase</code>: según tipo de habitación (simple $50, doble $80, suite $150) multiplicado por noches</div></div>
+        <div class="astep"><div class="anum">4</div><div class="atxt">Computed <code class="il">totalServicios</code>: suma los extras seleccionados (desayuno $15, spa $30, parking $10) por noche</div></div>
+        <div class="astep"><div class="anum">5</div><div class="atxt">Computed <code class="il">total</code>: suma precioBase + totalServicios · mostrar en tiempo real</div></div>
+        <div class="astep"><div class="anum">6</div><div class="atxt">Validar con <code class="il">@blur</code>: email válido, checkOut > checkIn, nombre no vacío</div></div>
+        <div class="astep"><div class="anum">7</div><div class="atxt">Al enviar: mostrar tarjeta de confirmación con resumen (datos + total)</div></div>
+        <div class="astep"><div class="anum">8</div><div class="atxt">⭐ Bonus: deshabilitar submit si checkOut ≤ checkIn o campos vacíos</div></div>
       </div>
     </div>
   </div>
 </div>
+</div>
 
-<!-- ═══ 14 DEMO 3 — MULTIPASO ═══ -->
-<div class="slide demo-slide" data-i="14">
-  <div class="container">
-    <div class="demo-hdr">
-      <div class="demo-icon">💻</div>
-      <div>
-        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
-          <span class="badge b-pri">DEMO 3</span>
-          <span class="badge b-sec">~20 min</span>
-        </div>
-        <h2 style="margin:0">Encuesta Multipaso — 4 Pasos con Validación por Paso</h2>
+<!-- ══════════════════════════════════════════
+     SLIDE 4 — BREAK
+══════════════════════════════════════════ -->
+<div class="slide brk" data-i="4">
+<div class="cnt">
+  <div style="font-size:3.8rem;margin-bottom:.4rem">☕</div>
+  <div class="brkttl">BREAK</div>
+  <p class="mu" style="font-size:1.1rem;margin:.7rem 0 1.3rem">20 minutos · volvemos con formularios multipaso y arrays dinámicos</p>
+  <div class="tcard" style="max-width:310px;margin:0 auto" id="tcb">
+    <div class="tlbl">⏱ descanso</div>
+    <div class="tdisp" id="tb">20:00</div>
+    <div class="tstat" id="tbs">¡A descansar!</div>
+    <div class="tctrl">
+      <button class="tbtn ts" onclick="startT('tb',20)">▶ Iniciar</button>
+      <button class="tbtn tp" onclick="pauseT('tb')">⏸ Pausar</button>
+      <button class="tbtn tr" onclick="resetT('tb',20)">↺ Reset</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 5 — DEMO 3: Formulario multipaso
+══════════════════════════════════════════ -->
+<div class="slide dslide" data-i="5">
+<div class="cnt wide">
+  <div class="dhdr">
+    <div class="dico">💻</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.18rem">
+        <span class="badge bp">DEMO 3</span><span class="badge bs">~25 min</span><span class="badge bw">Vos codeas y explicás</span>
+      </div>
+      <h2 style="margin:0">Formulario Multipaso — Wizard de 4 pasos con progreso</h2>
+    </div>
+  </div>
+  <div class="c2">
+    <div>
+      <p class="mu sm" style="margin-bottom:.5rem">QUÉ VAS A CONSTRUIR</p>
+      <div class="card nh ca" style="padding:1rem;margin-bottom:.8rem">
+        <p class="sm">Una encuesta de 4 pasos con <strong style="color:var(--s)">barra de progreso</strong>, navegación Siguiente/Anterior, validación por paso y pantalla de resumen final.</p>
+      </div>
+      <p class="mu sm" style="margin-bottom:.5rem">PASOS EN ORDEN</p>
+      <div class="dsteps">
+        <div class="dstep"><div class="dnum">1</div><div class="dtxt">Estructura de datos: <code class="il">pasoActual</code>, objeto <code class="il">encuesta</code>, <code class="il">totalPasos = 4</code></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dtxt">Barra de progreso con <code class="il">:style="{ width: progreso + '%' }"</code></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dtxt">Mostrar paso correcto con <code class="il">v-if="pasoActual === 1"</code> etc.</div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dtxt">Paso 1: datos personales (nombre, email)</div></div>
+        <div class="dstep"><div class="dnum">5</div><div class="dtxt">Paso 2: checkboxes de intereses</div></div>
+        <div class="dstep"><div class="dnum">6</div><div class="dtxt">Paso 3: slider satisfacción + radio recomendaría</div></div>
+        <div class="dstep"><div class="dnum">7</div><div class="dtxt">Paso 4: resumen visual de todo lo ingresado</div></div>
+        <div class="dstep"><div class="dnum">8</div><div class="dtxt">Computed <code class="il">pasoValido</code> con switch · botón Siguiente deshabilitado</div></div>
       </div>
     </div>
-    <div class="c2">
-      <div class="demo-steps">
-        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Definir objeto <code class="il">encuesta</code> completo + <code class="il">pasoActual: 1</code> + <code class="il">totalPasos: 4</code></div></div>
-        <div class="d-step"><div class="d-num">2</div><div class="d-txt">Barra de progreso visual: <code class="il">:style="{ width: (pasoActual/totalPasos*100)+'%' }"</code></div></div>
-        <div class="d-step"><div class="d-num">3</div><div class="d-txt">Paso 1: nombre, email, edad con <code class="il">v-model.trim</code> y <code class="il">v-model.number</code></div></div>
-        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Paso 2: checkboxes de intereses con array <code class="il">v-model</code></div></div>
-        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Paso 3: slider con <code class="il">type="range" v-model.number</code> + radio "¿Recomendaría?"</div></div>
-        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Paso 4: resumen completo con <code class="il">{{ encuesta }}</code> y botón enviar</div></div>
-        <div class="d-step"><div class="d-num">7</div><div class="d-txt">Computed <code class="il">pasoValido</code> por paso — deshabilitar botón "Siguiente" si el paso no está completo</div></div>
-        <div class="d-step"><div class="d-num">8</div><div class="d-txt">Al enviar: limpiar objeto con <code class="il">Object.assign</code> y volver al paso 1</div></div>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">validación por paso + reset</p>
-        <pre style="font-size:.71rem"><span class="prop">computed</span>: {
+    <div>
+      <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — lógica de navegación</p>
+      <pre><span class="cm">// data()</span>
+<span class="fn">data</span>() {
+  <span class="kw">return</span> {
+    <span class="prop">pasoActual</span>: <span class="num">1</span>,
+    <span class="prop">totalPasos</span>: <span class="num">4</span>,
+    <span class="prop">encuesta</span>: {
+      <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span>,
+      <span class="prop">intereses</span>: [],
+      <span class="prop">satisfaccion</span>: <span class="num">5</span>,
+      <span class="prop">recomendaria</span>: <span class="val">null</span>
+    }
+  }
+},
+
+<span class="cm">// computed</span>
+<span class="prop">computed</span>: {
+  <span class="fn">progreso</span>() {
+    <span class="kw">return</span> (<span class="kw">this</span>.pasoActual / <span class="kw">this</span>.totalPasos) * <span class="num">100</span>
+  },
   <span class="fn">pasoValido</span>() {
-    <span class="kw">switch</span> (<span class="kw">this</span>.<span class="prop">pasoActual</span>) {
-      <span class="kw">case</span> <span class="val">1</span>:
-        <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">encuesta</span>.<span class="prop">nombre</span>.<span class="fn">trim</span>() !== <span class="str">''</span>
-          &amp;&amp; /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            .<span class="fn">test</span>(<span class="kw">this</span>.<span class="prop">encuesta</span>.<span class="prop">email</span>)
-          &amp;&amp; <span class="kw">this</span>.<span class="prop">encuesta</span>.<span class="prop">edad</span> > <span class="val">0</span>
-      <span class="kw">case</span> <span class="val">2</span>:
-        <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">encuesta</span>.<span class="prop">intereses</span>.<span class="prop">length</span> > <span class="val">0</span>
+    <span class="kw">switch</span>(<span class="kw">this</span>.pasoActual) {
+      <span class="kw">case</span> <span class="num">1</span>: <span class="kw">return this</span>.encuesta.nombre && <span class="kw">this</span>.encuesta.email
+      <span class="kw">case</span> <span class="num">2</span>: <span class="kw">return this</span>.encuesta.intereses.length > <span class="num">0</span>
+      <span class="kw">case</span> <span class="num">3</span>: <span class="kw">return this</span>.encuesta.recomendaria !== <span class="val">null</span>
       <span class="kw">default</span>: <span class="kw">return true</span>
     }
   }
 },
-<span class="prop">methods</span>: {
-  <span class="fn">siguientePaso</span>() {
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="fn">pasoValido</span>) <span class="kw">this</span>.<span class="prop">pasoActual</span>++
-  },
-  <span class="fn">enviar</span>() {
-    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'Encuesta:'</span>, <span class="kw">this</span>.<span class="prop">encuesta</span>)
-    <span class="cm">// Reset completo</span>
-    <span class="kw">this</span>.<span class="prop">pasoActual</span> = <span class="val">1</span>
-    <span class="fn">Object</span>.<span class="fn">assign</span>(<span class="kw">this</span>.<span class="prop">encuesta</span>, {
-      <span class="prop">nombre</span>: <span class="str">''</span>, <span class="prop">email</span>: <span class="str">''</span>,
-      <span class="prop">intereses</span>: [], <span class="prop">satisfaccion</span>: <span class="val">3</span>
-    })
-  }
-}</pre>
-      </div>
+
+<span class="cm">// methods</span>
+<span class="fn">siguientePaso</span>() {
+  <span class="kw">if</span>(<span class="kw">this</span>.pasoValido && <span class="kw">this</span>.pasoActual < <span class="kw">this</span>.totalPasos)
+    <span class="kw">this</span>.pasoActual++
+},
+<span class="fn">anteriorPaso</span>() {
+  <span class="kw">if</span>(<span class="kw">this</span>.pasoActual > <span class="num">1</span>) <span class="kw">this</span>.pasoActual--
+},
+
+<span class="cm">&lt;!-- barra de progreso --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"{ width: progreso + '%' }"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- botón deshabilitado si paso no válido --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">:disabled</span>=<span class="str">"!pasoValido"</span> <span class="attr">@click</span>=<span class="str">"siguientePaso"</span><span class="tag">&gt;</span>
+  Siguiente →
+<span class="tag">&lt;/button&gt;</span></pre>
     </div>
   </div>
 </div>
+</div>
 
-<!-- ═══ 15 ARRAYS DINÁMICOS ═══ -->
-<div class="slide" data-i="15">
-  <div class="container">
-    <h2>Arrays Dinámicos en Formularios</h2>
-    <div class="c2">
-      <div>
-        <p style="margin-bottom:.9rem">Cuando un formulario necesita un número <strong style="color:var(--secondary)">variable de ítems</strong> — como líneas de un pedido o ítems de una factura — usamos un array en <code class="il">data()</code> con <code class="il">v-for</code> para renderizar y <code class="il">push/splice</code> para agregar/eliminar.</p>
-        <pre style="font-size:.72rem"><span class="fn">data</span>() {
+<!-- ══════════════════════════════════════════
+     SLIDE 6 — DEMO 4: Arrays dinámicos + componente custom
+══════════════════════════════════════════ -->
+<div class="slide dslide" data-i="6">
+<div class="cnt wide">
+  <div class="dhdr">
+    <div class="dico">💻</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.18rem">
+        <span class="badge bp">DEMO 4</span><span class="badge bs">~25 min</span><span class="badge bw">Vos codeas y explicás</span>
+      </div>
+      <h2 style="margin:0">Arrays Dinámicos + Componente CampoTexto con v-model</h2>
+    </div>
+  </div>
+  <div class="c2">
+    <div>
+      <p class="mu sm" style="margin-bottom:.5rem">QUÉ VAS A CONSTRUIR</p>
+      <div class="card nh ca" style="padding:1rem;margin-bottom:.8rem">
+        <p class="sm">Un formulario de pedido con <strong style="color:var(--s)">ítems dinámicos</strong> (agregar/eliminar filas), total computado automáticamente, y un <strong style="color:var(--p)">componente personalizado</strong> <code class="il">CampoTexto.vue</code> que usa v-model.</p>
+      </div>
+      <p class="mu sm" style="margin-bottom:.5rem">PASOS EN ORDEN</p>
+      <div class="dsteps">
+        <div class="dstep"><div class="dnum">1</div><div class="dtxt">Estructura: objeto <code class="il">pedido</code> con <code class="il">cliente</code> + <code class="il">items: []</code></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dtxt">Método <code class="il">agregarItem()</code> con <code class="il">push()</code> · método <code class="il">eliminarItem(i)</code> con <code class="il">splice()</code></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dtxt">Renderizar ítems con <code class="il">v-for</code> · campos editables en cada fila</div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dtxt">Computed <code class="il">total</code> con <code class="il">reduce()</code> sobre el array de ítems</div></div>
+        <div class="dstep"><div class="dnum">5</div><div class="dtxt">Crear <code class="il">CampoTexto.vue</code> — prop <code class="il">modelValue</code> + emit <code class="il">update:modelValue</code></div></div>
+        <div class="dstep"><div class="dnum">6</div><div class="dtxt">Usar <code class="il">CampoTexto</code> en el formulario con <code class="il">v-model</code></div></div>
+        <div class="dstep"><div class="dnum">7</div><div class="dtxt">Mostrar resumen del pedido debajo del formulario</div></div>
+      </div>
+    </div>
+    <div>
+      <p class="mu sm" style="margin-bottom:.4rem">REFERENCIA RÁPIDA — arrays y componente</p>
+      <pre><span class="cm">// data() — ítems del pedido</span>
+<span class="fn">data</span>() {
   <span class="kw">return</span> {
-    <span class="prop">pedido</span>: {
-      <span class="prop">cliente</span>: <span class="str">''</span>,
-      <span class="prop">items</span>: [
-        { <span class="prop">producto</span>: <span class="str">''</span>, <span class="prop">cantidad</span>: <span class="val">1</span>, <span class="prop">precio</span>: <span class="val">0</span> }
-      ]
+    pedido: {
+      cliente: <span class="str">''</span>,
+      items: [{ producto:<span class="str">''</span>, cantidad:<span class="num">1</span>, precio:<span class="num">0</span> }]
     }
   }
 },
+
+<span class="cm">// computed — total automático</span>
 <span class="prop">computed</span>: {
   <span class="fn">total</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>
-      .<span class="fn">reduce</span>((sum, item) => {
-        <span class="kw">return</span> sum + (item.<span class="prop">cantidad</span> * item.<span class="prop">precio</span>)
-      }, <span class="val">0</span>)
-  }
-},
-<span class="prop">methods</span>: {
-  <span class="fn">agregarItem</span>() {
-    <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">push</span>({
-      <span class="prop">producto</span>: <span class="str">''</span>, <span class="prop">cantidad</span>: <span class="val">1</span>, <span class="prop">precio</span>: <span class="val">0</span>
-    })
-  },
-  <span class="fn">eliminarItem</span>(idx) {
-    <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">splice</span>(idx, <span class="val">1</span>)
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="prop">length</span> === <span class="val">0</span>) {
-      <span class="kw">this</span>.<span class="fn">agregarItem</span>()
-    }
-  }
-}</pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">template de la lista dinámica</p>
-        <pre style="font-size:.72rem"><span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"pedido.cliente"</span>
-       <span class="attr">placeholder</span>=<span class="str">"Cliente"</span> <span class="tag">/&gt;</span>
-
-<span class="tag">&lt;div</span>
-  <span class="attr">v-for</span>=<span class="str">"(item, i) in pedido.items"</span>
-  <span class="attr">:key</span>=<span class="str">"i"</span>
-  <span class="attr">style</span>=<span class="str">"display:flex;gap:.5rem;margin:.4rem 0"</span>
-<span class="tag">&gt;</span>
-  <span class="tag">&lt;input</span>
-    <span class="attr">v-model.trim</span>=<span class="str">"item.producto"</span>
-    <span class="attr">placeholder</span>=<span class="str">"Producto"</span>
-    <span class="attr">style</span>=<span class="str">"flex:2"</span>
-  <span class="tag">/&gt;</span>
-  <span class="tag">&lt;input</span>
-    <span class="attr">v-model.number</span>=<span class="str">"item.cantidad"</span>
-    <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">min</span>=<span class="str">"1"</span>
-    <span class="attr">style</span>=<span class="str">"flex:1"</span>
-  <span class="tag">/&gt;</span>
-  <span class="tag">&lt;input</span>
-    <span class="attr">v-model.number</span>=<span class="str">"item.precio"</span>
-    <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">min</span>=<span class="str">"0"</span>
-    <span class="attr">style</span>=<span class="str">"flex:1"</span>
-  <span class="tag">/&gt;</span>
-  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"eliminarItem(i)"</span><span class="tag">&gt;</span>🗑️<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"agregarItem"</span><span class="tag">&gt;</span>+ Agregar ítem<span class="tag">&lt;/button&gt;</span>
-
-<span class="tag">&lt;h3&gt;</span>Total: ${{ total.<span class="fn">toFixed</span>(<span class="val">2</span>) }}<span class="tag">&lt;/h3&gt;</span></pre>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 16 COMPONENTE CUSTOM v-model ═══ -->
-<div class="slide" data-i="16">
-  <div class="container">
-    <h2>Componente Personalizado con v-model</h2>
-    <div class="c2">
-      <div>
-        <p style="margin-bottom:.9rem">Para usar <code class="il">v-model</code> en un componente hijo, necesitan implementar el <strong style="color:var(--secondary)">contrato</strong> que Vue espera: recibir <code class="il">modelValue</code> como prop y emitir <code class="il">update:modelValue</code>.</p>
-        <div class="hl" style="margin-bottom:.9rem">
-          <p style="font-size:.9rem">Esto permite que el padre escriba:<br><code class="il">&lt;CampoTexto v-model="nombre" /&gt;</code><br>y Vue lo traduzca a:<br><code class="il">&lt;CampoTexto :modelValue="nombre" @update:modelValue="nombre = $event" /&gt;</code></p>
-        </div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">Padre — uso limpio</p>
-        <pre style="font-size:.72rem"><span class="tag">&lt;CampoTexto</span>
-  <span class="attr">v-model</span>=<span class="str">"contacto.nombre"</span>
-  <span class="attr">label</span>=<span class="str">"Nombre"</span>
-  <span class="attr">:required</span>=<span class="str">"true"</span>
-<span class="tag">/&gt;</span>
-<span class="tag">&lt;CampoTexto</span>
-  <span class="attr">v-model</span>=<span class="str">"contacto.email"</span>
-  <span class="attr">label</span>=<span class="str">"Email"</span>
-  <span class="attr">tipo</span>=<span class="str">"email"</span>
-<span class="tag">/&gt;</span></pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">CampoTexto.vue — hijo</p>
-        <pre style="font-size:.72rem"><span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"campo"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;label&gt;</span>{{ label }}<span class="tag">&lt;/label&gt;</span>
-
-    <span class="tag">&lt;input</span>
-      <span class="attr">v-if</span>=<span class="str">"tipo !== 'textarea'"</span>
-      <span class="attr">:value</span>=<span class="str">"modelValue"</span>
-      <span class="attr">@input</span>=<span class="str">"$emit('update:modelValue',
-              $event.target.value)"</span>
-      <span class="attr">:type</span>=<span class="str">"tipo"</span>
-      <span class="attr">:required</span>=<span class="str">"required"</span>
-    <span class="tag">/&gt;</span>
-
-    <span class="tag">&lt;textarea</span>
-      <span class="attr">v-else</span>
-      <span class="attr">:value</span>=<span class="str">"modelValue"</span>
-      <span class="attr">@input</span>=<span class="str">"$emit('update:modelValue',
-              $event.target.value)"</span>
-    <span class="tag">&gt;&lt;/textarea&gt;</span>
-
-    <span class="tag">&lt;span</span> <span class="attr">v-if</span>=<span class="str">"error"</span> <span class="attr">class</span>=<span class="str">"error"</span><span class="tag">&gt;</span>
-      {{ error }}
-    <span class="tag">&lt;/span&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
-
-<span class="tag">&lt;script&gt;</span>
-<span class="kw">export default</span> {
-  <span class="prop">props</span>: {
-    <span class="prop">modelValue</span>: <span class="kw">String</span>,
-    <span class="prop">label</span>: <span class="kw">String</span>,
-    <span class="prop">tipo</span>: { <span class="kw">type</span>: <span class="kw">String</span>, <span class="prop">default</span>: <span class="str">'text'</span> },
-    <span class="prop">required</span>: <span class="kw">Boolean</span>,
-    <span class="prop">error</span>: <span class="kw">String</span>
-  },
-  <span class="prop">emits</span>: [<span class="str">'update:modelValue'</span>]
-}
-<span class="tag">&lt;/script&gt;</span></pre>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 17 DEMO 4 — ARRAYS DINÁMICOS ═══ -->
-<div class="slide demo-slide" data-i="17">
-  <div class="container">
-    <div class="demo-hdr">
-      <div class="demo-icon">💻</div>
-      <div>
-        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
-          <span class="badge b-pri">DEMO 4</span>
-          <span class="badge b-sec">~15 min</span>
-        </div>
-        <h2 style="margin:0">Pedido con Ítems Dinámicos + Total Reactivo</h2>
-      </div>
-    </div>
-    <div class="c2">
-      <div class="demo-steps">
-        <div class="d-step"><div class="d-num">1</div><div class="d-txt">Definir <code class="il">pedido: { cliente, items: [{ producto, cantidad, precio }] }</code></div></div>
-        <div class="d-step"><div class="d-num">2</div><div class="d-txt"><code class="il">v-for</code> sobre <code class="il">items</code> con inputs vinculados: <code class="il">v-model.trim="item.producto"</code></div></div>
-        <div class="d-step"><div class="d-num">3</div><div class="d-txt">Computed <code class="il">total</code> con <code class="il">reduce()</code> — ver en tiempo real cómo cambia al tipear precios</div></div>
-        <div class="d-step"><div class="d-num">4</div><div class="d-txt">Botón "Agregar ítem" con <code class="il">push()</code> · botón "Eliminar" con <code class="il">splice(idx, 1)</code></div></div>
-        <div class="d-step"><div class="d-num">5</div><div class="d-txt">Garantizar mínimo 1 ítem — si quedan 0, <code class="il">agregarItem()</code> automáticamente</div></div>
-        <div class="d-step"><div class="d-num">6</div><div class="d-txt">Computed <code class="il">pedidoValido</code>: cliente no vacío y todos los ítems tienen producto y precio > 0</div></div>
-        <div class="d-step"><div class="d-num">7</div><div class="d-txt">Crear componente <code class="il">CampoTexto.vue</code> con <code class="il">v-model</code> personalizado y usarlo para el campo cliente</div></div>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">computed total + validación</p>
-        <pre style="font-size:.72rem"><span class="prop">computed</span>: {
-  <span class="fn">total</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>
-      .<span class="fn">reduce</span>((sum, item) => {
-        <span class="kw">return</span> sum + (item.<span class="prop">cantidad</span> * item.<span class="prop">precio</span>)
-      }, <span class="val">0</span>)
-  },
-  <span class="fn">pedidoValido</span>() {
-    <span class="kw">if</span> (!<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">cliente</span>.<span class="fn">trim</span>()) <span class="kw">return false</span>
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">every</span>(item =>
-      item.<span class="prop">producto</span>.<span class="fn">trim</span>() !== <span class="str">''</span>
-      &amp;&amp; item.<span class="prop">precio</span> > <span class="val">0</span>
-      &amp;&amp; item.<span class="prop">cantidad</span> > <span class="val">0</span>
+    <span class="kw">return this</span>.pedido.items.reduce((sum, item) =>
+      sum + (item.cantidad * item.precio), <span class="num">0</span>
     )
   }
 },
-<span class="prop">methods</span>: {
-  <span class="fn">enviarPedido</span>() {
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="fn">pedidoValido</span>) {
-      <span class="fn">alert</span>(<span class="str">`Pedido de $</span>${<span class="kw">this</span>.<span class="prop">total</span>.<span class="fn">toFixed</span>(<span class="val">2</span>)}<span class="str"> enviado`</span>)
-      <span class="cm">// reset</span>
-      <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span> = [{
-        <span class="prop">producto</span>:<span class="str">''</span>, <span class="prop">cantidad</span>:<span class="val">1</span>, <span class="prop">precio</span>:<span class="val">0</span>
-      }]
-    }
-  }
-}</pre>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ═══ 18 ACTIVIDAD 2 ═══ -->
-<div class="slide" data-i="18">
-  <div class="container">
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem">
-      <span class="badge b-acc">ACTIVIDAD 2</span>
-      <h2 style="margin:0">Formulario de Pedido Interactivo con Múltiples Ítems</h2>
-    </div>
-    <div class="act-grid">
-      <div>
-        <div class="t-card" id="tc2">
-          <div class="t-lbl">⏱ tiempo disponible</div>
-          <div class="t-disp" id="t2">40:00</div>
-          <div class="t-status" id="t2s">Listo para iniciar</div>
-          <div class="t-ctrls">
-            <button class="t-btn tb-s" onclick="startT('t2',40)">▶ Iniciar</button>
-            <button class="t-btn tb-p" onclick="pauseT('t2')">⏸ Pausar</button>
-            <button class="t-btn tb-r" onclick="resetT('t2',40)">↺ Reset</button>
-          </div>
-        </div>
-      </div>
-      <div class="act-card">
-        <p style="margin-bottom:.3rem">Formulario de pedido completo: cliente, ítems dinámicos, total y validaciones. Integrá todo lo que aprendieron.</p>
-        <div class="act-steps">
-          <div class="a-step"><div class="a-num">1</div><div class="a-txt">Definir <code class="il">pedido: { cliente, items: [] }</code> e inicializar con un ítem vacío</div></div>
-          <div class="a-step"><div class="a-num">2</div><div class="a-txt"><code class="il">v-for</code> sobre items: inputs para producto, cantidad (<code class="il">.number</code>) y precio (<code class="il">.number</code>)</div></div>
-          <div class="a-step"><div class="a-num">3</div><div class="a-txt">Botones "Agregar ítem" y "Eliminar" con garantía de mínimo 1 ítem</div></div>
-          <div class="a-step"><div class="a-num">4</div><div class="a-txt">Computed <code class="il">total</code> con <code class="il">reduce()</code> — mostrar con <code class="il">.toFixed(2)</code></div></div>
-          <div class="a-step"><div class="a-num">5</div><div class="a-txt">Computed <code class="il">pedidoValido</code>: cliente, todos los items tienen producto y precio > 0</div></div>
-          <div class="a-step"><div class="a-num">6</div><div class="a-txt">Botón "Confirmar" deshabilitado si no es válido · al enviar mostrar resumen y reset</div></div>
-          <div class="a-step"><div class="a-num">7</div><div class="a-txt">⭐ Bonus: crear <code class="il">CampoTexto.vue</code> con <code class="il">v-model</code> personalizado y usarlo para el campo cliente</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 19 CORRECCIÓN ACT 2 ═══ -->
-<div class="slide" data-i="19">
-  <div class="container">
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
-      <span class="badge b-sec">CORRECCIÓN</span>
-      <h2 style="margin:0">Pedido con Ítems — Solución</h2>
-    </div>
-    <div class="c2">
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">template completo</p>
-        <pre style="font-size:.70rem"><span class="tag">&lt;div&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"pedido.cliente"</span>
-         <span class="attr">placeholder</span>=<span class="str">"Nombre del cliente"</span> <span class="tag">/&gt;</span>
-
-  <span class="tag">&lt;div</span> <span class="attr">v-for</span>=<span class="str">"(item, i) in pedido.items"</span> <span class="attr">:key</span>=<span class="str">"i"</span>
-       <span class="attr">style</span>=<span class="str">"display:flex;gap:.5rem;align-items:center"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">v-model.trim</span>=<span class="str">"item.producto"</span>
-           <span class="attr">placeholder</span>=<span class="str">"Producto"</span> <span class="attr">style</span>=<span class="str">"flex:2"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"item.cantidad"</span>
-           <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">min</span>=<span class="str">"1"</span> <span class="attr">style</span>=<span class="str">"flex:1"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">v-model.number</span>=<span class="str">"item.precio"</span>
-           <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">min</span>=<span class="str">"0"</span> <span class="attr">style</span>=<span class="str">"flex:1"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"eliminarItem(i)"</span>
-            <span class="attr">:disabled</span>=<span class="str">"pedido.items.length === 1"</span><span class="tag">&gt;</span>
-      🗑️
-    <span class="tag">&lt;/button&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-
-  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"agregarItem"</span><span class="tag">&gt;</span>+ Ítem<span class="tag">&lt;/button&gt;</span>
-
-  <span class="tag">&lt;h3&gt;</span>Total: ${{ total.<span class="fn">toFixed</span>(<span class="val">2</span>) }}<span class="tag">&lt;/h3&gt;</span>
-
-  <span class="tag">&lt;button</span>
-    <span class="attr">@click</span>=<span class="str">"confirmar"</span>
-    <span class="attr">:disabled</span>=<span class="str">"!pedidoValido"</span>
-  <span class="tag">&gt;</span>Confirmar pedido<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/div&gt;</span></pre>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.75rem;margin-bottom:.4rem">script</p>
-        <pre style="font-size:.70rem"><span class="fn">data</span>() {
-  <span class="kw">return</span> {
-    <span class="prop">pedido</span>: {
-      <span class="prop">cliente</span>: <span class="str">''</span>,
-      <span class="prop">items</span>: [{ <span class="prop">producto</span>:<span class="str">''</span>, <span class="prop">cantidad</span>:<span class="val">1</span>, <span class="prop">precio</span>:<span class="val">0</span> }]
-    }
-  }
+<span class="cm">// methods</span>
+<span class="fn">agregarItem</span>() {
+  <span class="kw">this</span>.pedido.items.push({ producto:<span class="str">''</span>, cantidad:<span class="num">1</span>, precio:<span class="num">0</span> })
 },
-<span class="prop">computed</span>: {
-  <span class="fn">total</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>
-      .<span class="fn">reduce</span>((s, i) => s + (i.<span class="prop">cantidad</span> * i.<span class="prop">precio</span>), <span class="val">0</span>)
-  },
-  <span class="fn">pedidoValido</span>() {
-    <span class="kw">return</span> <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">cliente</span>.<span class="fn">trim</span>() !== <span class="str">''</span>
-      &amp;&amp; <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">every</span>(i =>
-        i.<span class="prop">producto</span>.<span class="fn">trim</span>() &amp;&amp; i.<span class="prop">precio</span> > <span class="val">0</span>
-      )
-  }
-},
-<span class="prop">methods</span>: {
-  <span class="fn">agregarItem</span>() {
-    <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">push</span>({
-      <span class="prop">producto</span>:<span class="str">''</span>, <span class="prop">cantidad</span>:<span class="val">1</span>, <span class="prop">precio</span>:<span class="val">0</span>
-    })
-  },
-  <span class="fn">eliminarItem</span>(idx) {
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="prop">length</span> > <span class="val">1</span>)
-      <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span>.<span class="fn">splice</span>(idx, <span class="val">1</span>)
-  },
-  <span class="fn">confirmar</span>() {
-    <span class="fn">alert</span>(<span class="str">`Pedido de </span>${<span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">cliente</span>}<span class="str">: $</span>${<span class="kw">this</span>.<span class="prop">total</span>.<span class="fn">toFixed</span>(<span class="val">2</span>)}<span class="str">`</span>)
-    <span class="kw">this</span>.<span class="prop">pedido</span>.<span class="prop">items</span> = [{ <span class="prop">producto</span>:<span class="str">''</span>, <span class="prop">cantidad</span>:<span class="val">1</span>, <span class="prop">precio</span>:<span class="val">0</span> }]
-  }
-}</pre>
+<span class="fn">eliminarItem</span>(i) {
+  <span class="kw">if</span>(<span class="kw">this</span>.pedido.items.length > <span class="num">1</span>)
+    <span class="kw">this</span>.pedido.items.splice(i, <span class="num">1</span>)
+}
+
+<span class="cm">// ── CampoTexto.vue ──</span>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;input</span>
+    <span class="attr">:value</span>=<span class="str">"modelValue"</span>
+    <span class="attr">@input</span>=<span class="str">"$emit('update:modelValue', $event.target.value)"</span>
+  <span class="tag">/&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  props: [<span class="str">'modelValue'</span>],
+  emits: [<span class="str">'update:modelValue'</span>]
+}
+<span class="tag">&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- uso: igual que un input nativo --&gt;</span>
+<span class="tag">&lt;CampoTexto</span> <span class="attr">v-model</span>=<span class="str">"pedido.cliente"</span><span class="tag">/&gt;</span></pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 7 — ACTIVIDAD 2
+══════════════════════════════════════════ -->
+<div class="slide wide" data-i="7">
+<div class="cnt wide">
+  <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.65rem">
+    <span class="badge ba">ACTIVIDAD 2</span>
+    <h2 style="margin:0">Constructor de Curriculum Vitae</h2>
+  </div>
+  <div class="actg">
+    <div>
+      <div class="tcard" id="tc2">
+        <div class="tlbl">⏱ tiempo disponible</div>
+        <div class="tdisp" id="t2">40:00</div>
+        <div class="tstat" id="t2s">Listo para iniciar</div>
+        <div class="tctrl">
+          <button class="tbtn ts" onclick="startT('t2',40)">▶ Iniciar</button>
+          <button class="tbtn tp" onclick="pauseT('t2')">⏸ Pausar</button>
+          <button class="tbtn tr" onclick="resetT('t2',40)">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="acard">
+      <p class="sm" style="margin-bottom:.3rem"><strong>Contexto:</strong> Generador de CV con secciones dinámicas. Usa arrays dinámicos y componente personalizado <em>en un contexto completamente diferente</em> al del pedido.</p>
+      <div class="asteps">
+        <div class="astep"><div class="anum">1</div><div class="atxt">Crear <code class="il">data()</code>: perfil (nombre, cargo, email, resumen) + <code class="il">habilidades: []</code> + <code class="il">experiencias: []</code></div></div>
+        <div class="astep"><div class="anum">2</div><div class="atxt">Sección <strong>Habilidades</strong>: array de strings · agregar con input temporal + botón · eliminar con splice</div></div>
+        <div class="astep"><div class="anum">3</div><div class="atxt">Sección <strong>Experiencias</strong>: array de objetos <code class="il">{ empresa, cargo, desde, hasta, descripcion }</code> · agregar/eliminar filas</div></div>
+        <div class="astep"><div class="anum">4</div><div class="atxt">Computed <code class="il">cvValido</code>: nombre no vacío, al menos 1 habilidad, al menos 1 experiencia</div></div>
+        <div class="astep"><div class="anum">5</div><div class="atxt">Crear <code class="il">CampoCV.vue</code>: componente de input con label y placeholder — usa <code class="il">modelValue</code> + emit <code class="il">update:modelValue</code></div></div>
+        <div class="astep"><div class="anum">6</div><div class="atxt">Reemplazar los inputs del perfil por <code class="il">&lt;CampoCV v-model="..." /&gt;</code></div></div>
+        <div class="astep"><div class="anum">7</div><div class="atxt">Panel de preview del CV en tiempo real (lado derecho): muestra nombre, cargo, habilidades como chips, experiencias como lista</div></div>
+        <div class="astep"><div class="anum">8</div><div class="atxt">⭐ Bonus: botón "Exportar JSON" que muestra el CV como JSON en un modal</div></div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- ═══ 20 BUENAS PRÁCTICAS ═══ -->
-<div class="slide" data-i="20">
-  <div class="container">
-    <h2>Buenas Prácticas en Formularios Vue</h2>
-    <div class="grid2">
-      <div>
-        <div class="card" style="margin-bottom:.9rem;padding:1.1rem">
-          <h3 style="font-size:1rem">🏗️ Estructura de datos clara</h3>
-          <ul style="font-size:.88rem">
-            <li>Un objeto por formulario con todas sus propiedades</li>
-            <li>Valores iniciales para todos los campos</li>
-            <li>Objeto <code class="il">errores</code> paralelo con mismas keys</li>
-          </ul>
-        </div>
-        <div class="card" style="margin-bottom:.9rem;padding:1.1rem">
-          <h3 style="font-size:1rem">✅ Validación progresiva</h3>
-          <ul style="font-size:.88rem">
-            <li>Computed para estado global del form</li>
-            <li><code class="il">@blur</code> para validar al salir del campo</li>
-            <li>Validación completa solo al enviar</li>
-          </ul>
-        </div>
-        <div class="card" style="padding:1.1rem">
-          <h3 style="font-size:1rem">🔒 Seguridad</h3>
-          <ul style="font-size:.88rem">
-            <li>Nunca confíes solo en validación del cliente</li>
-            <li>Sanitizar datos antes de enviar a la API</li>
-            <li>Tokens CSRF en formularios que modifican datos</li>
-          </ul>
-        </div>
-      </div>
-      <div>
-        <div class="card" style="margin-bottom:.9rem;padding:1.1rem">
-          <h3 style="font-size:1rem">⚡ Rendimiento</h3>
-          <ul style="font-size:.88rem">
-            <li>Usar <code class="il">.lazy</code> para campos que no necesitan update por tecla</li>
-            <li>Debounce para búsquedas en tiempo real</li>
-            <li><code class="il">v-if</code> para secciones que no siempre son necesarias</li>
-          </ul>
-        </div>
-        <div class="card" style="margin-bottom:.9rem;padding:1.1rem">
-          <h3 style="font-size:1rem">♻️ Componentes reutilizables</h3>
-          <ul style="font-size:.88rem">
-            <li>Un <code class="il">CampoTexto.vue</code> genérico para todos los inputs</li>
-            <li>Pasá <code class="il">label, tipo, error, required</code> como props</li>
-            <li>Implementá el contrato <code class="il">modelValue / update:modelValue</code></li>
-          </ul>
-        </div>
-        <div class="hl">
-          <p style="font-size:.88rem">💡 Para forms complejos, considerá <strong>Vuelidate</strong> o <strong>VeeValidate</strong> — librerías de validación dedicadas para Vue.</p>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ═══ 21 CIERRE ═══ -->
-<div class="slide" data-i="21">
-  <div class="container">
-    <h2>Resumen de la Clase</h2>
-    <div class="grid2" style="margin-bottom:1rem">
-      <div>
-        <p class="muted" style="font-size:.78rem;letter-spacing:.05em;margin-bottom:.55rem">✅ PARTE I — FORM BINDING BÁSICO</p>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem"><code class="il">v-model</code> en todos los tipos: text, checkbox, radio, select, textarea</p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Modificadores: <code class="il">.trim</code>, <code class="il">.number</code>, <code class="il">.lazy</code> — cuándo y por qué</p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Validaciones con computed + <code class="il">@blur</code> + botón deshabilitado</p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Objeto de errores paralelo para feedback por campo</p></div>
-      </div>
-      <div>
-        <p class="muted" style="font-size:.78rem;letter-spacing:.05em;margin-bottom:.55rem">✅ PARTE II — FORMULARIOS AVANZADOS</p>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Formulario multipaso con <code class="il">v-if</code> + validación por paso + reset</p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Arrays dinámicos: <code class="il">push/splice</code> con <code class="il">v-for</code> + computed <code class="il">reduce()</code></p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Componente custom con <code class="il">v-model</code>: <code class="il">modelValue</code> + <code class="il">update:modelValue</code></p></div>
-        <div class="check-item"><span class="ch-ico">✅</span><p style="font-size:.88rem">Buenas prácticas de estructura, validación y seguridad</p></div>
-      </div>
-    </div>
-    <div style="display:flex;gap:1rem">
-      <div class="hl" style="flex:1">
-        <p style="font-size:.88rem">📚 <strong>Próxima clase:</strong> Manejo de Eventos en Vue · event bus · emitters · custom events</p>
-      </div>
-      <div class="hl hl-warn" style="flex:1">
-        <p style="font-size:.88rem">🏆 <strong>Para practicar:</strong> Completar Actividad 2 con el componente <code class="il">CampoTexto</code> personalizado y agregar validación de mínimo de stock</p>
-      </div>
-    </div>
-  </div>
-</div>
+</div><!-- #wrap -->
 
-</div><!-- /#slides -->
-
-<!-- FOOTER -->
 <footer>
-  <button class="nav-btn" id="bp" onclick="nav(-1)">← Anterior</button>
-  <span class="ft-hint">← → teclado · Espacio para avanzar</span>
-  <button class="nav-btn" id="bn" onclick="nav(1)">Siguiente →</button>
+  <button class="navbtn" id="bp" onclick="nav(-1)" disabled>← Anterior</button>
+  <span class="nhint">← → Flechas · Espacio para avanzar</span>
+  <button class="navbtn" id="bn" onclick="nav(1)">Siguiente →</button>
 </footer>
-</div><!-- /#app -->
+</div><!-- #app -->
 
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let cur = 0;
-  document.getElementById('tot').textContent = total;
+const slides=document.querySelectorAll('.slide');
+const TOTAL=slides.length;
+let cur=0;
+document.getElementById('tn').textContent=TOTAL;
 
-  function goTo(n) {
-    if (n < 0 || n >= total) return;
-    slides[cur].classList.remove('active');
-    cur = n;
-    slides[cur].classList.add('active');
-    ui();
-  }
-  function nav(d) { goTo(cur + d); }
-  function ui() {
-    document.getElementById('ctr').innerHTML = `<strong>${cur+1}</strong> / <span id="tot">${total}</span>`;
-    document.getElementById('pf').style.width = `${((cur+1)/total)*100}%`;
-    document.getElementById('bp').disabled = cur === 0;
-    document.getElementById('bn').disabled = cur === total - 1;
-  }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === ' ') nav(1);
-    if (e.key === 'ArrowLeft') nav(-1);
-  });
-  ui();
+function goTo(n){
+  if(n<0||n>=TOTAL)return;
+  slides[cur].classList.remove('active');
+  cur=n;slides[cur].classList.add('active');ui();
+}
+function nav(d){goTo(cur+d);}
+function ui(){
+  document.getElementById('cn').textContent=cur+1;
+  document.getElementById('pf').style.width=((cur+1)/TOTAL*100)+'%';
+  document.getElementById('bp').disabled=cur===0;
+  document.getElementById('bn').disabled=cur===TOTAL-1;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nav(1);}
+  if(e.key==='ArrowLeft'){e.preventDefault();nav(-1);}
+});
+ui();
 
-  /* ── TIMERS ── */
-  const TS = {};
-  function fmt(s) {
-    return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+/* TIMERS */
+const TS={};
+const CID={t1:'tc1',t2:'tc2',tb:'tcb'};
+function fmt(s){return`${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;}
+
+function renderT(id){
+  const t=TS[id];if(!t)return;
+  const disp=document.getElementById(id);
+  const stat=document.getElementById(id+'s');
+  const card=document.getElementById(CID[id]);
+  if(!disp)return;
+  disp.textContent=fmt(t.rem);
+  disp.className='tdisp';
+  if(card)card.className='tcard';
+  if(t.rem<=60){
+    disp.classList.add('td');if(card)card.classList.add('td');
+    if(stat)stat.textContent='⚠️ ¡Menos de 1 minuto!';
+  }else if(t.rem<=300){
+    disp.classList.add('tw');if(card)card.classList.add('tw');
+    if(stat)stat.textContent='⏳ Menos de 5 minutos';
+  }else if(stat){
+    stat.textContent=t.running?'🟢 En curso...':(t.rem===t.total?'Listo para iniciar':'⏸ Pausado');
   }
-  function cardId(id) {
-    if (id === 'tb') return 'tcb';
-    return 'tc' + id.slice(-1);
-  }
-  function renderT(id) {
-    const st = TS[id]; if (!st) return;
-    const d = document.getElementById(id);
-    const s = document.getElementById(id + 's');
-    const c = document.getElementById(cardId(id));
-    if (!d) return;
-    d.textContent = fmt(st.rem);
-    d.className = 't-disp';
-    if (c) c.className = 't-card';
-    if (st.rem <= 60) {
-      d.classList.add('td');
-      if (c) c.classList.add('td');
-      if (s) s.textContent = '⚠️ ¡Menos de 1 minuto!';
-    } else if (st.rem <= 300) {
-      d.classList.add('tw');
-      if (c) c.classList.add('tw');
-      if (s) s.textContent = '⏳ Menos de 5 minutos';
-    } else {
-      if (s) s.textContent = st.running ? '🟢 En curso...' : (st.rem === st.total ? 'Listo para iniciar' : '⏸ Pausado');
+}
+function startT(id,min){
+  if(!TS[id])TS[id]={rem:min*60,total:min*60,running:false,iv:null};
+  const t=TS[id];if(t.running)return;
+  t.running=true;
+  t.iv=setInterval(()=>{
+    t.rem--;renderT(id);
+    if(t.rem<=0){
+      clearInterval(t.iv);t.running=false;
+      const s=document.getElementById(id+'s');
+      if(s)s.textContent='🏁 ¡Tiempo terminado!';
+      beep();
     }
-  }
-  function startT(id, min) {
-    if (!TS[id]) TS[id] = { rem: min*60, total: min*60, running: false, iv: null };
-    const st = TS[id];
-    if (st.running) return;
-    st.running = true;
-    st.iv = setInterval(() => {
-      st.rem--;
-      renderT(id);
-      if (st.rem <= 0) {
-        clearInterval(st.iv); st.running = false;
-        const s = document.getElementById(id + 's');
-        if (s) s.textContent = '🏁 ¡Tiempo terminado!';
-        beep();
-      }
-    }, 1000);
-    renderT(id);
-  }
-  function pauseT(id) {
-    const st = TS[id]; if (!st) return;
-    clearInterval(st.iv); st.running = false; renderT(id);
-  }
-  function resetT(id, min) {
-    if (TS[id]) clearInterval(TS[id].iv);
-    TS[id] = { rem: min*60, total: min*60, running: false, iv: null };
-    const s = document.getElementById(id + 's');
-    if (s) s.textContent = 'Listo para iniciar';
-    renderT(id);
-  }
-  function beep() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [0,.15,.3].forEach(t => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine'; o.frequency.value = 880;
-        g.gain.setValueAtTime(.4, ctx.currentTime+t);
-        g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+t+.25);
-        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+.3);
-      });
-    } catch(e) {}
-  }
+  },1000);
+  renderT(id);
+}
+function pauseT(id){const t=TS[id];if(!t)return;clearInterval(t.iv);t.running=false;renderT(id);}
+function resetT(id,min){
+  if(TS[id])clearInterval(TS[id].iv);
+  TS[id]={rem:min*60,total:min*60,running:false,iv:null};
+  const s=document.getElementById(id+'s');if(s)s.textContent='Listo para iniciar';
+  renderT(id);
+}
+function beep(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,.18,.36].forEach(o=>{
+      const osc=ctx.createOscillator(),g=ctx.createGain();
+      osc.connect(g);g.connect(ctx.destination);
+      osc.type='sine';osc.frequency.value=880;
+      g.gain.setValueAtTime(.42,ctx.currentTime+o);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+o+.27);
+      osc.start(ctx.currentTime+o);osc.stop(ctx.currentTime+o+.3);
+    });
+  }catch(e){}
+}
 </script>
 </body>
 </html>

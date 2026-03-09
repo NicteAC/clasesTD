@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vue Router — Clase 1: Fundamentos Teóricos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#2D5BFF;--s:#00D4AA;--a:#FF6B6B;--d:#1A1A2E;--l:#F8F9FA;--w:#FFA500;--cb:rgba(255,255,255,.05);--br:rgba(255,255,255,.1)}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Sora',sans-serif;background:var(--d);color:var(--l)}
+#app{display:flex;flex-direction:column;width:100vw;height:100vh}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:.55rem 2rem;background:rgba(26,26,46,.98);border-bottom:1px solid var(--br);flex-shrink:0}
+.h-brand{font-size:.76rem;font-weight:600;color:var(--s);letter-spacing:.08em;text-transform:uppercase}
+.h-cnt{font-family:'Space Mono',monospace;font-size:.92rem;font-weight:700}
+.h-ttl{font-size:.72rem;color:rgba(255,255,255,.4);text-align:right;max-width:300px}
+
+.pbar{height:3px;background:rgba(255,255,255,.07);flex-shrink:0}
+.pfill{height:100%;background:linear-gradient(90deg,var(--p),var(--s));transition:width .4s ease}
+
+#vp{flex:1;overflow:hidden;position:relative}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:.9rem 2rem;animation:sIn .6s ease-out}
+.slide.active{display:flex}
+@keyframes sIn{from{opacity:0;transform:translateX(42px)}to{opacity:1;transform:translateX(0)}}
+
+footer{display:flex;align-items:center;justify-content:space-between;padding:.5rem 2rem;background:rgba(26,26,46,.98);border-top:1px solid var(--br);flex-shrink:0}
+.nbtn{font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;padding:.42rem 1.2rem;border:1.5px solid var(--p);background:transparent;color:var(--p);border-radius:8px;cursor:pointer;transition:all .3s ease}
+.nbtn:hover{background:var(--p);color:#fff}
+.nbtn:disabled{opacity:.2;cursor:not-allowed}
+.dots{display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:520px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:all .3s}
+.dot.active{background:var(--p);transform:scale(1.45)}
+.dot.act{background:var(--s)}.dot.brk{background:var(--w)}.dot.cov{background:rgba(255,255,255,.38)}
+
+.cnt{width:100%;max-width:1200px;padding:0}
+
+h1{font-size:3.5rem;font-weight:800;line-height:1.12}
+h2{font-size:2.5rem;font-weight:700;line-height:1.2}
+h3{font-size:1.8rem;font-weight:600;line-height:1.3}
+p,li{font-size:1.3rem;line-height:1.8}
+.sm p,.sm li,.sm{font-size:1rem!important;line-height:1.7}
+.xs{font-size:.88rem!important}
+.muted{opacity:.5}
+.gt{background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.badge{display:inline-block;padding:.26rem .88rem;border-radius:50px;font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.55rem}
+.bb{background:rgba(45,91,255,.2);color:var(--p);border:1px solid var(--p)}
+.bg{background:rgba(0,212,170,.2);color:var(--s);border:1px solid var(--s)}
+.br2{background:rgba(255,107,107,.2);color:var(--a);border:1px solid var(--a)}
+.bo{background:rgba(255,165,0,.2);color:var(--w);border:1px solid var(--w)}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+.card{background:var(--cb);border:1px solid var(--br);border-radius:12px;padding:1.5rem;transition:all .3s ease}
+.card:hover{border-color:var(--p);transform:translateY(-5px);box-shadow:0 8px 24px rgba(45,91,255,.2)}
+.card h3{font-size:1.25rem;margin-bottom:.5rem}
+.card p,.card li{font-size:1.05rem;line-height:1.7}
+
+.cb{background:#0d1117;border:1px solid rgba(45,91,255,.3);border-radius:10px;padding:.85rem 1.1rem;font-family:'Space Mono',monospace;font-size:.76rem;line-height:1.75;color:#e6edf3}
+.cb.sm{font-size:.7rem}.cb.xs{font-size:.65rem}
+.kw{color:#ff7b72}.str{color:#a5d6ff}.fn{color:#d2a8ff}.cm{color:#8b949e}
+.tag{color:#7ee787}.att{color:#79c0ff}.val{color:#ffa657}.hl{color:#f8e45c}
+
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.chip{font-family:'Space Mono',monospace;font-size:.72rem;padding:.2rem .62rem;border-radius:5px;background:rgba(45,91,255,.15);color:var(--p);border:1px solid rgba(45,91,255,.3)}
+.chip.g{background:rgba(0,212,170,.15);color:var(--s);border-color:rgba(0,212,170,.3)}
+.chip.r{background:rgba(255,107,107,.15);color:var(--a);border-color:rgba(255,107,107,.3)}
+.chip.o{background:rgba(255,165,0,.15);color:var(--w);border-color:rgba(255,165,0,.3)}
+
+.tline{display:flex;flex-direction:column;gap:.35rem}
+.ti{display:flex;align-items:center;gap:1rem;padding:.52rem 1rem;background:rgba(255,255,255,.04);border-radius:9px;border-left:3px solid var(--p)}
+.ti.ta{border-left-color:var(--s)}.ti.tb{border-left-color:var(--w)}
+.tt{font-family:'Space Mono',monospace;font-size:.78rem;color:rgba(255,255,255,.4);min-width:62px}
+.tl{font-size:.98rem;font-weight:600}
+.td{margin-left:auto;font-family:'Space Mono',monospace;font-size:.74rem;opacity:.4}
+
+.ag{display:grid;grid-template-columns:300px 1fr;gap:3rem;align-items:start}
+.tc{background:var(--cb);border:1px solid var(--br);border-radius:16px;padding:1.5rem;text-align:center}
+.tlab{font-size:.76rem;opacity:.5;margin-bottom:.2rem}
+.tdis{font-family:'Space Mono',monospace;font-size:6rem;font-weight:700;color:var(--s);text-shadow:0 0 22px rgba(0,212,170,.45);line-height:1;margin:.35rem 0;transition:color .5s,text-shadow .5s}
+.tdis.warn{color:var(--w);text-shadow:0 0 22px rgba(255,165,0,.45)}
+.tdis.danger{color:var(--a);text-shadow:0 0 22px rgba(255,107,107,.45);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tstat{font-size:.76rem;color:rgba(255,255,255,.4);min-height:1em;margin-bottom:.8rem}
+.tctrl{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.tbtn{font-family:'Sora',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem 1rem;border-radius:7px;cursor:pointer;border:none;transition:all .2s}
+.tbtn.st{background:var(--s);color:#000}.tbtn.pa{background:var(--w);color:#000}.tbtn.re{background:rgba(255,255,255,.1);color:var(--l)}
+.tbtn:hover{opacity:.82;transform:scale(1.04)}
+.ic{background:var(--cb);border:1px solid var(--br);border-radius:16px;padding:1.5rem}
+.ic h3{font-size:1.25rem;color:var(--s);margin-bottom:.65rem}
+.ic ol{padding-left:1.15rem}
+.ic li{font-size:1.05rem;line-height:1.7;margin-bottom:.3rem}
+.ctx{font-size:.95rem;opacity:.72;margin-bottom:.75rem;padding:.65rem 1rem;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid var(--s);line-height:1.6}
+
+.col2{column-count:2;column-gap:3rem}
+.col2 li{break-inside:avoid}
+.hlbox{background:linear-gradient(135deg,rgba(45,91,255,.1),rgba(0,212,170,.06));border:1px solid rgba(45,91,255,.25);border-radius:10px;padding:.8rem 1.1rem}
+
+.sc{background:linear-gradient(135deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%)}
+.sth{background:linear-gradient(135deg,rgba(45,91,255,.07) 0%,rgba(0,212,170,.04) 100%)}
+.se{background:linear-gradient(135deg,rgba(0,212,170,.08) 0%,rgba(45,91,255,.05) 100%)}
+.sb{background:linear-gradient(135deg,rgba(255,165,0,.1) 0%,rgba(255,107,107,.07) 100%)}
+
+.flow{display:flex;flex-direction:column;gap:.6rem}
+.fstep{display:flex;align-items:flex-start;gap:.9rem;padding:.6rem .9rem;background:rgba(255,255,255,.04);border-radius:9px}
+.fnum{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--p);min-width:28px}
+.ftxt{font-size:1rem;line-height:1.6}
+
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.diff-card{border-radius:12px;padding:1.2rem}
+.diff-card.red{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3)}
+.diff-card.green{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.3)}
+.diff-card h3{font-size:1.1rem;margin-bottom:.6rem}
+.diff-card li{font-size:.98rem;line-height:1.65}
+
+@media(max-height:860px){
+  h1{font-size:2.8rem}h2{font-size:2rem}h3{font-size:1.5rem}
+  p,li{font-size:1.1rem}.tdis{font-size:4.8rem}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <span class="h-brand">Vue Router · Clase 1 — Fundamentos Teóricos</span>
+  <span class="h-cnt" id="hcnt">1 / 19</span>
+  <span class="h-ttl" id="httl">Portada</span>
+</header>
+<div class="pbar"><div class="pfill" id="pf" style="width:5.26%"></div></div>
+<div id="vp">
+
+<!-- ══ 1. PORTADA ══ -->
+<div class="slide sc active" data-t="Portada" data-d="cov">
+  <div class="cnt" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.4rem">
+    <span class="badge bb">Vue 2 CLI · Módulo 6 · Lección 5</span>
+    <h1>Manejo de <span class="gt">Rutas</span><br>con Vue Router</h1>
+    <p class="muted" style="max-width:600px;font-size:1.15rem">Clase 1 de 2 — Fundamentos teóricos<br>Rutas estáticas, dinámicas, anidadas, alias y redirecciones</p>
+    <div class="chips" style="justify-content:center">
+      <span class="chip">Vue Router</span><span class="chip">router-link</span><span class="chip">router-view</span>
+      <span class="chip g">$route.params</span><span class="chip g">rutas dinámicas</span><span class="chip g">rutas anidadas</span>
+      <span class="chip o">alias · redirect · 404</span><span class="chip o">props desde rutas</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2. AGENDA ══ -->
+<div class="slide sc" data-t="Agenda" data-d="cov">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Agenda</span><h2>Plan de las <span class="gt">3 horas</span></h2></div>
+    <div class="tline">
+      <div class="ti"><span class="tt">00:00</span><span class="tl">🎯 ¿Qué es Vue Router? — SPA y casos de uso</span><span class="td">15 min</span></div>
+      <div class="ti"><span class="tt">00:15</span><span class="tl">⚙️ Instalación, configuración y estructura del router</span><span class="td">15 min</span></div>
+      <div class="ti"><span class="tt">00:30</span><span class="tl">🔗 router-link, router-view y rutas estáticas</span><span class="td">20 min</span></div>
+      <div class="ti"><span class="tt">00:50</span><span class="tl">🎯 Rutas dinámicas, parámetros y validación</span><span class="td">20 min</span></div>
+      <div class="ti ta"><span class="tt">01:10</span><span class="tl">✍️ Ejercicio 1 — SPA básica con rutas estáticas y dinámicas</span><span class="td">20 min</span></div>
+      <div class="ti tb"><span class="tt">01:30</span><span class="tl">☕ Descanso</span><span class="td">20 min</span></div>
+      <div class="ti"><span class="tt">01:50</span><span class="tl">🌿 Rutas anidadas (children)</span><span class="td">15 min</span></div>
+      <div class="ti"><span class="tt">02:05</span><span class="tl">📦 Props desde rutas — desacoplar componentes</span><span class="td">15 min</span></div>
+      <div class="ti"><span class="tt">02:20</span><span class="tl">↩️ Redirecciones, alias y ruta 404</span><span class="td">15 min</span></div>
+      <div class="ti ta"><span class="tt">02:35</span><span class="tl">✍️ Ejercicio 2 — SPA con rutas enriquecidas</span><span class="td">20 min</span></div>
+      <div class="ti"><span class="tt">02:55</span><span class="tl">🏁 Resumen y cierre</span><span class="td">5 min</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. QUÉ ES VUE ROUTER ══ -->
+<div class="slide sth" data-t="¿Qué es Vue Router?" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Introducción</span><h2>¿Qué es <span class="gt">Vue Router</span>?</h2></div>
+    <div class="g2">
+      <div style="display:flex;flex-direction:column;gap:.9rem">
+        <div class="card" style="border-color:rgba(45,91,255,.35)">
+          <h3>📌 Definición</h3>
+          <p>Biblioteca <strong>oficial de enrutamiento</strong> para Vue.js. Mapea URLs del navegador a componentes, permitiendo que la app cambie de vista <strong>sin recargar la página</strong>.</p>
+        </div>
+        <div class="card" style="border-color:rgba(0,212,170,.35)">
+          <h3>🌐 SPA</h3>
+          <p>Simula el comportamiento de un sitio multi-página dentro de una <strong>Single Page Application</strong>. El navegador carga el HTML solo una vez.</p>
+        </div>
+      </div>
+      <div class="diff-grid" style="align-content:start;gap:1rem">
+        <div class="diff-card red">
+          <h3 style="color:var(--a)">🗺️ Sin Vue Router</h3>
+          <ul style="padding-left:1rem">
+            <li class="sm">Cada vista = nueva petición al servidor</li>
+            <li class="sm">La página se recarga completa</li>
+            <li class="sm">El estado de la app se pierde</li>
+            <li class="sm">Experiencia lenta y fragmentada</li>
+          </ul>
+        </div>
+        <div class="diff-card green">
+          <h3 style="color:var(--s)">✅ Con Vue Router</h3>
+          <ul style="padding-left:1rem">
+            <li class="sm">La URL cambia, el HTML no</li>
+            <li class="sm">El componente cambia instantáneamente</li>
+            <li class="sm">El estado se conserva entre vistas</li>
+            <li class="sm">Experiencia fluida de app nativa</li>
+          </ul>
+        </div>
+        <div class="hlbox" style="grid-column:1/-1">
+          <p class="sm"><strong>Regla:</strong> Si la app tiene más de una "pantalla", usamos Vue Router. Una sola vista = no es necesario.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. PARA QUÉ Y CUÁNDO ══ -->
+<div class="slide sth" data-t="¿Para qué y cuándo usarlo?" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Motivación</span><h2>¿Para qué y <span class="gt">cuándo</span> usarlo?</h2></div>
+    <div class="g3" style="margin-bottom:1rem">
+      <div class="card" style="border-color:rgba(45,91,255,.35)">
+        <h3>🖥️ Múltiples vistas</h3>
+        <p>Cuando la app requiere diferentes "pantallas": inicio, productos, contacto, perfil, etc. Cada una tiene su propia URL.</p>
+      </div>
+      <div class="card" style="border-color:rgba(0,212,170,.35)">
+        <h3>⚡ Sin recarga</h3>
+        <p>En vez de múltiples archivos HTML, un solo archivo con componentes que cambian según la ruta activa.</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,107,107,.35)">
+        <h3>🔒 Control total</h3>
+        <p>Historial de navegación, navegación programática, guardas de acceso y rutas protegidas.</p>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card" style="border-color:rgba(255,165,0,.3)">
+        <h3 style="font-size:1.1rem;margin-bottom:.5rem">🕐 ¿Cuándo usar Vue Router?</h3>
+        <ul style="padding-left:1.1rem" class="sm">
+          <li>La app tiene más de una vista o sección</li>
+          <li>Necesitás navegación fluida sin recargas</li>
+          <li>Querés mantener el estado entre cambios de vista</li>
+          <li>La app usa componentes reutilizables por sección</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(0,212,170,.3)">
+        <h3 style="font-size:1.1rem;margin-bottom:.5rem">✅ Ventajas clave</h3>
+        <ul style="padding-left:1.1rem" class="sm">
+          <li>Integración con Vue Devtools para debugging</li>
+          <li>Compatible con la arquitectura basada en componentes</li>
+          <li>Estandariza el manejo de rutas en el proyecto</li>
+          <li>Mejora la experiencia del usuario</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5. INSTALACIÓN ══ -->
+<div class="slide sth" data-t="Instalación y registro" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Instalación</span><h2>Instalar y <span class="gt">registrar</span> Vue Router</h2></div>
+    <div class="g2">
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <p style="font-size:1.1rem">Instalar desde la terminal del proyecto:</p>
+        <div class="cb"><span class="hl">npm install vue-router</span>
+<span class="cm"># o con yarn:</span>
+<span class="hl">yarn add vue-router</span></div>
+        <p style="font-size:1.1rem;margin-top:.3rem">Registrar en <strong>main.js</strong>:</p>
+        <div class="cb"><span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> App <span class="kw">from</span> <span class="str">'./App.vue'</span>
+<span class="kw">import</span> router <span class="kw">from</span> <span class="str">'./router'</span>
+
+<span class="cm">// Conecta el router a la instancia Vue</span>
+<span class="kw">new</span> <span class="fn">Vue</span>({
+  router,
+  render: <span class="fn">h</span> => <span class="fn">h</span>(App)
+}).<span class="fn">$mount</span>(<span class="str">'#app'</span>)</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="hlbox">
+          <p class="sm"><strong>¿Qué hace <code>router</code> en la instancia?</strong><br>Hace que todos los componentes tengan acceso a <code>this.$route</code> (info de la ruta actual) y <code>this.$router</code> (instancia del router para navegar).</p>
+        </div>
+        <p style="font-size:1.1rem">Estructura de carpetas recomendada:</p>
+        <div class="cb"><span class="hl">src/</span>
+  <span class="hl">├── router/</span>
+  <span class="hl">│   └── index.js</span>   <span class="cm">← configuración del router</span>
+  <span class="hl">├── views/</span>         <span class="cm">← componentes de página (rutas)</span>
+  <span class="hl">│   ├── Home.vue</span>
+  <span class="hl">│   ├── Productos.vue</span>
+  <span class="hl">│   └── NotFound.vue</span>
+  <span class="hl">├── components/</span>    <span class="cm">← componentes reutilizables</span>
+  <span class="hl">└── App.vue</span>        <span class="cm">← contiene router-view</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6. CONFIGURACIÓN ROUTER ══ -->
+<div class="slide sth" data-t="Configuración de router/index.js" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Configuración</span><h2>Archivo <span class="gt">router/index.js</span></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Cuatro pasos para armar el router:</p>
+        <div class="flow">
+          <div class="fstep"><span class="fnum">①</span><span class="ftxt"><strong>Importar</strong> Vue, VueRouter y los componentes de vista</span></div>
+          <div class="fstep"><span class="fnum">②</span><span class="ftxt"><strong>Registrar</strong> el plugin con <code>Vue.use(VueRouter)</code></span></div>
+          <div class="fstep"><span class="fnum">③</span><span class="ftxt"><strong>Definir</strong> el array <code>routes</code> con path y componente</span></div>
+          <div class="fstep"><span class="fnum">④</span><span class="ftxt"><strong>Crear</strong> la instancia con <code>new VueRouter()</code> y exportarla</span></div>
+        </div>
+        <div class="hlbox" style="margin-top:.9rem">
+          <p class="sm"><strong><code>mode: 'history'</code></strong> — URLs limpias como <code>/productos</code>.<br>Sin esto, las URLs usan <code>#</code>: <code>/#/productos</code>.</p>
+        </div>
+      </div>
+      <div>
+        <div class="cb sm"><span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> VueRouter <span class="kw">from</span> <span class="str">'vue-router'</span>
+<span class="kw">import</span> Home <span class="kw">from</span> <span class="str">'../views/Home.vue'</span>
+<span class="kw">import</span> Productos <span class="kw">from</span> <span class="str">'../views/Productos.vue'</span>
+
+<span class="cm">// ② Registrar el plugin</span>
+Vue.<span class="fn">use</span>(VueRouter)
+
+<span class="cm">// ③ Definir las rutas</span>
+<span class="kw">const</span> routes = [
+  { path: <span class="str">'/'</span>,         component: Home },
+  { path: <span class="str">'/productos'</span>,  component: Productos }
+]
+
+<span class="cm">// ④ Crear la instancia y exportar</span>
+<span class="kw">const</span> router = <span class="kw">new</span> <span class="fn">VueRouter</span>({
+  mode: <span class="str">'history'</span>,
+  routes
+})
+
+<span class="kw">export default</span> router</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 7. ROUTER-LINK Y ROUTER-VIEW ══ -->
+<div class="slide sth" data-t="router-link y router-view" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Componentes clave</span><h2><span class="gt">router-link</span> y <span class="gt">router-view</span></h2></div>
+    <div class="g2">
+      <div>
+        <div class="card" style="border-color:rgba(45,91,255,.4);margin-bottom:.9rem">
+          <h3>🔗 &lt;router-link&gt;</h3>
+          <p class="sm">Reemplaza al <code>&lt;a href&gt;</code>. Intercepta el clic y navega <strong>sin recargar</strong>. Vue aplica automáticamente la clase <code>router-link-active</code> al enlace activo.</p>
+          <div class="cb sm" style="margin-top:.7rem"><span class="tag">&lt;nav&gt;</span>
+  <span class="tag">&lt;router-link</span> <span class="att">to</span>=<span class="str">"/"</span><span class="tag">&gt;</span>Inicio<span class="tag">&lt;/router-link&gt;</span>
+  <span class="tag">&lt;router-link</span> <span class="att">to</span>=<span class="str">"/productos"</span><span class="tag">&gt;</span>Productos<span class="tag">&lt;/router-link&gt;</span>
+<span class="tag">&lt;/nav&gt;</span></div>
+        </div>
+        <div class="card" style="border-color:rgba(0,212,170,.4)">
+          <h3>📺 &lt;router-view&gt;</h3>
+          <p class="sm">El "marco" donde Vue inyecta el componente de la ruta activa. Va en <code>App.vue</code>. Cambia de contenido cuando cambia la URL.</p>
+          <div class="cb sm" style="margin-top:.7rem"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="att">id</span>=<span class="str">"app"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;nav&gt;</span> <span class="cm">... router-links ...</span> <span class="tag">&lt;/nav&gt;</span>
+    <span class="cm">&lt;!-- La vista activa se renderiza aquí --&gt;</span>
+    <span class="tag">&lt;router-view&gt;&lt;/router-view&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.8rem;font-weight:600">¿Cómo funcionan juntos?</p>
+        <div class="flow">
+          <div class="fstep"><span class="fnum" style="color:var(--p)">1</span><span class="ftxt">Usuario hace clic en <code>&lt;router-link to="/productos"&gt;</code></span></div>
+          <div class="fstep"><span class="fnum" style="color:var(--s)">2</span><span class="ftxt">Vue Router intercepta el clic y actualiza la URL <strong>sin recargar</strong></span></div>
+          <div class="fstep"><span class="fnum" style="color:var(--a)">3</span><span class="ftxt">Busca en el array <code>routes</code> cuál coincide con <code>/productos</code></span></div>
+          <div class="fstep"><span class="fnum" style="color:var(--w)">4</span><span class="ftxt">Renderiza ese componente dentro de <code>&lt;router-view&gt;</code></span></div>
+        </div>
+        <div class="hlbox" style="margin-top:.9rem">
+          <p class="sm"><strong>Analogía:</strong> <code>router-view</code> es un marco en la pared. Los componentes son cuadros que se intercambian dentro del marco.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8. RUTAS ESTÁTICAS ══ -->
+<div class="slide sth" data-t="Rutas estáticas" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Rutas</span><h2>Rutas <span class="gt">estáticas</span></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Path fijo → componente fijo. Las más simples de definir.</p>
+        <div class="cb sm"><span class="kw">const</span> routes = [
+  <span class="cm">// path: URL · component: qué renderizar</span>
+  { path: <span class="str">'/'</span>,         component: Home },
+  { path: <span class="str">'/about'</span>,     component: About },
+  { path: <span class="str">'/productos'</span>,  component: Productos },
+  { path: <span class="str">'/contacto'</span>,   component: Contacto }
+]</div>
+        <div class="hlbox" style="margin-top:.9rem">
+          <p class="sm">Convención: las vistas van en <code>src/views/</code>. Son componentes que corresponden a rutas. Los reutilizables van en <code>src/components/</code>.</p>
+        </div>
+      </div>
+      <div class="g3" style="grid-template-columns:1fr;gap:.8rem;align-content:start">
+        <div class="card" style="border-color:rgba(45,91,255,.3);padding:1rem">
+          <h3 style="font-size:1.05rem">🏠 Home.vue</h3>
+          <p class="sm">Componente para la ruta raíz <code>/</code>. Página de bienvenida.</p>
+        </div>
+        <div class="card" style="border-color:rgba(0,212,170,.3);padding:1rem">
+          <h3 style="font-size:1.05rem">📦 Productos.vue</h3>
+          <p class="sm">Componente para <code>/productos</code>. Lista el catálogo.</p>
+        </div>
+        <div class="card" style="border-color:rgba(255,107,107,.3);padding:1rem">
+          <h3 style="font-size:1.05rem">📬 Contacto.vue</h3>
+          <p class="sm">Componente para <code>/contacto</code>. Formulario de contacto.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9. RUTAS DINÁMICAS ══ -->
+<div class="slide sth" data-t="Rutas dinámicas" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Rutas dinámicas</span><h2>Parámetros con <span class="gt"><code>:nombre</code></span></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">El prefijo <code>:</code> convierte un segmento en variable. Una sola ruta captura múltiples URLs.</p>
+        <div class="cb sm"><span class="cm">// router/index.js</span>
+{ path: <span class="str">'/producto/:id'</span>, component: DetalleProducto }
+
+<span class="cm">// Coincide con TODAS estas URLs:
+//   /producto/1
+//   /producto/42
+//   /producto/abc
+//   /producto/zapatillas-nike</span></div>
+        <div class="cb sm" style="margin-top:.8rem"><span class="cm">// Múltiples parámetros en una misma ruta</span>
+{ path: <span class="str">'/blog/:año/:mes/:slug'</span>,
+  component: ArticuloBlog }
+<span class="cm">//   /blog/2020/03/vue-router-guia</span></div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Ventajas de rutas dinámicas:</p>
+        <div class="g3" style="grid-template-columns:1fr;gap:.7rem;align-content:start">
+          <div class="card" style="padding:1rem;border-color:rgba(0,212,170,.3)">
+            <h3 style="font-size:1.05rem">♻️ Reutilización</h3>
+            <p class="sm">Un solo componente maneja el detalle de cualquier producto, sin duplicar código.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(45,91,255,.3)">
+            <h3 style="font-size:1.05rem">🔗 URLs semánticas</h3>
+            <p class="sm">Las URLs son descriptivas y amigables para el usuario y los motores de búsqueda.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(255,165,0,.3)">
+            <h3 style="font-size:1.05rem">🎯 Contextual</h3>
+            <p class="sm">La interfaz se personaliza según el parámetro recibido, mostrando datos relevantes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10. PARAMS + VALIDACIÓN ══ -->
+<div class="slide sth" data-t="$route.params y validación" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Acceso a datos</span><h2><span class="gt"><code>$route.params</code></span> y validación</h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Acceder al parámetro desde el componente:</p>
+        <div class="cb sm"><span class="cm">// DetalleProducto.vue</span>
+<span class="kw">export default</span> {
+  <span class="fn">mounted</span>() {
+    <span class="cm">// $route.params contiene los parámetros</span>
+    <span class="kw">const</span> id = <span class="kw">this</span>.$route.params.id
+
+    console.<span class="fn">log</span>(id)
+    <span class="cm">// ⚠️ Siempre llega como STRING</span>
+    <span class="cm">// '42' no es lo mismo que 42</span>
+
+    <span class="kw">this</span>.<span class="fn">cargarProducto</span>(id)
+  }
+}</div>
+        <div class="hlbox" style="margin-top:.8rem">
+          <p class="sm">⚠️ <code>$route.params.id</code> siempre es <strong>string</strong>. Para operaciones numéricas usar <code>Number(id)</code> o <code>parseInt(id)</code>.</p>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Validar parámetros antes de usarlos:</p>
+        <div class="cb sm"><span class="kw">export default</span> {
+  data() {
+    <span class="kw">return</span> { producto: <span class="kw">null</span>, error: <span class="kw">false</span> }
+  },
+  <span class="fn">mounted</span>() {
+    <span class="kw">const</span> id = <span class="kw">this</span>.$route.params.id
+
+    <span class="cm">// Validar que sea numérico</span>
+    <span class="kw">if</span> (!/<span class="str">^\d+$</span>/.<span class="fn">test</span>(id)) {
+      <span class="kw">this</span>.error = <span class="kw">true</span>
+      <span class="kw">return</span> <span class="cm">// Salir si no es válido</span>
+    }
+
+    <span class="cm">// Convertir a número y buscar</span>
+    <span class="kw">this</span>.<span class="fn">buscarProducto</span>(Number(id))
+  },
+  methods: {
+    <span class="fn">buscarProducto</span>(id) { <span class="cm">/* ... */</span> }
+  }
+}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 11. EJERCICIO 1 ══ -->
+<div class="slide se" data-t="Ejercicio 1 — SPA básica" data-d="act">
+  <div class="cnt">
+    <div style="margin-bottom:.8rem"><span class="badge bg">✍️ Ejercicio 1 · 20 min</span><h2>Primera <span class="gt">SPA con rutas</span></h2></div>
+    <div class="ag">
+      <div>
+        <div class="tc">
+          <div class="tlab">⏱ Tiempo disponible</div>
+          <div class="tdis" id="t1">20:00</div>
+          <div class="tstat" id="t1-s">Listo para iniciar</div>
+          <div class="tctrl">
+            <button class="tbtn st" onclick="startTimer('t1',20)">▶ Iniciar</button>
+            <button class="tbtn pa" onclick="pauseTimer('t1')">⏸</button>
+            <button class="tbtn re" onclick="resetTimer('t1',20)">↺</button>
+          </div>
+        </div>
+      </div>
+      <div class="ic">
+        <h3>📋 Consigna</h3>
+        <div class="ctx">Crear una SPA básica con Vue CLI y Vue Router que tenga 3 vistas navegables con una ruta dinámica para el detalle.</div>
+        <ol>
+          <li>Instalar Vue Router y configurar <code>router/index.js</code> con <code>new VueRouter({ mode: 'history' })</code></li>
+          <li>Registrar el router en <code>main.js</code> e inyectarlo en la instancia Vue</li>
+          <li>Crear vistas: <code>Home.vue</code>, <code>Peliculas.vue</code> y <code>DetallePelicula.vue</code></li>
+          <li>Rutas estáticas para <code>/</code> y <code>/peliculas</code>; dinámica <code>/pelicula/:id</code></li>
+          <li>En <code>App.vue</code> agregar <code>&lt;nav&gt;</code> con <code>&lt;router-link&gt;</code> y <code>&lt;router-view&gt;</code></li>
+          <li>En <code>Peliculas.vue</code> listar 4 películas con <code>v-for</code>, cada una como <code>router-link</code> a su detalle</li>
+          <li>En <code>DetallePelicula.vue</code> mostrar el <code>$route.params.id</code> recibido</li>
+        </ol>
+        <div class="chips" style="margin-top:.7rem">
+          <span class="chip">router/index.js</span><span class="chip">Vue.use(VueRouter)</span>
+          <span class="chip">router-link</span><span class="chip">router-view</span><span class="chip g">$route.params</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 12. DESCANSO ══ -->
+<div class="slide sb" data-t="Descanso" data-d="brk">
+  <div class="cnt" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.6rem">
+    <span class="badge bo">☕ Descanso</span>
+    <h1 style="font-size:3.6rem">¡A <span style="background:linear-gradient(135deg,var(--w),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">descansar!</span></h1>
+    <div class="tc" style="width:295px">
+      <div class="tlab">Regresamos en</div>
+      <div class="tdis warn" id="t-b">20:00</div>
+      <div class="tstat" id="t-b-s">Pausa activa</div>
+      <div class="tctrl" style="justify-content:center">
+        <button class="tbtn st" onclick="startTimer('t-b',20)">▶ Iniciar</button>
+        <button class="tbtn pa" onclick="pauseTimer('t-b')">⏸</button>
+        <button class="tbtn re" onclick="resetTimer('t-b',20)">↺</button>
+      </div>
+    </div>
+    <p class="muted">Segunda parte: Rutas anidadas · Props · Redirecciones · Alias · 404</p>
+  </div>
+</div>
+
+<!-- ══ 13. RUTAS ANIDADAS ══ -->
+<div class="slide sth" data-t="Rutas anidadas (children)" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Jerarquía</span><h2>Rutas <span class="gt">anidadas</span> — <code>children</code></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Una vista padre contiene sub-rutas en su interior. Se definen con <code>children</code>.</p>
+        <div class="cb sm"><span class="kw">const</span> routes = [
+  {
+    path: <span class="str">'/usuario/:id'</span>,
+    component: Usuario,
+    children: [
+      <span class="cm">// → /usuario/:id/perfil</span>
+      { path: <span class="str">'perfil'</span>, component: UsuarioPerfil },
+      <span class="cm">// → /usuario/:id/posts</span>
+      { path: <span class="str">'posts'</span>,  component: UsuarioPosts }
+    ]
+  }
+]</div>
+        <div class="hlbox" style="margin-top:.8rem">
+          <p class="sm">Los paths de <code>children</code> son <strong>relativos</strong> — no empiezan con <code>/</code>. Vue Router arma la URL completa automáticamente.</p>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem"><strong>Usuario.vue</strong> necesita su propio <code>&lt;router-view&gt;</code>:</p>
+        <div class="cb sm"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>Usuario {{ $route.params.id }}<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;router-link</span> <span class="att">:to</span>=<span class="str">"`/usuario/${$route.params.id}/perfil`"</span><span class="tag">&gt;</span>Perfil<span class="tag">&lt;/router-link&gt;</span>
+      <span class="tag">&lt;router-link</span> <span class="att">:to</span>=<span class="str">"`/usuario/${$route.params.id}/posts`"</span><span class="tag">&gt;</span>Posts<span class="tag">&lt;/router-link&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+    <span class="cm">&lt;!-- Aquí se inyectan las subrutas --&gt;</span>
+    <span class="tag">&lt;router-view&gt;&lt;/router-view&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></div>
+        <div class="hlbox" style="margin-top:.8rem">
+          <p class="sm">⚠️ Sin <code>&lt;router-view&gt;</code> en el padre, las subrutas <strong>no se renderizan</strong>. Es el error más común con rutas anidadas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 14. PROPS DESDE RUTAS ══ -->
+<div class="slide sth" data-t="Props desde rutas" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Desacoplamiento</span><h2><span class="gt">Props</span> desde rutas</h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.5rem">Por defecto: componente acoplado al router.</p>
+        <div class="cb sm"><span class="cm">// ❌ Acoplado al router</span>
+<span class="kw">export default</span> {
+  <span class="fn">mounted</span>() {
+    <span class="kw">const</span> id = <span class="kw">this</span>.$route.params.id
+    <span class="cm">// Depende de $route — difícil de testear</span>
+  }
+}</div>
+        <p style="font-size:1.05rem;margin:.7rem 0 .5rem">Con <code>props: true</code>: componente desacoplado.</p>
+        <div class="cb sm"><span class="cm">// router/index.js</span>
+{ path: <span class="str">'/producto/:id'</span>, component: Detalle, props: <span class="kw">true</span> }
+
+<span class="cm">// ✅ Desacoplado — limpio y testeable</span>
+<span class="kw">export default</span> {
+  props: [<span class="str">'id'</span>], <span class="cm">// :id llega como prop</span>
+  <span class="fn">mounted</span>() {
+    <span class="kw">this</span>.<span class="fn">cargar</span>(<span class="kw">this</span>.id) <span class="cm">// No usa $route</span>
+  }
+}</div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Tres modos de pasar props:</p>
+        <div class="g3" style="grid-template-columns:1fr;gap:.7rem;align-content:start">
+          <div class="card" style="padding:1rem;border-color:rgba(45,91,255,.3)">
+            <h3 style="font-size:1.05rem">Boolean mode</h3>
+            <div class="cb xs" style="margin:.4rem 0">props: <span class="kw">true</span></div>
+            <p class="sm">Pasa todos los <code>params</code> como props al componente.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(0,212,170,.3)">
+            <h3 style="font-size:1.05rem">Object mode</h3>
+            <div class="cb xs" style="margin:.4rem 0">props: { premium: <span class="kw">true</span> }</div>
+            <p class="sm">Props estáticas que no vienen de la URL.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(255,107,107,.3)">
+            <h3 style="font-size:1.05rem">Function mode</h3>
+            <div class="cb xs" style="margin:.4rem 0">props: route => ({ id: route.params.id })</div>
+            <p class="sm">Transforma o combina parámetros antes de pasarlos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 15. REDIRECCIONES ══ -->
+<div class="slide sth" data-t="Redirecciones" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Navegación</span><h2><span class="gt">Redirecciones</span></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Vue Router permite definir redirecciones automáticas. La URL <strong>cambia</strong> en el navegador.</p>
+        <div class="cb sm"><span class="kw">const</span> routes = [
+  <span class="cm">// Path simple → nueva ruta</span>
+  { path: <span class="str">'/inicio'</span>, redirect: <span class="str">'/'</span> },
+
+  <span class="cm">// Redirigir a una ruta con nombre</span>
+  { path: <span class="str">'/home'</span>, redirect: { name: <span class="str">'inicio'</span> } },
+
+  <span class="cm">// Redirección dinámica con función</span>
+  { path: <span class="str">'/buscar'</span>, redirect: to => {
+    <span class="kw">return</span> { path: <span class="str">'/productos'</span>, query: to.query }
+  }}
+]</div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Casos de uso para redirecciones:</p>
+        <div class="g3" style="grid-template-columns:1fr;gap:.7rem;align-content:start">
+          <div class="card" style="padding:1rem;border-color:rgba(255,165,0,.3)">
+            <h3 style="font-size:1.05rem">🗑️ URLs obsoletas</h3>
+            <p class="sm">Cuando el sitio se reorganiza, redirigir desde rutas antiguas a las nuevas sin romper links existentes.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(255,107,107,.3)">
+            <h3 style="font-size:1.05rem">🔒 Rutas protegidas</h3>
+            <p class="sm">Redirigir al login cuando un usuario intenta acceder a contenido que requiere autenticación.</p>
+          </div>
+          <div class="card" style="padding:1rem;border-color:rgba(45,91,255,.3)">
+            <h3 style="font-size:1.05rem">🏠 Ruta por defecto</h3>
+            <p class="sm">Redirigir a la página principal cuando el usuario accede a una ruta raíz sin especificar sección.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 16. ALIAS ══ -->
+<div class="slide sth" data-t="Alias y diferencias con redirect" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Rutas alternativas</span><h2>Alias — <span class="gt">misma vista, URL distinta</span></h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Los alias permiten acceder a la misma vista por diferentes rutas <strong>sin cambiar la URL</strong>.</p>
+        <div class="cb sm"><span class="kw">const</span> routes = [
+  {
+    path: <span class="str">'/productos'</span>,
+    component: ListaProductos,
+    <span class="cm">// /items también muestra ListaProductos</span>
+    <span class="cm">// pero la URL no cambia</span>
+    alias: <span class="str">'/items'</span>
+  },
+  <span class="cm">// Múltiples alias</span>
+  {
+    path: <span class="str">'/sobre-nosotros'</span>,
+    component: About,
+    alias: [<span class="str">'/about'</span>, <span class="str">'/acerca'</span>]
+  }
+]</div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.7rem">Diferencias clave:</p>
+        <div class="diff-grid" style="gap:1rem">
+          <div class="diff-card red" style="border-color:rgba(255,107,107,.35)">
+            <h3 style="color:var(--a);font-size:1.1rem">🔀 Redirect</h3>
+            <ul style="padding-left:1rem" class="sm">
+              <li>La URL <strong>cambia</strong> en el navegador</li>
+              <li>Reemplaza la entrada del historial</li>
+              <li>El usuario ve la nueva URL</li>
+              <li>Útil cuando una ruta fue movida</li>
+            </ul>
+          </div>
+          <div class="diff-card green" style="border-color:rgba(0,212,170,.35)">
+            <h3 style="color:var(--s);font-size:1.1rem">🏷️ Alias</h3>
+            <ul style="padding-left:1rem" class="sm">
+              <li>La URL <strong>no cambia</strong></li>
+              <li>No modifica el historial</li>
+              <li>El usuario ve la URL que escribió</li>
+              <li>Útil para rutas alternativas</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 17. RUTA 404 ══ -->
+<div class="slide sth" data-t="Ruta 404 — NotFound" data-d="">
+  <div class="cnt">
+    <div style="margin-bottom:.9rem"><span class="badge bb">Manejo de errores</span><h2>Ruta <span class="gt">404</span> — Página no encontrada</h2></div>
+    <div class="g2">
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">El comodín <code>*</code> captura cualquier ruta que no coincida con las definidas. <strong>Siempre al final del array.</strong></p>
+        <div class="cb sm"><span class="kw">const</span> routes = [
+  { path: <span class="str">'/'</span>,         component: Home },
+  { path: <span class="str">'/productos'</span>,  component: Productos },
+  { path: <span class="str">'/contacto'</span>,   component: Contacto },
+
+  <span class="cm">// ⚠️ SIEMPRE AL FINAL DEL ARRAY</span>
+  <span class="cm">// Captura todo lo que no coincidió</span>
+  { path: <span class="str">'*'</span>, component: NotFound }
+]</div>
+        <div class="hlbox" style="margin-top:.8rem">
+          <p class="sm">Si <code>*</code> está al principio, captura todo y ninguna ruta funciona. Siempre va al final.</p>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:1.05rem;margin-bottom:.6rem">Componente <strong>NotFound.vue</strong>:</p>
+        <div class="cb sm"><span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="att">class</span>=<span class="str">"not-found"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>404 — Página no encontrada<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span>
+      La ruta <strong>{{ $route.path }}</strong> no existe.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;router-link</span> <span class="att">to</span>=<span class="str">"/"</span><span class="tag">&gt;</span>
+      ← Volver al inicio
+    <span class="tag">&lt;/router-link&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> { name: <span class="str">'NotFound'</span> }
+<span class="tag">&lt;/script&gt;</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 18. EJERCICIO 2 ══ -->
+<div class="slide se" data-t="Ejercicio 2 — SPA enriquecida" data-d="act">
+  <div class="cnt">
+    <div style="margin-bottom:.8rem"><span class="badge bg">✍️ Ejercicio 2 · 20 min</span><h2>SPA con rutas <span class="gt">enriquecidas</span></h2></div>
+    <div class="ag">
+      <div>
+        <div class="tc">
+          <div class="tlab">⏱ Tiempo disponible</div>
+          <div class="tdis" id="t2">20:00</div>
+          <div class="tstat" id="t2-s">Listo para iniciar</div>
+          <div class="tctrl">
+            <button class="tbtn st" onclick="startTimer('t2',20)">▶ Iniciar</button>
+            <button class="tbtn pa" onclick="pauseTimer('t2')">⏸</button>
+            <button class="tbtn re" onclick="resetTimer('t2',20)">↺</button>
+          </div>
+        </div>
+      </div>
+      <div class="ic">
+        <h3>📋 Consigna</h3>
+        <div class="ctx">Extender la app del Ejercicio 1 agregando rutas anidadas, validación de params, alias, props desde ruta y página 404.</div>
+        <ol>
+          <li>Agregar rutas anidadas dentro de <code>/pelicula/:id</code>: sub-rutas <code>/descripcion</code> y <code>/reparto</code></li>
+          <li>En <code>DetallePelicula.vue</code> agregar <code>&lt;router-view&gt;</code> y nav a las subrutas</li>
+          <li>Validar que <code>$route.params.id</code> sea numérico; si no, mostrar mensaje de error</li>
+          <li>Pasar el <code>id</code> al componente como prop (<code>props: true</code> en el router)</li>
+          <li>Agregar alias <code>/films</code> apuntando a <code>/peliculas</code></li>
+          <li>Agregar redirección de <code>/inicio</code> a <code>/</code></li>
+          <li>Crear <code>NotFound.vue</code> con ruta <code>*</code> al final del array</li>
+        </ol>
+        <div class="chips" style="margin-top:.7rem">
+          <span class="chip">children</span><span class="chip g">props: true</span>
+          <span class="chip o">alias</span><span class="chip o">redirect</span><span class="chip r">* (404)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 19. RESUMEN ══ -->
+<div class="slide sc" data-t="Resumen" data-d="cov">
+  <div class="cnt" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.2rem">
+    <span class="badge bg">🏁 Resumen</span>
+    <h2>Lo que aprendimos <span class="gt">hoy</span></h2>
+    <div class="g2" style="text-align:left;width:100%">
+      <div class="card" style="border-color:rgba(45,91,255,.35)">
+        <h3 style="font-size:1.15rem;margin-bottom:.7rem">⚙️ Base</h3>
+        <div class="chips">
+          <span class="chip">npm install vue-router</span>
+          <span class="chip">Vue.use(VueRouter)</span>
+          <span class="chip">new VueRouter({ mode, routes })</span>
+          <span class="chip">router-link</span>
+          <span class="chip">router-view</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(0,212,170,.35)">
+        <h3 style="font-size:1.15rem;margin-bottom:.7rem">🌿 Rutas</h3>
+        <div class="chips">
+          <span class="chip g">estáticas</span>
+          <span class="chip g">dinámicas :id</span>
+          <span class="chip g">$route.params</span>
+          <span class="chip g">anidadas children</span>
+          <span class="chip g">props: true</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,165,0,.35)">
+        <h3 style="font-size:1.15rem;margin-bottom:.7rem">↩️ Control</h3>
+        <div class="chips">
+          <span class="chip o">redirect</span>
+          <span class="chip o">alias</span>
+          <span class="chip r">* (404)</span>
+          <span class="chip">validación de params</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,107,107,.35)">
+        <h3 style="font-size:1.15rem;margin-bottom:.7rem">🚀 Próxima clase</h3>
+        <div class="chips">
+          <span class="chip r">$router.push()</span>
+          <span class="chip r">$router.go()</span>
+          <span class="chip r">beforeEach (guardas)</span>
+          <span class="chip r">lazy loading</span>
+          <span class="chip r">scrollBehavior</span>
+        </div>
+      </div>
+    </div>
+    <div class="hlbox" style="width:100%">
+      <p><strong>Regla de oro:</strong> <code>router-link</code> para navegar · <code>router-view</code> para renderizar · <code>$route.params</code> para leer datos de la URL</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /vp -->
+
+<footer>
+  <button class="nbtn" id="bp" onclick="navigate(-1)" disabled>← Anterior</button>
+  <div class="dots" id="dots"></div>
+  <button class="nbtn" id="bn" onclick="navigate(1)">Siguiente →</button>
+</footer>
+</div><!-- /app -->
+
+<script>
+const slides=document.querySelectorAll('.slide'),total=slides.length;let cur=0;
+const dotsEl=document.getElementById('dots');
+slides.forEach((s,i)=>{
+  const d=document.createElement('div');
+  const dc=s.dataset.d||'';
+  d.className='dot'+(dc?' '+dc:'');
+  d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+function updateUI(){
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+  document.getElementById('hcnt').textContent=`${cur+1} / ${total}`;
+  document.getElementById('httl').textContent=slides[cur].dataset.t||'';
+  document.getElementById('pf').style.width=`${((cur+1)/total)*100}%`;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  document.getElementById('bp').disabled=cur===0;
+  document.getElementById('bn').disabled=cur===total-1;
+}
+function navigate(dir){const n=cur+dir;if(n>=0&&n<total){cur=n;updateUI()}}
+function goTo(i){cur=i;updateUI()}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();navigate(1)}
+  if(e.key==='ArrowLeft')navigate(-1)
+});
+updateUI();
+
+const timers={};const pad=n=>String(n).padStart(2,'0');
+function beep(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[0,.4,.8].forEach(t=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,ctx.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+t+.3);o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+.3)})}catch(e){}}
+function startTimer(id,min){
+  if(timers[id]?.interval)return;
+  if(!timers[id])timers[id]={remaining:min*60,interval:null};
+  const disp=document.getElementById(id),stat=document.getElementById(id+'-s');
+  if(!disp)return;
+  timers[id].interval=setInterval(()=>{
+    timers[id].remaining--;
+    const r=timers[id].remaining,m=Math.floor(r/60),s=r%60;
+    disp.textContent=`${pad(m)}:${pad(s)}`;
+    disp.className='tdis';
+    if(id==='t-b')disp.classList.add('warn');
+    if(r<=60){disp.classList.add('danger');if(stat)stat.textContent='⚠️ ¡Menos de 1 minuto!'}
+    else if(r<=300){disp.classList.add('warn');if(stat)stat.textContent='⏰ Menos de 5 minutos'}
+    else if(stat)stat.textContent='En progreso...';
+    if(r<=0){clearInterval(timers[id].interval);timers[id].interval=null;disp.textContent='00:00';if(stat)stat.textContent='✅ ¡Tiempo!';beep()}
+  },1000);
+  if(stat)stat.textContent='En progreso...';
+}
+function pauseTimer(id){
+  if(timers[id]?.interval){clearInterval(timers[id].interval);timers[id].interval=null;
+  const s=document.getElementById(id+'-s');if(s)s.textContent='⏸ Pausado'}
+}
+function resetTimer(id,min){
+  pauseTimer(id);timers[id]={remaining:min*60,interval:null};
+  const d=document.getElementById(id),s=document.getElementById(id+'-s');
+  if(d){d.textContent=`${pad(min)}:00`;d.className='tdis';if(id==='t-b')d.classList.add('warn')}
+  if(s)s.textContent='Listo para iniciar';
+}
+</script>
+</body>
+</html>

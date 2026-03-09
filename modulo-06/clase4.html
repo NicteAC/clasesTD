@@ -3,1401 +3,502 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manejo de Eventos en Vue.js — Clase Completa</title>
+<title>Manejo de Eventos en Vue 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   :root {
-    --primary: #2D5BFF;
-    --secondary: #00D4AA;
-    --accent: #FF6B6B;
-    --dark: #1A1A2E;
-    --light: #F8F9FA;
-    --warning: #FFA500;
-    --card-bg: rgba(255,255,255,0.05);
-    --border: rgba(255,255,255,0.1);
+    --primary:#2D5BFF; --secondary:#00D4AA; --accent:#FF6B6B;
+    --dark:#1A1A2E;    --light:#F8F9FA;     --warning:#FFA500;
+    --card-bg:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
   }
+  html,body { width:100%; height:100%; overflow:hidden; font-family:'Sora',sans-serif; background:var(--dark); color:var(--light); }
+  #app { display:flex; flex-direction:column; width:100vw; height:100vh; }
 
-  html, body {
-    width: 100%; height: 100%; overflow: hidden;
-    font-family: 'Sora', sans-serif;
-    background: var(--dark);
-    color: var(--light);
-  }
+  header { display:flex; align-items:center; justify-content:space-between; padding:0.55rem 2rem; background:rgba(26,26,46,0.98); border-bottom:1px solid var(--border); flex-shrink:0; }
+  .header-brand { font-size:0.78rem; font-weight:600; color:var(--secondary); letter-spacing:0.08em; text-transform:uppercase; }
+  .header-counter { font-family:'Space Mono',monospace; font-size:0.9rem; }
+  .header-title { font-size:0.76rem; color:rgba(255,255,255,0.45); text-align:right; }
 
-  /* ── LAYOUT ── */
-  #app {
-    display: flex; flex-direction: column;
-    width: 100vw; height: 100vh;
-  }
+  .progress-bar { height:3px; background:rgba(255,255,255,0.07); flex-shrink:0; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary)); transition:width 0.4s ease; }
 
-  /* HEADER */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.6rem 2rem;
-    background: rgba(26,26,46,0.95);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    z-index: 100;
-  }
-  .header-brand {
-    font-size: 0.8rem; font-weight: 600; color: var(--secondary);
-    letter-spacing: 0.08em; text-transform: uppercase;
-  }
-  .header-counter {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.95rem; color: var(--light);
-    opacity: 0.8;
-  }
-  .header-title {
-    font-size: 0.78rem; color: rgba(255,255,255,0.5);
-    text-align: right; max-width: 280px;
-  }
+  #slides-viewport { flex:1; overflow:hidden; position:relative; }
+  .slide { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1rem 2rem; animation:slideIn 0.45s ease-out; }
+  .slide.active { display:flex; }
+  @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
+  .container { width:100%; max-width:1200px; display:flex; flex-direction:column; gap:0.9rem; }
 
-  /* PROGRESS BAR */
-  .progress-bar {
-    height: 3px; background: rgba(255,255,255,0.08);
-    flex-shrink: 0;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    transition: width 0.4s ease;
-  }
+  footer { display:flex; align-items:center; justify-content:space-between; padding:0.55rem 2rem; background:rgba(26,26,46,0.98); border-top:1px solid var(--border); flex-shrink:0; }
+  .nav-btn { font-family:'Sora',sans-serif; font-size:0.85rem; font-weight:600; padding:0.45rem 1.3rem; border:1.5px solid var(--primary); background:transparent; color:var(--primary); border-radius:8px; cursor:pointer; transition:all 0.2s; }
+  .nav-btn:hover { background:var(--primary); color:#fff; }
+  .nav-btn:disabled { opacity:0.2; cursor:not-allowed; }
+  .slide-dots { display:flex; gap:7px; align-items:center; }
+  .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.18); transition:all 0.3s; cursor:pointer; }
+  .dot.active { background:var(--primary); transform:scale(1.5); }
+  .dot.d-act { background:var(--secondary); }
+  .dot.d-brk { background:var(--warning); }
+  .dot.d-cov { background:rgba(255,255,255,0.35); }
 
-  /* SLIDE VIEWPORT */
-  #slides-viewport {
-    flex: 1; overflow: hidden; position: relative;
-  }
+  h1 { font-size:3.5rem; font-weight:800; line-height:1.1; }
+  h2 { font-size:2.1rem; font-weight:700; line-height:1.2; }
+  h3 { font-size:1.35rem; font-weight:600; line-height:1.3; }
+  p,li { font-size:1.12rem; line-height:1.8; }
+  .gradient-text { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .muted { opacity:0.5; }
 
-  .slide {
-    position: absolute; inset: 0;
-    display: none; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 1.2rem 2rem;
-    animation: slideIn 0.5s ease-out;
-  }
-  .slide.active { display: flex; }
+  .badge { display:inline-block; padding:0.28rem 0.9rem; border-radius:50px; font-size:0.74rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.6rem; }
+  .b-blue   { background:rgba(45,91,255,0.2);  color:var(--primary);   border:1px solid var(--primary); }
+  .b-green  { background:rgba(0,212,170,0.2);  color:var(--secondary); border:1px solid var(--secondary); }
+  .b-red    { background:rgba(255,107,107,0.2);color:var(--accent);    border:1px solid var(--accent); }
+  .b-orange { background:rgba(255,165,0,0.2);  color:var(--warning);   border:1px solid var(--warning); }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(40px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.3rem; transition:all 0.25s; }
+  .card:hover { border-color:var(--primary); transform:translateY(-3px); box-shadow:0 5px 18px rgba(45,91,255,0.15); }
 
-  .container {
-    width: 100%; max-width: 1200px;
-    display: flex; flex-direction: column;
-    gap: 1rem;
-  }
+  .act-grid { display:grid; grid-template-columns:280px 1fr; gap:3rem; align-items:start; }
 
-  /* FOOTER NAV */
-  footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.6rem 2rem;
-    background: rgba(26,26,46,0.95);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .nav-btn {
-    font-family: 'Sora', sans-serif;
-    font-size: 0.85rem; font-weight: 600;
-    padding: 0.5rem 1.4rem;
-    border: 1.5px solid var(--primary);
-    background: transparent; color: var(--primary);
-    border-radius: 8px; cursor: pointer;
-    transition: all 0.25s ease;
-  }
-  .nav-btn:hover { background: var(--primary); color: #fff; }
-  .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-  .slide-dots {
-    display: flex; gap: 6px; align-items: center;
-  }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: all 0.3s ease; cursor: pointer;
-  }
-  .dot.active { background: var(--primary); transform: scale(1.4); }
-  .dot.activity { background: var(--secondary); }
-  .dot.break { background: var(--warning); }
+  .timer-card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:1.5rem; text-align:center; }
+  .t-label { font-size:0.78rem; opacity:0.5; margin-bottom:0.2rem; }
+  .t-display { font-family:'Space Mono',monospace; font-size:4.5rem; font-weight:700; color:var(--secondary); text-shadow:0 0 18px rgba(0,212,170,0.4); line-height:1; margin:0.5rem 0; transition:color 0.5s,text-shadow 0.5s; }
+  .t-display.warn   { color:var(--warning); text-shadow:0 0 18px rgba(255,165,0,0.4); }
+  .t-display.danger { color:var(--accent);  text-shadow:0 0 18px rgba(255,107,107,0.4); animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .t-status { font-size:0.78rem; color:rgba(255,255,255,0.4); min-height:1em; margin-bottom:0.9rem; }
+  .t-controls { display:flex; gap:0.65rem; justify-content:center; flex-wrap:wrap; }
+  .tbtn { font-family:'Sora',sans-serif; font-size:0.77rem; font-weight:700; padding:0.38rem 0.95rem; border-radius:7px; cursor:pointer; border:none; transition:all 0.2s; }
+  .tbtn.start { background:var(--secondary); color:#000; }
+  .tbtn.pause { background:var(--warning);   color:#000; }
+  .tbtn.reset { background:rgba(255,255,255,0.1); color:var(--light); }
+  .tbtn:hover { opacity:0.8; transform:scale(1.05); }
 
-  /* ── TYPOGRAPHY ── */
-  h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; }
-  h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; }
-  h3 { font-size: 1.8rem; font-weight: 600; line-height: 1.3; }
-  p, li { font-size: 1.3rem; line-height: 1.8; }
+  .instr { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:1.3rem 1.5rem; }
+  .instr h3 { font-size:1.2rem; color:var(--secondary); margin-bottom:0.8rem; }
+  .instr ol { padding-left:1.25rem; }
+  .instr li { font-size:1.03rem; line-height:1.72; margin-bottom:0.32rem; }
+  .context-box { font-size:0.97rem; opacity:0.7; margin-bottom:0.9rem; padding:0.75rem 1rem; background:rgba(255,255,255,0.04); border-radius:8px; border-left:3px solid var(--secondary); line-height:1.6; }
 
-  .gradient-text {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .accent-text { color: var(--accent); }
-  .secondary-text { color: var(--secondary); }
-  .muted { opacity: 0.6; }
+  .chips { display:flex; flex-wrap:wrap; gap:0.42rem; margin-top:0.6rem; }
+  .chip { font-family:'Space Mono',monospace; font-size:0.75rem; padding:0.2rem 0.62rem; border-radius:6px; background:rgba(45,91,255,0.15); color:var(--primary); border:1px solid rgba(45,91,255,0.3); }
+  .chip.g { background:rgba(0,212,170,0.15); color:var(--secondary); border-color:rgba(0,212,170,0.3); }
+  .chip.r { background:rgba(255,107,107,0.15);color:var(--accent);   border-color:rgba(255,107,107,0.3); }
+  .chip.o { background:rgba(255,165,0,0.15);  color:var(--warning);  border-color:rgba(255,165,0,0.3); }
 
-  /* ── CARDS ── */
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.5rem;
-    transition: all 0.3s ease;
-  }
-  .card:hover {
-    border-color: var(--primary);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(45,91,255,0.2);
-  }
-  .card h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-  .card p, .card li { font-size: 1.05rem; }
+  .timeline { display:flex; flex-direction:column; gap:0.38rem; }
+  .tl { display:flex; align-items:center; gap:1rem; padding:0.58rem 1rem; background:var(--card-bg); border-radius:9px; border-left:3px solid var(--primary); }
+  .tl.act  { border-left-color:var(--secondary); }
+  .tl.brk  { border-left-color:var(--warning); }
+  .tl.demo { border-left-color:var(--accent); }
+  .tl-t { font-family:'Space Mono',monospace; font-size:0.8rem; color:rgba(255,255,255,0.4); min-width:65px; }
+  .tl-l { font-size:0.97rem; font-weight:600; }
+  .tl-d { margin-left:auto; font-family:'Space Mono',monospace; font-size:0.76rem; opacity:0.4; }
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+  .s-cover { background:linear-gradient(135deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%); }
+  .s-demo  { background:linear-gradient(135deg,rgba(255,107,107,0.09) 0%,rgba(45,91,255,0.07) 100%); }
+  .s-act   { background:linear-gradient(135deg,rgba(0,212,170,0.08) 0%,rgba(45,91,255,0.06) 100%); }
+  .s-brk   { background:linear-gradient(135deg,rgba(255,165,0,0.1) 0%,rgba(255,107,107,0.07) 100%); }
 
-  /* ── CODE BLOCKS ── */
-  .code-block {
-    background: #0d1117;
-    border: 1px solid rgba(45,91,255,0.3);
-    border-radius: 10px; padding: 1.2rem 1.4rem;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.88rem; line-height: 1.7;
-    color: #e6edf3; overflow: hidden;
-  }
-  .kw { color: #ff7b72; }   /* keyword */
-  .str { color: #a5d6ff; }  /* string */
-  .fn { color: #d2a8ff; }   /* function */
-  .cm { color: #8b949e; }   /* comment */
-  .tag { color: #7ee787; }  /* tag */
-  .attr { color: #79c0ff; } /* attribute */
-  .val { color: #ffa657; }  /* value */
+  .hl { background:linear-gradient(135deg,rgba(45,91,255,0.1),rgba(0,212,170,0.06)); border:1px solid rgba(45,91,255,0.25); border-radius:10px; padding:0.85rem 1.2rem; }
 
-  /* ── COVERS / SECTION SLIDES ── */
-  .slide-cover {
-    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
-  }
-  .slide-section {
-    background: linear-gradient(135deg, rgba(45,91,255,0.15) 0%, rgba(0,212,170,0.1) 100%);
-  }
-  .slide-break {
-    background: linear-gradient(135deg, rgba(255,165,0,0.12) 0%, rgba(255,107,107,0.08) 100%);
-  }
-  .slide-activity {
-    background: linear-gradient(135deg, rgba(0,212,170,0.1) 0%, rgba(45,91,255,0.08) 100%);
-  }
-  .slide-demo {
-    background: linear-gradient(135deg, rgba(255,107,107,0.1) 0%, rgba(45,91,255,0.08) 100%);
-  }
-
-  /* Badges */
-  .badge {
-    display: inline-block; padding: 0.3rem 1rem;
-    border-radius: 50px; font-size: 0.8rem; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    margin-bottom: 0.8rem;
-  }
-  .badge-blue { background: rgba(45,91,255,0.2); color: var(--primary); border: 1px solid var(--primary); }
-  .badge-green { background: rgba(0,212,170,0.2); color: var(--secondary); border: 1px solid var(--secondary); }
-  .badge-red { background: rgba(255,107,107,0.2); color: var(--accent); border: 1px solid var(--accent); }
-  .badge-orange { background: rgba(255,165,0,0.2); color: var(--warning); border: 1px solid var(--warning); }
-
-  /* ── TIMER ── */
-  .activity-grid {
-    display: grid; grid-template-columns: 1fr 2fr; gap: 3rem;
-    align-items: start;
-  }
-  .timer-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 2rem;
-    text-align: center;
-  }
-  .timer-display {
-    font-family: 'Space Mono', monospace;
-    font-size: 5rem; font-weight: 700;
-    color: var(--secondary);
-    text-shadow: 0 0 20px rgba(0,212,170,0.5);
-    line-height: 1; margin: 1rem 0;
-    transition: color 0.5s ease, text-shadow 0.5s ease;
-  }
-  .timer-display.warn {
-    color: var(--warning);
-    text-shadow: 0 0 20px rgba(255,165,0,0.5);
-  }
-  .timer-display.danger {
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(255,107,107,0.5);
-    animation: pulse 1s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; } 50% { opacity: 0.5; }
-  }
-  .timer-status {
-    font-size: 0.85rem; color: rgba(255,255,255,0.5);
-    margin-bottom: 1.2rem; min-height: 1.2em;
-    transition: color 0.3s ease;
-  }
-  .timer-controls {
-    display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;
-  }
-  .timer-btn {
-    font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700;
-    padding: 0.45rem 1.1rem; border-radius: 8px; cursor: pointer; border: none;
-    transition: all 0.25s ease;
-  }
-  .timer-btn.start { background: var(--secondary); color: #000; }
-  .timer-btn.pause { background: var(--warning); color: #000; }
-  .timer-btn.reset { background: rgba(255,255,255,0.1); color: var(--light); }
-  .timer-btn:hover { opacity: 0.85; transform: scale(1.04); }
-
-  .instructions-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 1.5rem;
-  }
-  .instructions-card h3 { color: var(--secondary); margin-bottom: 1rem; font-size: 1.4rem; }
-  .instructions-card ol { padding-left: 1.4rem; }
-  .instructions-card li { font-size: 1.05rem; line-height: 1.7; margin-bottom: 0.4rem; }
-
-  /* Columns for long lists */
-  .col-2 { column-count: 2; column-gap: 3rem; }
-  .col-2 li { break-inside: avoid; }
-
-  /* Agenda timeline */
-  .timeline {
-    display: flex; flex-direction: column; gap: 0.5rem;
-  }
-  .timeline-item {
-    display: flex; align-items: center; gap: 1rem;
-    padding: 0.7rem 1rem;
-    background: var(--card-bg);
-    border-radius: 10px; border-left: 3px solid var(--primary);
-  }
-  .timeline-item.break-item { border-left-color: var(--warning); }
-  .timeline-item.activity-item { border-left-color: var(--secondary); }
-  .timeline-item.demo-item { border-left-color: var(--accent); }
-  .timeline-time {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85rem; color: rgba(255,255,255,0.5);
-    min-width: 80px;
-  }
-  .timeline-label { font-size: 1rem; font-weight: 600; }
-  .timeline-dur {
-    margin-left: auto; font-size: 0.8rem; opacity: 0.5;
-    font-family: 'Space Mono', monospace;
-  }
-
-  /* Highlight box */
-  .highlight-box {
-    background: linear-gradient(135deg, rgba(45,91,255,0.12), rgba(0,212,170,0.08));
-    border: 1px solid rgba(45,91,255,0.3);
-    border-radius: 12px; padding: 1.2rem 1.5rem;
-  }
-
-  /* Divider */
-  .divider {
-    height: 1px; background: var(--border); margin: 0.5rem 0;
-  }
-
-  /* Tag chips */
-  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
-  .chip {
-    font-family: 'Space Mono', monospace; font-size: 0.8rem;
-    padding: 0.25rem 0.7rem; border-radius: 6px;
-    background: rgba(45,91,255,0.15); color: var(--primary);
-    border: 1px solid rgba(45,91,255,0.3);
-  }
-  .chip.green { background: rgba(0,212,170,0.15); color: var(--secondary); border-color: rgba(0,212,170,0.3); }
-  .chip.red { background: rgba(255,107,107,0.15); color: var(--accent); border-color: rgba(255,107,107,0.3); }
-
-  /* Step indicator */
-  .steps { display: flex; gap: 0; }
-  .step {
-    flex: 1; text-align: center; padding: 0.8rem 0.5rem;
-    background: var(--card-bg); border: 1px solid var(--border);
-    position: relative;
-  }
-  .step:first-child { border-radius: 10px 0 0 10px; }
-  .step:last-child { border-radius: 0 10px 10px 0; }
-  .step-num {
-    display: block; font-size: 1.5rem; font-weight: 800;
-    color: var(--primary); font-family: 'Space Mono', monospace;
-  }
-  .step-label { font-size: 0.85rem; opacity: 0.7; }
-
-  /* Responsive — maintain 1080 feel */
-  @media (max-height: 850px) {
-    h1 { font-size: 2.8rem; }
-    h2 { font-size: 2rem; }
-    h3 { font-size: 1.4rem; }
-    p, li { font-size: 1.1rem; }
-    .timer-display { font-size: 4rem; }
+  @media (max-height:860px){
+    h1{font-size:2.7rem} h2{font-size:1.8rem} h3{font-size:1.2rem}
+    p,li{font-size:1rem} .t-display{font-size:3.6rem}
   }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- HEADER -->
   <header>
-    <span class="header-brand">Vue.js — Manejo de Eventos</span>
-    <span class="header-counter" id="slide-counter">1 / 22</span>
+    <span class="header-brand">Vue 2 CLI — Manejo de Eventos</span>
+    <span class="header-counter" id="slide-counter">1 / 8</span>
     <span class="header-title" id="slide-title-header">Portada</span>
   </header>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:12.5%"></div></div>
 
-  <!-- PROGRESS -->
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill" style="width:4.5%"></div>
-  </div>
-
-  <!-- SLIDES -->
   <div id="slides-viewport">
 
-    <!-- ═══ SLIDE 1: PORTADA ═══ -->
-    <div class="slide slide-cover active" data-title="Portada">
-      <div class="container" style="align-items:center;text-align:center;gap:1.4rem">
-        <span class="badge badge-blue">Módulo 6 · Lección 4</span>
-        <h1>Manejo de <span class="gradient-text">Eventos</span><br>en Vue.js</h1>
-        <p class="muted" style="font-size:1.2rem;max-width:600px">Parte I + Parte II · Clase completa de 3 horas<br>Desarrollo de Aplicaciones Front-end Trainee</p>
+    <!-- ══ 1 · PORTADA ══ -->
+    <div class="slide s-cover active" data-title="Portada" data-dot="d-cov">
+      <div class="container" style="align-items:center;text-align:center;gap:1.5rem">
+        <span class="badge b-blue">Vue 2 CLI · Módulo 6 · Lección 4</span>
+        <h1>Manejo de <span class="gradient-text">Eventos</span><br>en Vue 2</h1>
+        <p class="muted" style="max-width:580px;font-size:1.1rem">
+          Clase de 3 horas · 2 demos en vivo · 2 ejercicios prácticos
+        </p>
         <div class="chips" style="justify-content:center">
-          <span class="chip">v-on / @</span>
-          <span class="chip">$event</span>
+          <span class="chip">@click · @input · @keydown</span>
           <span class="chip">modificadores</span>
-          <span class="chip">$emit</span>
-          <span class="chip green">Composition API</span>
-          <span class="chip green">debounce</span>
-          <span class="chip red">Demo en vivo ×2</span>
+          <span class="chip">$event</span>
+          <span class="chip">data()</span>
+          <span class="chip">methods</span>
+          <span class="chip">computed</span>
+          <span class="chip g">this.$emit</span>
+          <span class="chip o">Vuex</span>
+          <span class="chip r">2 demos en vivo</span>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 2: AGENDA ═══ -->
-    <div class="slide" data-title="Agenda del día">
+    <!-- ══ 2 · AGENDA ══ -->
+    <div class="slide s-cover" data-title="Agenda del día" data-dot="d-cov">
       <div class="container">
-        <div style="margin-bottom:0.5rem">
-          <span class="badge badge-blue">Agenda</span>
+        <div><span class="badge b-blue">Agenda</span>
           <h2>Plan de las <span class="gradient-text">3 horas</span></h2>
         </div>
         <div class="timeline">
-          <div class="timeline-item"><span class="timeline-time">00:00</span><span class="timeline-label">🎯 Introducción + repaso</span><span class="timeline-dur">10 min</span></div>
-          <div class="timeline-item"><span class="timeline-time">00:10</span><span class="timeline-label">📚 Teoría Parte I — eventos DOM y directivas</span><span class="timeline-dur">25 min</span></div>
-          <div class="timeline-item demo-item"><span class="timeline-time">00:35</span><span class="timeline-label">💻 Demo en vivo 1 — Lista de tareas reactiva</span><span class="timeline-dur">25 min</span></div>
-          <div class="timeline-item activity-item"><span class="timeline-time">01:00</span><span class="timeline-label">✍️ Ejercicio 1 — Tareas con validación</span><span class="timeline-dur">45 min</span></div>
-          <div class="timeline-item break-item"><span class="timeline-time">01:45</span><span class="timeline-label">☕ DESCANSO</span><span class="timeline-dur">20 min</span></div>
-          <div class="timeline-item"><span class="timeline-time">02:05</span><span class="timeline-label">📚 Teoría Parte II — Composition API, patrones</span><span class="timeline-dur">20 min</span></div>
-          <div class="timeline-item demo-item"><span class="timeline-time">02:25</span><span class="timeline-label">💻 Demo en vivo 2 — Formulario de contacto</span><span class="timeline-dur">25 min</span></div>
-          <div class="timeline-item activity-item"><span class="timeline-time">02:50</span><span class="timeline-label">✍️ Ejercicio 2 — Contacto validado con payload</span><span class="timeline-dur">45 min</span></div>
-          <div class="timeline-item"><span class="timeline-time">03:35</span><span class="timeline-label">🏁 Cierre y resumen</span><span class="timeline-dur">10 min</span></div>
+          <div class="tl"     ><span class="tl-t">00:00</span><span class="tl-l">🎯 Repaso y contexto</span><span class="tl-d">10 min</span></div>
+          <div class="tl demo"><span class="tl-t">00:10</span><span class="tl-l">💻 Demo 1 — Lista de tareas reactiva</span><span class="tl-d">25 min</span></div>
+          <div class="tl act" ><span class="tl-t">00:35</span><span class="tl-l">✍️ Ejercicio 1 — Carrito de compras interactivo</span><span class="tl-d">45 min</span></div>
+          <div class="tl brk" ><span class="tl-t">01:20</span><span class="tl-l">☕ Descanso</span><span class="tl-d">20 min</span></div>
+          <div class="tl demo"><span class="tl-t">01:40</span><span class="tl-l">💻 Demo 2 — Formulario con <code>$emit</code> + Vuex</span><span class="tl-d">25 min</span></div>
+          <div class="tl act" ><span class="tl-t">02:05</span><span class="tl-l">✍️ Ejercicio 2 — Sistema de reseñas con estrellas</span><span class="tl-d">45 min</span></div>
+          <div class="tl"     ><span class="tl-t">02:50</span><span class="tl-l">🏁 Cierre y resumen</span><span class="tl-d">10 min</span></div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 3: ¿QUÉ ES UN EVENTO DOM? ═══ -->
-    <div class="slide" data-title="¿Qué es un Evento DOM?">
+    <!-- ══ 3 · DEMO 1 ══ -->
+    <div class="slide s-demo" data-title="Demo 1 — Lista de tareas reactiva" data-dot="">
       <div class="container">
-        <span class="badge badge-blue">Parte I — Fundamentos</span>
-        <h2>¿Qué es un <span class="gradient-text">Evento DOM</span>?</h2>
-        <div class="grid-2" style="gap:2rem">
-          <div>
-            <div class="card" style="margin-bottom:1rem">
-              <h3>📌 Definición</h3>
-              <p>Notificaciones que el navegador genera cuando el usuario <strong>interactúa</strong> con la página — clicks, teclas, movimientos del mouse, envíos de formularios.</p>
-            </div>
-            <div class="card">
-              <h3>⚙️ Funcionamiento</h3>
-              <p>El <strong>DOM</strong> expone estos eventos a JavaScript. Cada evento tiene un <em>tipo</em> (<code style="color:var(--secondary)">click</code>, <code style="color:var(--secondary)">input</code>, <code style="color:var(--secondary)">submit</code>) y puede asociarse a un elemento.</p>
-            </div>
-          </div>
-          <div>
-            <div class="card" style="background: linear-gradient(135deg,rgba(45,91,255,0.12),rgba(0,212,170,0.06))">
-              <h3 style="margin-bottom:1rem">🖱️ Ratón</h3>
-              <div class="chips"><span class="chip">click</span><span class="chip">dblclick</span><span class="chip">mouseover</span><span class="chip">mouseleave</span></div>
-              <h3 style="margin:1rem 0 0.5rem">⌨️ Teclado</h3>
-              <div class="chips"><span class="chip">keydown</span><span class="chip">keyup</span><span class="chip">keypress</span></div>
-              <h3 style="margin:1rem 0 0.5rem">📋 Formulario</h3>
-              <div class="chips"><span class="chip">input</span><span class="chip">change</span><span class="chip">submit</span></div>
-            </div>
-          </div>
+        <div><span class="badge b-red">💻 Demo en Vivo 1 · 25 min</span>
+          <h2>Lista de tareas <span class="gradient-text">reactiva</span></h2>
         </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 4: DIRECTIVA v-on / @ ═══ -->
-    <div class="slide" data-title="Directiva v-on / @">
-      <div class="container">
-        <span class="badge badge-blue">Captura de Eventos</span>
-        <h2>La directiva <span class="gradient-text">v-on</span> y su alias <span class="accent-text">@</span></h2>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:1rem">Vue <strong>simplifica</strong> el manejo de eventos con una sintaxis declarativa:</p>
-            <div class="code-block">
-<span class="cm"><!-- Forma larga --></span>
-<span class="tag">&lt;button</span> <span class="attr">v-on:click</span>=<span class="str">"incrementar"</span><span class="tag">&gt;</span>+<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- Forma corta (recomendada) --></span>
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"incrementar"</span><span class="tag">&gt;</span>+<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- Con parámetros --></span>
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"saludar('hola')"</span><span class="tag">&gt;</span>Saludar<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- Acceder al evento nativo --></span>
-<span class="tag">&lt;input</span> <span class="attr">@input</span>=<span class="str">"log($event)"</span> <span class="tag">/&gt;</span>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="card" style="border-color:rgba(0,212,170,0.3)">
-              <h3>✅ Código más limpio</h3>
-              <p>No manipulamos el DOM directamente con <code>addEventListener</code></p>
-            </div>
-            <div class="card" style="border-color:rgba(45,91,255,0.3)">
-              <h3>✅ Reactivo</h3>
-              <p>Vue se encarga de <strong>suscribir y eliminar</strong> listeners automáticamente al montar/desmontar</p>
-            </div>
-            <div class="card" style="border-color:rgba(255,107,107,0.3)">
-              <h3>✅ Separación clara</h3>
-              <p>La lógica vive en <code style="color:var(--secondary)">methods</code>, no en el HTML</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 5: MÉTODOS MANEJADORES ═══ -->
-    <div class="slide" data-title="Métodos Manejadores">
-      <div class="container">
-        <span class="badge badge-blue">Manejadores</span>
-        <h2>Métodos <span class="gradient-text">manejadores</span> de eventos</h2>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.8rem">Funciones definidas en <code style="color:var(--secondary)">methods</code> que se ejecutan al dispararse un evento.</p>
-            <div class="code-block" style="font-size:0.82rem">
-<span class="cm">// Template</span>
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"incrementar"</span><span class="tag">&gt;</span>Sumar<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"sumar(5)"</span><span class="tag">&gt;</span>+5<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm">// Script</span>
-<span class="kw">export default</span> {
-  <span class="fn">data</span>() { <span class="kw">return</span> { contador: <span class="val">0</span> } },
-  <span class="fn">methods</span>: {
-    <span class="fn">incrementar</span>() { <span class="kw">this</span>.contador++ },
-    <span class="fn">sumar</span>(n) { <span class="kw">this</span>.contador += n }
-  }
-}
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.8rem"><strong>Manejador en línea</strong> — para lógica breve:</p>
-            <div class="code-block" style="font-size:0.82rem">
-<span class="cm"><!-- En línea: ok para lógica simple --></span>
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"contador++"</span><span class="tag">&gt;</span>+<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- Acceder a $event en línea --></span>
-<span class="tag">&lt;input</span> <span class="attr">@input</span>=<span class="str">"valor = $event.target.value"</span><span class="tag">/&gt;</span>
-            </div>
-            <div class="card" style="margin-top:1rem;background:rgba(255,165,0,0.08);border-color:rgba(255,165,0,0.3)">
-              <h3 style="color:var(--warning)">⚠️ Regla de oro</h3>
-              <p>Si la lógica tiene <strong>más de 1–2 líneas</strong>, muévela a un método separado para mantener el HTML limpio.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 6: $event ═══ -->
-    <div class="slide" data-title="Objeto $event">
-      <div class="container">
-        <span class="badge badge-blue">Acceso al Evento</span>
-        <h2>El objeto <span class="gradient-text">$event</span></h2>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.8rem">Nos da acceso al <strong>evento nativo del DOM</strong> con todos sus detalles:</p>
-            <div class="code-block" style="font-size:0.82rem">
-<span class="cm">// Acceso al valor de un input</span>
-<span class="tag">&lt;input</span> <span class="attr">@input</span>=<span class="str">"capturar($event)"</span> <span class="tag">/&gt;</span>
-
-<span class="fn">capturar</span>(e) {
-  console.<span class="fn">log</span>(e.target.value)   <span class="cm">// texto</span>
-  console.<span class="fn">log</span>(e.target.name)    <span class="cm">// nombre input</span>
-  console.<span class="fn">log</span>(e.type)           <span class="cm">// 'input'</span>
-}
-
-<span class="cm">// Coordenadas del mouse</span>
-<span class="tag">&lt;div</span> <span class="attr">@mousemove</span>=<span class="str">"mover($event)"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
-
-<span class="fn">mover</span>(e) {
-  <span class="kw">this</span>.x = e.clientX
-  <span class="kw">this</span>.y = e.clientY
-}
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="highlight-box">
-              <h3 style="margin-bottom:0.6rem">📦 Propiedades clave del objeto evento</h3>
-              <div class="chips">
-                <span class="chip">target</span>
-                <span class="chip">currentTarget</span>
-                <span class="chip">type</span>
-                <span class="chip">key</span>
-                <span class="chip">keyCode</span>
-                <span class="chip">clientX / clientY</span>
-                <span class="chip">preventDefault()</span>
-                <span class="chip">stopPropagation()</span>
-              </div>
-            </div>
-            <div class="card" style="border-color:rgba(0,212,170,0.3)">
-              <h3>💡 Pasar parámetros + $event</h3>
-              <div class="code-block" style="margin-top:0.5rem;font-size:0.82rem">
-<span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"accion(item, $event)"</span><span class="tag">&gt;</span>
-  Click
-<span class="tag">&lt;/button&gt;</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 7: MODIFICADORES ═══ -->
-    <div class="slide" data-title="Modificadores de Eventos">
-      <div class="container">
-        <span class="badge badge-blue">Modificadores</span>
-        <h2>Modificadores de <span class="gradient-text">eventos</span></h2>
-        <p style="margin-bottom:1rem">Se agregan después del evento separados por punto — evitan código boilerplate en JS.</p>
-        <div class="grid-2">
-          <div style="display:flex;flex-direction:column;gap:0.8rem">
-            <div class="code-block" style="font-size:0.82rem">
-<span class="cm"><!-- .prevent: evita comportamiento por defecto --></span>
-<span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/form&gt;</span>
-
-<span class="cm"><!-- .stop: detiene propagación --></span>
-<span class="tag">&lt;button</span> <span class="attr">@click.stop</span>=<span class="str">"accion"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- .once: se ejecuta una sola vez --></span>
-<span class="tag">&lt;button</span> <span class="attr">@click.once</span>=<span class="str">"bienvenida"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/button&gt;</span>
-
-<span class="cm"><!-- .self: solo si el target ES el elemento --></span>
-<span class="tag">&lt;div</span> <span class="attr">@click.self</span>=<span class="str">"cerrar"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm"><!-- Cadena de modificadores --></span>
-<span class="tag">&lt;a</span> <span class="attr">@click.stop.prevent</span>=<span class="str">"ir"</span><span class="tag">&gt;</span>Link<span class="tag">&lt;/a&gt;</span>
-            </div>
-          </div>
-          <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:0.8rem;align-content:start">
-            <div class="card"><h3 style="color:var(--secondary)">.prevent</h3><p>= <code>preventDefault()</code></p></div>
-            <div class="card"><h3 style="color:var(--secondary)">.stop</h3><p>= <code>stopPropagation()</code></p></div>
-            <div class="card"><h3 style="color:var(--secondary)">.once</h3><p>Se auto-elimina tras la 1ª ejecución</p></div>
-            <div class="card"><h3 style="color:var(--secondary)">.self</h3><p>Solo si el evento viene del elemento exacto</p></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 8: MODIFICADORES DE TECLA ═══ -->
-    <div class="slide" data-title="Modificadores de Tecla">
-      <div class="container">
-        <span class="badge badge-blue">Modificadores de Tecla</span>
-        <h2>Modificadores de <span class="gradient-text">teclado</span></h2>
-        <div class="grid-2">
-          <div>
-            <div class="code-block" style="font-size:0.82rem">
-<span class="cm"><!-- Presionar Enter para confirmar --></span>
-<span class="tag">&lt;input</span> <span class="attr">@keydown.enter</span>=<span class="str">"buscar"</span> <span class="tag">/&gt;</span>
-
-<span class="cm"><!-- Presionar Escape para cancelar --></span>
-<span class="tag">&lt;input</span> <span class="attr">@keydown.esc</span>=<span class="str">"limpiar"</span> <span class="tag">/&gt;</span>
-
-<span class="cm"><!-- Solo teclas de dirección --></span>
-<span class="tag">&lt;div</span> <span class="attr">@keydown.up</span>=<span class="str">"moverArriba"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
-
-<span class="cm"><!-- Combinaciones: Ctrl+Enter --></span>
-<span class="tag">&lt;textarea</span> <span class="attr">@keydown.ctrl.enter</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span><span class="tag">&lt;/textarea&gt;</span>
-
-<span class="cm"><!-- Tab para saltar campo --></span>
-<span class="tag">&lt;input</span> <span class="attr">@keydown.tab.prevent</span>=<span class="str">"siguiente"</span><span class="tag">/&gt;</span>
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.8rem">Modificadores disponibles:</p>
-            <div class="chips" style="gap:0.6rem">
-              <span class="chip">.enter</span>
-              <span class="chip">.tab</span>
-              <span class="chip">.esc</span>
-              <span class="chip">.space</span>
-              <span class="chip">.delete</span>
-              <span class="chip">.up</span>
-              <span class="chip">.down</span>
-              <span class="chip">.left</span>
-              <span class="chip">.right</span>
-              <span class="chip">.ctrl</span>
-              <span class="chip">.alt</span>
-              <span class="chip">.shift</span>
-              <span class="chip">.meta</span>
-            </div>
-            <div class="card" style="margin-top:1rem;border-color:rgba(0,212,170,0.3)">
-              <h3>✅ Ventaja</h3>
-              <p>Sin estos modificadores, habría que verificar <code>e.key === 'Enter'</code> manualmente en JS. Vue lo hace por nosotros de forma <strong>declarativa</strong>.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 9: DEMO EN VIVO 1 ═══ -->
-    <div class="slide slide-demo" data-title="Demo en Vivo 1">
-      <div class="container">
-        <div style="margin-bottom:1rem">
-          <span class="badge badge-red">💻 Demo en Vivo</span>
-          <h2>Demo 1 — <span class="gradient-text">Lista de Tareas Reactiva</span></h2>
-        </div>
-        <div class="activity-grid">
+        <div class="act-grid">
           <div>
             <div class="timer-card">
-              <div style="font-size:0.85rem;opacity:0.6;margin-bottom:0.3rem">⏱ Tiempo disponible</div>
-              <div class="timer-display" id="t1">25:00</div>
-              <div class="timer-status" id="t1-status">Listo para iniciar</div>
-              <div class="timer-controls">
-                <button class="timer-btn start" onclick="startTimer('t1',25)">▶ Iniciar</button>
-                <button class="timer-btn pause" onclick="pauseTimer('t1')">⏸ Pausar</button>
-                <button class="timer-btn reset" onclick="resetTimer('t1',25)">↺ Reiniciar</button>
+              <div class="t-label">⏱ Tiempo de demo</div>
+              <div class="t-display" id="t1">25:00</div>
+              <div class="t-status" id="t1-s">Listo para iniciar</div>
+              <div class="t-controls">
+                <button class="tbtn start" onclick="startTimer('t1',25)">▶ Iniciar</button>
+                <button class="tbtn pause" onclick="pauseTimer('t1')">⏸</button>
+                <button class="tbtn reset" onclick="resetTimer('t1',25)">↺</button>
               </div>
             </div>
           </div>
-          <div class="instructions-card">
-            <h3>🛠 Construiremos paso a paso:</h3>
+          <div class="instr">
+            <h3>🛠 Lo que construimos</h3>
+            <div class="context-box">
+              <code>App.vue</code> con <code>data()</code>, <code>methods</code> y <code>computed</code>. Explico cada sección mientras la escribo.
+            </div>
             <ol>
-              <li>Input con <code>v-model</code> + botón <code>@click</code> para agregar tareas</li>
-              <li>Escuchar <code>@keydown.enter</code> para agregar también con Enter</li>
-              <li>Validar con <code>.trim()</code> — campo vacío muestra error</li>
-              <li>Mostrar lista con <code>v-for</code> + botón <code>@click</code> para eliminar</li>
-              <li>Usar <code>$event</code> para leer valor del input directamente</li>
-              <li>Botón con <code>@click.once</code> — se ejecuta solo una vez</li>
-              <li>Crear componente <code>TareaItem</code> que emite <code>@eliminar-tarea</code></li>
-              <li>El padre escucha y elimina del array</li>
+              <li><strong><code>data() { return {} }</code></strong> — declarar <code>nueva</code>, <code>tareas</code> y <code>error</code></li>
+              <li><strong><code>v-model</code></strong> en el input — vincularlo con la propiedad <code>nueva</code></li>
+              <li><strong><code>@keydown.enter</code></strong> en el input y <strong><code>@click</code></strong> en el botón, ambos llaman al mismo método</li>
+              <li><strong>Método <code>agregar()</code></strong> con <code>this.nueva.trim()</code> — validar vacío y duplicado</li>
+              <li><strong><code>$event</code></strong> — leer el valor del input manualmente sin <code>v-model</code></li>
+              <li><strong><code>v-for</code></strong> en la lista + método <code>eliminar(i)</code> con <code>@click</code></li>
+              <li><strong><code>computed: { total() }</code></strong> — contar cuántas tareas hay</li>
+              <li><strong>Componente <code>TareaItem.vue</code></strong> con <code>props</code> y <code>this.$emit('eliminar-tarea', i)</code></li>
             </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 10: CÓDIGO DEMO 1 ═══ -->
-    <div class="slide slide-demo" data-title="Código Demo 1">
-      <div class="container">
-        <span class="badge badge-red">💻 Demo 1 — Código</span>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.5rem;font-size:1rem;opacity:0.7">Template</p>
-            <div class="code-block" style="font-size:0.76rem">
-<span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;div&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"nueva"</span>
-      <span class="attr">@keydown.enter</span>=<span class="str">"agregar"</span>
-      <span class="attr">placeholder</span>=<span class="str">"Nueva tarea..."</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"agregar"</span><span class="tag">&gt;</span>Agregar<span class="tag">&lt;/button&gt;</span>
-    <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"error"</span> <span class="attr">class</span>=<span class="str">"error"</span><span class="tag">&gt;</span>{{ error }}<span class="tag">&lt;/p&gt;</span>
-    <span class="tag">&lt;ul&gt;</span>
-      <span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"(t, i) in tareas"</span> <span class="attr">:key</span>=<span class="str">"i"</span><span class="tag">&gt;</span>
-        {{ t }}
-        <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"eliminar(i)"</span><span class="tag">&gt;</span>✕<span class="tag">&lt;/button&gt;</span>
-      <span class="tag">&lt;/li&gt;</span>
-    <span class="tag">&lt;/ul&gt;</span>
-    <span class="tag">&lt;button</span> <span class="attr">@click.once</span>=<span class="str">"clickUnico"</span><span class="tag">&gt;</span>Solo una vez<span class="tag">&lt;/button&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.5rem;font-size:1rem;opacity:0.7">Script</p>
-            <div class="code-block" style="font-size:0.76rem">
-<span class="kw">export default</span> {
-  <span class="fn">data</span>() {
-    <span class="kw">return</span> {
-      nueva: <span class="str">''</span>,
-      tareas: [],
-      error: <span class="str">''</span>
-    }
-  },
-  <span class="fn">methods</span>: {
-    <span class="fn">agregar</span>() {
-      <span class="kw">const</span> v = <span class="kw">this</span>.nueva.<span class="fn">trim</span>()
-      <span class="kw">if</span> (!v) { <span class="kw">this</span>.error = <span class="str">'Campo vacío'</span>; <span class="kw">return</span> }
-      <span class="kw">if</span> (<span class="kw">this</span>.tareas.<span class="fn">includes</span>(v)) {
-        <span class="kw">this</span>.error = <span class="str">'Ya existe'</span>; <span class="kw">return</span>
-      }
-      <span class="kw">this</span>.tareas.<span class="fn">push</span>(v)
-      <span class="kw">this</span>.nueva = <span class="str">''</span>
-      <span class="kw">this</span>.error = <span class="str">''</span>
-    },
-    <span class="fn">eliminar</span>(i) { <span class="kw">this</span>.tareas.<span class="fn">splice</span>(i, <span class="val">1</span>) },
-    <span class="fn">clickUnico</span>() { alert(<span class="str">'Solo una vez!'</span>) }
-  }
-}
+            <div class="chips" style="margin-top:0.9rem">
+              <span class="chip">data()</span>
+              <span class="chip">methods</span>
+              <span class="chip">computed</span>
+              <span class="chip">@click</span>
+              <span class="chip">@keydown.enter</span>
+              <span class="chip">$event</span>
+              <span class="chip">.once</span>
+              <span class="chip g">this.$emit</span>
+              <span class="chip g">props</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 11: EJERCICIO 1 ═══ -->
-    <div class="slide slide-activity" data-title="Ejercicio 1">
+    <!-- ══ 4 · EJERCICIO 1 ══ -->
+    <div class="slide s-act" data-title="Ejercicio 1 — Carrito de compras" data-dot="d-act">
       <div class="container">
-        <div style="margin-bottom:1rem">
-          <span class="badge badge-green">✍️ Ejercicio 1 — 45 min</span>
-          <h2>Tareas interactivas con <span class="gradient-text">entrada y eliminación dinámica</span></h2>
+        <div><span class="badge b-green">✍️ Ejercicio 1 · 45 min</span>
+          <h2>Carrito de compras <span class="gradient-text">interactivo</span></h2>
         </div>
-        <div class="activity-grid">
+        <div class="act-grid">
           <div>
             <div class="timer-card">
-              <div style="font-size:0.85rem;opacity:0.6;margin-bottom:0.3rem">⏱ Tiempo disponible</div>
-              <div class="timer-display" id="t2">45:00</div>
-              <div class="timer-status" id="t2-status">Listo para iniciar</div>
-              <div class="timer-controls">
-                <button class="timer-btn start" onclick="startTimer('t2',45)">▶ Iniciar</button>
-                <button class="timer-btn pause" onclick="pauseTimer('t2')">⏸ Pausar</button>
-                <button class="timer-btn reset" onclick="resetTimer('t2',45)">↺ Reiniciar</button>
+              <div class="t-label">⏱ Tiempo disponible</div>
+              <div class="t-display" id="t2">45:00</div>
+              <div class="t-status" id="t2-s">Listo para iniciar</div>
+              <div class="t-controls">
+                <button class="tbtn start" onclick="startTimer('t2',45)">▶ Iniciar</button>
+                <button class="tbtn pause" onclick="pauseTimer('t2')">⏸</button>
+                <button class="tbtn reset" onclick="resetTimer('t2',45)">↺</button>
               </div>
             </div>
           </div>
-          <div class="instructions-card">
-            <h3>📋 Consigna:</h3>
-            <p style="margin-bottom:0.8rem;font-size:1.05rem">Formulario para agregar tareas con <code>@click</code> o <code>Enter</code>. Validar duplicados y campo vacío. Cada tarea se puede eliminar.</p>
+          <div class="instr">
+            <h3>📋 Contexto</h3>
+            <div class="context-box">
+              Catálogo de 4 productos con nombre y precio. El usuario agrega productos al carrito, ajusta la cantidad con botones + / − y ve el total actualizado en tiempo real.
+            </div>
+            <h3 style="margin-bottom:0.7rem">Consigna:</h3>
             <ol>
-              <li>Crear <code>tareaNueva</code> y array <code>tareas</code></li>
-              <li>Escuchar <code>@keydown.enter</code> y <code>@click</code> en el botón</li>
-              <li>Validar que no esté vacía ni repetida</li>
-              <li>Mostrar lista con <code>v-for</code>, botón eliminar por ítem</li>
-              <li>Usar <code>$event</code> para leer el valor manualmente (sin v-model)</li>
-              <li>Mostrar mensaje de error si falla la validación</li>
-              <li>Crear <code>TareaItem.vue</code> que emita <code>@eliminar-tarea</code></li>
+              <li>En <code>data()</code> declarar array <code>productos</code> con <code>{ id, nombre, precio }</code> y array <code>carrito</code> vacío</li>
+              <li><code>@click</code> en cada producto para ejecutar <code>agregar(producto)</code> — no agregar duplicados</li>
+              <li>Lista del carrito con <code>v-for</code>; botones <code>+</code> y <code>−</code> con <code>@click</code> cambian <code>item.cantidad</code> (mínimo 1)</li>
+              <li>Botón eliminar ítem con <code>@click.stop</code></li>
+              <li><code>computed: { total() }</code> que suma <code>precio × cantidad</code> de todos los ítems</li>
+              <li>Componente <code>ProductoCard.vue</code> con <code>props: ['producto']</code> que hace <code>this.$emit('agregar', producto)</code></li>
+              <li>El padre escucha <code>@agregar="agregarAlCarrito"</code></li>
+              <li>Botón "Vaciar carrito" con <code>@click.once</code> — solo funciona una vez</li>
             </ol>
+            <div class="chips" style="margin-top:0.9rem">
+              <span class="chip">data()</span>
+              <span class="chip">methods</span>
+              <span class="chip">computed</span>
+              <span class="chip">@click .stop .once</span>
+              <span class="chip">v-for</span>
+              <span class="chip g">props · this.$emit</span>
+              <span class="chip r">≠ Demo</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 12: DESCANSO ═══ -->
-    <div class="slide slide-break" data-title="Descanso">
-      <div class="container" style="align-items:center;text-align:center;gap:1.5rem">
-        <span class="badge badge-orange">☕ Descanso</span>
-        <h1 style="font-size:4rem">¡Tiempo de<br><span style="background:linear-gradient(135deg,var(--warning),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">descansar!</span></h1>
-        <div class="timer-card" style="width:320px">
-          <div class="timer-display warn" id="t-break">20:00</div>
-          <div class="timer-status" id="t-break-status">Pausa activa</div>
-          <div class="timer-controls" style="justify-content:center">
-            <button class="timer-btn start" onclick="startTimer('t-break',20)">▶ Iniciar</button>
-            <button class="timer-btn pause" onclick="pauseTimer('t-break')">⏸ Pausar</button>
-            <button class="timer-btn reset" onclick="resetTimer('t-break',20)">↺ Reiniciar</button>
+    <!-- ══ 5 · DESCANSO ══ -->
+    <div class="slide s-brk" data-title="Descanso" data-dot="d-brk">
+      <div class="container" style="align-items:center;text-align:center;gap:1.8rem">
+        <span class="badge b-orange">☕ Descanso</span>
+        <h1 style="font-size:3.8rem">¡A <span style="background:linear-gradient(135deg,var(--warning),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">descansar!</span></h1>
+        <div class="timer-card" style="width:295px">
+          <div class="t-label">Regresamos en</div>
+          <div class="t-display warn" id="t-brk">20:00</div>
+          <div class="t-status" id="t-brk-s">Pausa activa</div>
+          <div class="t-controls" style="justify-content:center">
+            <button class="tbtn start" onclick="startTimer('t-brk',20)">▶ Iniciar</button>
+            <button class="tbtn pause" onclick="pauseTimer('t-brk')">⏸</button>
+            <button class="tbtn reset" onclick="resetTimer('t-brk',20)">↺</button>
           </div>
         </div>
-        <p class="muted">Regresamos en 20 minutos · Parte II: Eventos avanzados y Composition API</p>
+        <p class="muted">Segunda parte — <code>$emit</code> con payload · Vuex</p>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 13: COMPOSITION API ═══ -->
-    <div class="slide" data-title="Composition API y Eventos">
+    <!-- ══ 6 · DEMO 2 ══ -->
+    <div class="slide s-demo" data-title="Demo 2 — Formulario con $emit + Vuex" data-dot="">
       <div class="container">
-        <span class="badge badge-blue">Parte II — Avanzado</span>
-        <h2>Eventos en la <span class="gradient-text">Composition API</span></h2>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.8rem">En Vue 3 con <code>&lt;script setup&gt;</code> usamos <code style="color:var(--secondary)">defineEmits</code> y <code style="color:var(--secondary)">emit()</code> en lugar de <code>this.$emit</code>:</p>
-            <div class="code-block" style="font-size:0.78rem">
-<span class="tag">&lt;script setup&gt;</span>
-<span class="kw">import</span> { ref } <span class="kw">from</span> <span class="str">'vue'</span>
-
-<span class="cm">// Declaramos qué eventos puede emitir</span>
-<span class="kw">const</span> emit = <span class="fn">defineEmits</span>([<span class="str">'actualizar'</span>, <span class="str">'cerrar'</span>])
-
-<span class="kw">const</span> valor = <span class="fn">ref</span>(<span class="str">''</span>)
-
-<span class="kw">function</span> <span class="fn">confirmar</span>() {
-  emit(<span class="str">'actualizar'</span>, valor.value)
-}
-<span class="tag">&lt;/script&gt;</span>
-
-<span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"valor"</span> <span class="attr">@keydown.enter</span>=<span class="str">"confirmar"</span><span class="tag">/&gt;</span>
-  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"confirmar"</span><span class="tag">&gt;</span>OK<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="card" style="border-color:rgba(0,212,170,0.3)">
-              <h3>Options API (Vue 2 / Vue 3)</h3>
-              <div class="code-block" style="font-size:0.78rem;margin-top:0.5rem">
-<span class="fn">methods</span>: {
-  <span class="fn">confirmar</span>() {
-    <span class="kw">this</span>.<span class="fn">$emit</span>(<span class="str">'actualizar'</span>, dato)
-  }
-}
-              </div>
-            </div>
-            <div class="card" style="border-color:rgba(45,91,255,0.3)">
-              <h3>🔑 Diferencias clave</h3>
-              <ul style="padding-left:1.2rem;font-size:1rem">
-                <li>No existe <code>this</code> en <code>setup()</code></li>
-                <li>Los manejadores son funciones normales</li>
-                <li>Acceso reactivo con <code>ref()</code> y <code>.value</code></li>
-              </ul>
-            </div>
-          </div>
+        <div><span class="badge b-red">💻 Demo en Vivo 2 · 25 min</span>
+          <h2>Formulario con <span class="gradient-text"><code>$emit</code></span> y <span class="gradient-text">Vuex</span></h2>
         </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 14: VALIDACIÓN DE EVENTOS ═══ -->
-    <div class="slide" data-title="Validación de Eventos">
-      <div class="container">
-        <span class="badge badge-blue">Eventos Personalizados</span>
-        <h2>Validación de <span class="gradient-text">eventos emitidos</span></h2>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.8rem">Vue 3 permite <strong>validar el payload</strong> de eventos personalizados. Si devuelve <code>false</code>, emite una advertencia en consola.</p>
-            <div class="code-block" style="font-size:0.78rem">
-<span class="kw">export default</span> {
-  emits: {
-    <span class="cm">// Sin validación</span>
-    <span class="str">'cerrar'</span>: <span class="kw">null</span>,
-
-    <span class="cm">// Con validación del payload</span>
-    <span class="str">'enviar'</span>: (payload) => {
-      <span class="kw">return</span> payload.email
-        && payload.email.<span class="fn">includes</span>(<span class="str">'@'</span>)
-        && payload.mensaje.length >= <span class="val">10</span>
-    }
-  },
-  <span class="fn">methods</span>: {
-    <span class="fn">submit</span>() {
-      <span class="kw">this</span>.<span class="fn">$emit</span>(<span class="str">'enviar'</span>, {
-        email: <span class="kw">this</span>.email,
-        mensaje: <span class="kw">this</span>.mensaje
-      })
-    }
-  }
-}
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="card" style="border-color:rgba(0,212,170,0.3)">
-              <h3>👨‍👩‍👧 Comunicación padre ↔ hijo</h3>
-              <div class="code-block" style="margin-top:0.5rem;font-size:0.78rem">
-<span class="cm"><!-- Padre escucha el evento --></span>
-<span class="tag">&lt;ContactoForm</span>
-  <span class="attr">@enviar</span>=<span class="str">"procesarEnvio"</span>
-<span class="tag">/&gt;</span>
-
-<span class="fn">procesarEnvio</span>({ email, mensaje }) {
-  <span class="cm">// Recibe el payload validado</span>
-  <span class="kw">this</span>.confirmacion = <span class="str">`Enviado: </span>${email}<span class="str">`</span>
-}
-              </div>
-            </div>
-            <div class="card" style="border-color:rgba(255,165,0,0.3);background:rgba(255,165,0,0.06)">
-              <h3 style="color:var(--warning)">💡 Buena práctica</h3>
-              <p>Declara siempre el array/objeto <code>emits</code> — mejora la <strong>documentación</strong> del componente y ayuda al editor a dar autocompletado.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 15: PATRONES ═══ -->
-    <div class="slide" data-title="Patrones de Comunicación">
-      <div class="container">
-        <span class="badge badge-blue">Patrones de Diseño</span>
-        <h2>Patrones de <span class="gradient-text">comunicación</span></h2>
-        <div class="grid-2" style="align-items:start">
-          <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="card" style="border-color:rgba(45,91,255,0.4)">
-              <h3>🔭 Patrón Observador</h3>
-              <p>Un componente (<em>sujeto</em>) emite eventos cuando su estado cambia. Otros (<em>observadores</em>) escuchan y reaccionan.</p>
-              <div class="steps" style="margin-top:0.8rem">
-                <div class="step"><span class="step-num">1</span><span class="step-label">Emit</span></div>
-                <div class="step"><span class="step-num">→</span><span class="step-label"></span></div>
-                <div class="step"><span class="step-num">2</span><span class="step-label">Escucha</span></div>
-                <div class="step"><span class="step-num">→</span><span class="step-label"></span></div>
-                <div class="step"><span class="step-num">3</span><span class="step-label">Reacción</span></div>
-              </div>
-            </div>
-            <div class="card" style="border-color:rgba(0,212,170,0.4)">
-              <h3>🎛 Patrón Mediador</h3>
-              <p>Un <strong>store (Pinia/Vuex)</strong> o bus de eventos actúa como intermediario entre componentes no relacionados directamente.</p>
-              <div class="chips" style="margin-top:0.5rem">
-                <span class="chip green">Pinia</span>
-                <span class="chip green">Vuex</span>
-                <span class="chip">mitt</span>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.8rem"><strong>Flujo de comunicación en Vue:</strong></p>
-            <div class="card" style="background:rgba(45,91,255,0.08)">
-              <div style="display:flex;flex-direction:column;gap:0.7rem;font-size:1.05rem">
-                <div style="display:flex;align-items:center;gap:1rem">
-                  <span style="color:var(--primary);font-weight:700;min-width:80px">Props ↓</span>
-                  <span>Datos del padre al hijo mediante propiedades</span>
-                </div>
-                <div class="divider"></div>
-                <div style="display:flex;align-items:center;gap:1rem">
-                  <span style="color:var(--secondary);font-weight:700;min-width:80px">Events ↑</span>
-                  <span>Notificaciones del hijo al padre mediante emit</span>
-                </div>
-                <div class="divider"></div>
-                <div style="display:flex;align-items:center;gap:1rem">
-                  <span style="color:var(--warning);font-weight:700;min-width:80px">Store ↔</span>
-                  <span>Estado global para componentes no relacionados</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 16: RENDIMIENTO ═══ -->
-    <div class="slide" data-title="Rendimiento — Debounce y Throttle">
-      <div class="container">
-        <span class="badge badge-blue">Rendimiento</span>
-        <h2><span class="gradient-text">Debounce</span> y <span class="accent-text">Throttle</span></h2>
-        <div class="grid-2">
-          <div style="display:flex;flex-direction:column;gap:0.8rem">
-            <div class="card" style="border-color:rgba(45,91,255,0.4)">
-              <h3>⏳ Debounce</h3>
-              <p>Espera N ms desde el <strong>último</strong> evento antes de ejecutar. Ideal para búsquedas en tiempo real.</p>
-            </div>
-            <div class="code-block" style="font-size:0.78rem">
-<span class="kw">import</span> { <span class="fn">debounce</span> } <span class="kw">from</span> <span class="str">'lodash'</span>
-
-<span class="kw">const</span> <span class="fn">buscarDebounced</span> = <span class="fn">debounce</span>((q) => {
-  <span class="cm">// Solo se llama 300ms después del último keyup</span>
-  api.<span class="fn">buscar</span>(q)
-}, <span class="val">300</span>)
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:0.8rem">
-            <div class="card" style="border-color:rgba(255,107,107,0.4)">
-              <h3>⚡ Throttle</h3>
-              <p>Ejecuta máximo 1 vez cada N ms aunque el evento se dispare más. Ideal para <code>scroll</code> o <code>resize</code>.</p>
-            </div>
-            <div class="code-block" style="font-size:0.78rem">
-<span class="kw">import</span> { <span class="fn">throttle</span> } <span class="kw">from</span> <span class="str">'lodash'</span>
-
-<span class="kw">const</span> <span class="fn">onScroll</span> = <span class="fn">throttle</span>(() => {
-  <span class="cm">// Máximo 1 vez cada 200ms</span>
-  <span class="fn">actualizarPosicion</span>()
-}, <span class="val">200</span>)
-            </div>
-            <div class="card" style="border-color:rgba(0,212,170,0.3)">
-              <h3>✅ .once</h3>
-              <p>Para eventos que deben ejecutarse exactamente <strong>una sola vez</strong> (ej: bienvenida, tutorial).</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 17: ACCESIBILIDAD ═══ -->
-    <div class="slide" data-title="Accesibilidad y Eventos">
-      <div class="container">
-        <span class="badge badge-blue">Accesibilidad</span>
-        <h2>Eventos y <span class="gradient-text">accesibilidad</span></h2>
-        <div class="grid-3">
-          <div class="card" style="border-color:rgba(45,91,255,0.4)">
-            <h3>⌨️ Teclado</h3>
-            <p>Toda funcionalidad disponible con mouse debe ser accesible con teclado (<code>.enter</code>, <code>.space</code>, <code>.esc</code>).</p>
-            <div class="code-block" style="margin-top:0.7rem;font-size:0.75rem">
-<span class="tag">&lt;button</span>
-  <span class="attr">@click</span>=<span class="str">"accion"</span>
-  <span class="attr">@keydown.enter</span>=<span class="str">"accion"</span>
-  <span class="attr">@keydown.space.prevent</span>=<span class="str">"accion"</span>
-<span class="tag">&gt;</span>Botón accesible<span class="tag">&lt;/button&gt;</span>
-            </div>
-          </div>
-          <div class="card" style="border-color:rgba(0,212,170,0.4)">
-            <h3>🏷 ARIA roles</h3>
-            <p>Complementar eventos con atributos ARIA para lectores de pantalla.</p>
-            <div class="code-block" style="margin-top:0.7rem;font-size:0.75rem">
-<span class="tag">&lt;div</span>
-  <span class="attr">role</span>=<span class="str">"button"</span>
-  <span class="attr">aria-label</span>=<span class="str">"Eliminar tarea"</span>
-  <span class="attr">tabindex</span>=<span class="str">"0"</span>
-  <span class="attr">@click</span>=<span class="str">"eliminar"</span>
-<span class="tag">&gt;</span>✕<span class="tag">&lt;/div&gt;</span>
-            </div>
-          </div>
-          <div class="card" style="border-color:rgba(255,107,107,0.4)">
-            <h3>👁 Feedback visual</h3>
-            <p>Indicaciones claras de estado: <strong>focus visible</strong>, estados de carga, mensajes de confirmación o error.</p>
-            <div class="code-block" style="margin-top:0.7rem;font-size:0.75rem">
-<span class="tag">&lt;button</span>
-  <span class="attr">:aria-busy</span>=<span class="str">"enviando"</span>
-  <span class="attr">:aria-disabled</span>=<span class="str">"enviando"</span>
-<span class="tag">&gt;</span>
-  {{ enviando ? <span class="str">'Enviando...'</span> : <span class="str">'Enviar'</span> }}
-<span class="tag">&lt;/button&gt;</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 18: DEMO EN VIVO 2 ═══ -->
-    <div class="slide slide-demo" data-title="Demo en Vivo 2">
-      <div class="container">
-        <div style="margin-bottom:1rem">
-          <span class="badge badge-red">💻 Demo en Vivo 2</span>
-          <h2>Demo 2 — <span class="gradient-text">Formulario de Contacto Validado</span></h2>
-        </div>
-        <div class="activity-grid">
+        <div class="act-grid">
           <div>
             <div class="timer-card">
-              <div style="font-size:0.85rem;opacity:0.6;margin-bottom:0.3rem">⏱ Tiempo disponible</div>
-              <div class="timer-display" id="t3">25:00</div>
-              <div class="timer-status" id="t3-status">Listo para iniciar</div>
-              <div class="timer-controls">
-                <button class="timer-btn start" onclick="startTimer('t3',25)">▶ Iniciar</button>
-                <button class="timer-btn pause" onclick="pauseTimer('t3')">⏸ Pausar</button>
-                <button class="timer-btn reset" onclick="resetTimer('t3',25)">↺ Reiniciar</button>
+              <div class="t-label">⏱ Tiempo de demo</div>
+              <div class="t-display" id="t3">25:00</div>
+              <div class="t-status" id="t3-s">Listo para iniciar</div>
+              <div class="t-controls">
+                <button class="tbtn start" onclick="startTimer('t3',25)">▶ Iniciar</button>
+                <button class="tbtn pause" onclick="pauseTimer('t3')">⏸</button>
+                <button class="tbtn reset" onclick="resetTimer('t3',25)">↺</button>
               </div>
             </div>
           </div>
-          <div class="instructions-card">
-            <h3>🛠 Construiremos paso a paso:</h3>
+          <div class="instr">
+            <h3>🛠 Lo que construimos</h3>
+            <div class="context-box">
+              <code>ContactoForm.vue</code> valida y emite al padre. El padre guarda los mensajes en <strong>Vuex</strong> y los muestra con un <code>computed</code> que lee el store.
+            </div>
             <ol>
-              <li>Crear <code>ContactoForm.vue</code> con <code>&lt;script setup&gt;</code></li>
-              <li>Definir <code>defineEmits</code> con validación del payload</li>
-              <li>Capturar <code>email</code> y <code>mensaje</code> con <code>v-model</code></li>
-              <li>Emitir <code>enviar</code> al presionar botón o <code>@keydown.enter</code></li>
-              <li>Validar: email con "@", mensaje ≥ 10 caracteres</li>
-              <li>Mostrar spinner/estado mientras se "envía"</li>
-              <li>El padre escucha <code>@enviar</code> y muestra confirmación reactiva</li>
-              <li>Aplicar <code>.prevent</code> y roles ARIA para accesibilidad</li>
+              <li><strong><code>data()</code></strong> en el hijo — <code>email</code>, <code>mensaje</code>, <code>errorMsg</code>, <code>enviando</code></li>
+              <li><strong><code>@submit.prevent</code></strong> en el form — frenar el comportamiento nativo</li>
+              <li><strong>Método <code>enviar()</code></strong> — validar, luego <code>this.$emit('enviar', { email, mensaje })</code></li>
+              <li><strong><code>@keydown.ctrl.enter</code></strong> en el textarea — atajo de teclado</li>
+              <li><strong><code>:disabled="enviando"</code></strong> en el botón mientras procesa</li>
+              <li><strong>Vuex store</strong> — <code>state.mensajes</code> y mutation <code>AGREGAR_MENSAJE</code></li>
+              <li><strong>El padre</strong> escucha <code>@enviar</code> y llama a <code>this.$store.commit('AGREGAR_MENSAJE', payload)</code></li>
+              <li><strong><code>computed: { mensajes() { return this.$store.state.mensajes } }</code></strong></li>
             </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 19: CÓDIGO DEMO 2 HIJO ═══ -->
-    <div class="slide slide-demo" data-title="Código Demo 2 — Hijo">
-      <div class="container">
-        <span class="badge badge-red">💻 Demo 2 — ContactoForm.vue (hijo)</span>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.4rem;font-size:0.9rem;opacity:0.7">Template</p>
-            <div class="code-block" style="font-size:0.74rem">
-<span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"email"</span> <span class="attr">type</span>=<span class="str">"email"</span>
-      <span class="attr">placeholder</span>=<span class="str">"Email"</span>
-      <span class="attr">aria-label</span>=<span class="str">"Correo electrónico"</span> <span class="tag">/&gt;</span>
-    <span class="tag">&lt;textarea</span> <span class="attr">v-model</span>=<span class="str">"mensaje"</span>
-      <span class="attr">placeholder</span>=<span class="str">"Mensaje (mín. 10 chars)"</span>
-      <span class="attr">@keydown.ctrl.enter</span>=<span class="str">"enviar"</span><span class="tag">&gt;</span><span class="tag">&lt;/textarea&gt;</span>
-    <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"errorMsg"</span> <span class="attr">role</span>=<span class="str">"alert"</span><span class="tag">&gt;</span>{{ errorMsg }}<span class="tag">&lt;/p&gt;</span>
-    <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"submit"</span> <span class="attr">:disabled</span>=<span class="str">"enviando"</span>
-      <span class="attr">:aria-busy</span>=<span class="str">"enviando"</span><span class="tag">&gt;</span>
-      {{ enviando ? <span class="str">'Enviando...'</span> : <span class="str">'Enviar'</span> }}
-    <span class="tag">&lt;/button&gt;</span>
-  <span class="tag">&lt;/form&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.4rem;font-size:0.9rem;opacity:0.7">Script (Composition API)</p>
-            <div class="code-block" style="font-size:0.74rem">
-<span class="tag">&lt;script setup&gt;</span>
-<span class="kw">import</span> { ref } <span class="kw">from</span> <span class="str">'vue'</span>
-
-<span class="kw">const</span> emit = <span class="fn">defineEmits</span>({
-  <span class="str">'enviar'</span>: ({ email, mensaje }) => {
-    <span class="kw">return</span> email.<span class="fn">includes</span>(<span class="str">'@'</span>)
-      && mensaje.length >= <span class="val">10</span>
-  }
-})
-
-<span class="kw">const</span> email = <span class="fn">ref</span>(<span class="str">''</span>)
-<span class="kw">const</span> mensaje = <span class="fn">ref</span>(<span class="str">''</span>)
-<span class="kw">const</span> errorMsg = <span class="fn">ref</span>(<span class="str">''</span>)
-<span class="kw">const</span> enviando = <span class="fn">ref</span>(<span class="kw">false</span>)
-
-<span class="kw">function</span> <span class="fn">enviar</span>() {
-  <span class="kw">if</span> (!email.value.<span class="fn">includes</span>(<span class="str">'@'</span>)) {
-    errorMsg.value = <span class="str">'Email inválido'</span>; <span class="kw">return</span>
-  }
-  <span class="kw">if</span> (mensaje.value.length < <span class="val">10</span>) {
-    errorMsg.value = <span class="str">'Mensaje muy corto'</span>; <span class="kw">return</span>
-  }
-  enviando.value = <span class="kw">true</span>
-  errorMsg.value = <span class="str">''</span>
-  emit(<span class="str">'enviar'</span>, {
-    email: email.value, mensaje: mensaje.value
-  })
-  <span class="fn">setTimeout</span>(() => {
-    enviando.value = <span class="kw">false</span>
-  }, <span class="val">1500</span>)
-}
-<span class="tag">&lt;/script&gt;</span>
+            <div class="chips" style="margin-top:0.9rem">
+              <span class="chip">data()</span>
+              <span class="chip">methods</span>
+              <span class="chip">computed</span>
+              <span class="chip">.prevent · .ctrl.enter</span>
+              <span class="chip">:disabled</span>
+              <span class="chip g">this.$emit</span>
+              <span class="chip o">Vuex · state · mutations</span>
+              <span class="chip o">$store.commit</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 20: CÓDIGO DEMO 2 PADRE ═══ -->
-    <div class="slide slide-demo" data-title="Código Demo 2 — Padre">
+    <!-- ══ 7 · EJERCICIO 2 ══ -->
+    <div class="slide s-act" data-title="Ejercicio 2 — Sistema de reseñas con estrellas" data-dot="d-act">
       <div class="container">
-        <span class="badge badge-red">💻 Demo 2 — App.vue (padre)</span>
-        <div class="grid-2">
-          <div>
-            <p style="margin-bottom:0.4rem;font-size:0.9rem;opacity:0.7">App.vue — Template</p>
-            <div class="code-block" style="font-size:0.8rem">
-<span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"app"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;h1&gt;</span>Contacto<span class="tag">&lt;/h1&gt;</span>
-
-    <span class="tag">&lt;ContactoForm</span>
-      <span class="attr">@enviar</span>=<span class="str">"procesarEnvio"</span>
-    <span class="tag">/&gt;</span>
-
-    <span class="tag">&lt;div</span> <span class="attr">v-if</span>=<span class="str">"confirmacion"</span>
-      <span class="attr">class</span>=<span class="str">"success"</span>
-      <span class="attr">role</span>=<span class="str">"status"</span><span class="tag">&gt;</span>
-      ✅ {{ confirmacion }}
-    <span class="tag">&lt;/div&gt;</span>
-  <span class="tag">&lt;/div&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
-            </div>
-          </div>
-          <div>
-            <p style="margin-bottom:0.4rem;font-size:0.9rem;opacity:0.7">App.vue — Script</p>
-            <div class="code-block" style="font-size:0.8rem">
-<span class="tag">&lt;script setup&gt;</span>
-<span class="kw">import</span> { ref } <span class="kw">from</span> <span class="str">'vue'</span>
-<span class="kw">import</span> ContactoForm <span class="kw">from</span> <span class="str">'./ContactoForm.vue'</span>
-
-<span class="kw">const</span> confirmacion = <span class="fn">ref</span>(<span class="str">''</span>)
-
-<span class="kw">function</span> <span class="fn">procesarEnvio</span>({ email, mensaje }) {
-  <span class="cm">// Simulamos procesamiento asíncrono</span>
-  confirmacion.value =
-    <span class="str">`✅ Mensaje de </span>${email}<span class="str"> recibido`</span>
-
-  <span class="cm">// Limpiar después de 4s</span>
-  <span class="fn">setTimeout</span>(() => {
-    confirmacion.value = <span class="str">''</span>
-  }, <span class="val">4000</span>)
-}
-<span class="tag">&lt;/script&gt;</span>
-            </div>
-            <div class="highlight-box" style="margin-top:1rem">
-              <p><strong>Flujo:</strong> Hijo valida → emite → Padre recibe payload → actualiza estado → UI reactiva</p>
-            </div>
-          </div>
+        <div><span class="badge b-green">✍️ Ejercicio 2 · 45 min</span>
+          <h2>Sistema de <span class="gradient-text">reseñas con estrellas</span></h2>
         </div>
-      </div>
-    </div>
-
-    <!-- ═══ SLIDE 21: EJERCICIO 2 ═══ -->
-    <div class="slide slide-activity" data-title="Ejercicio 2">
-      <div class="container">
-        <div style="margin-bottom:1rem">
-          <span class="badge badge-green">✍️ Ejercicio 2 — 45 min</span>
-          <h2>Contacto validado con <span class="gradient-text">payload y feedback</span></h2>
-        </div>
-        <div class="activity-grid">
+        <div class="act-grid">
           <div>
             <div class="timer-card">
-              <div style="font-size:0.85rem;opacity:0.6;margin-bottom:0.3rem">⏱ Tiempo disponible</div>
-              <div class="timer-display" id="t4">45:00</div>
-              <div class="timer-status" id="t4-status">Listo para iniciar</div>
-              <div class="timer-controls">
-                <button class="timer-btn start" onclick="startTimer('t4',45)">▶ Iniciar</button>
-                <button class="timer-btn pause" onclick="pauseTimer('t4')">⏸ Pausar</button>
-                <button class="timer-btn reset" onclick="resetTimer('t4',45)">↺ Reiniciar</button>
+              <div class="t-label">⏱ Tiempo disponible</div>
+              <div class="t-display" id="t4">45:00</div>
+              <div class="t-status" id="t4-s">Listo para iniciar</div>
+              <div class="t-controls">
+                <button class="tbtn start" onclick="startTimer('t4',45)">▶ Iniciar</button>
+                <button class="tbtn pause" onclick="pauseTimer('t4')">⏸</button>
+                <button class="tbtn reset" onclick="resetTimer('t4',45)">↺</button>
               </div>
             </div>
           </div>
-          <div class="instructions-card">
-            <h3>📋 Consigna:</h3>
-            <p style="margin-bottom:0.8rem;font-size:1.05rem">Formulario <code>ContactoForm</code> que emite <code>@enviar</code> con <code>{email, mensaje}</code>. Validar payload, mostrar errores y confirmación. El padre controla el estado.</p>
+          <div class="instr">
+            <h3>📋 Contexto</h3>
+            <div class="context-box">
+              Componente hijo <code>ResenaForm.vue</code> donde el usuario ingresa nombre, selecciona puntuación con estrellas y escribe un comentario. El padre guarda las reseñas en Vuex y muestra el promedio.
+            </div>
+            <h3 style="margin-bottom:0.7rem">Consigna:</h3>
             <ol>
-              <li>Crear <code>ContactoForm.vue</code> con <code>defineEmits</code> y validación</li>
-              <li>Capturar <code>v-model</code> para email y mensaje</li>
-              <li>Emitir al presionar botón o <code>@keydown.enter</code></li>
-              <li>Validar: email con "@", mensaje ≥ 10 caracteres</li>
-              <li>Mostrar spinner al enviar y desactivarlo al recibir respuesta</li>
-              <li>El padre escucha <code>@enviar</code> y muestra mensaje reactivo</li>
-              <li>Aplicar <code>.prevent</code> y <code>.once</code> donde corresponda</li>
-              <li>Agregar roles ARIA para accesibilidad: <code>role="alert"</code>, <code>aria-busy</code></li>
+              <li><code>data()</code> en el hijo: <code>nombre</code>, <code>puntuacion</code>, <code>puntPreview</code>, <code>comentario</code>, <code>errores</code></li>
+              <li>5 <code>&lt;span&gt;</code> como estrellas: <code>@click</code> asigna <code>puntuacion</code>, <code>@mouseover</code> asigna <code>puntPreview</code> para efecto visual</li>
+              <li>Validar en <code>methods</code>: nombre no vacío, puntuación 1–5, comentario ≥ 15 caracteres</li>
+              <li><code>this.$emit('nueva-resena', { nombre, puntuacion, comentario })</code> solo si pasa la validación</li>
+              <li>Vuex store con <code>state.resenas</code> y mutation <code>AGREGAR_RESENA</code></li>
+              <li>El padre escucha <code>@nueva-resena</code> y hace <code>this.$store.commit('AGREGAR_RESENA', payload)</code></li>
+              <li>Botón "👍 Me gusta" por reseña con <code>@click.stop</code> que incrementa un contador en <code>data()</code></li>
+              <li><code>computed: { promedio() }</code> en el padre que calcula el promedio de puntuaciones del store</li>
             </ol>
+            <div class="chips" style="margin-top:0.9rem">
+              <span class="chip">data()</span>
+              <span class="chip">methods</span>
+              <span class="chip">computed</span>
+              <span class="chip">@mouseover</span>
+              <span class="chip">.stop</span>
+              <span class="chip g">this.$emit</span>
+              <span class="chip o">Vuex · $store.commit</span>
+              <span class="chip r">≠ Demo</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SLIDE 22: CIERRE ═══ -->
-    <div class="slide slide-cover" data-title="Resumen y Cierre">
-      <div class="container">
-        <span class="badge badge-green">🏁 Resumen</span>
-        <h2>¿Qué aprendimos <span class="gradient-text">hoy</span>?</h2>
-        <div class="grid-2" style="margin-top:0.5rem">
-          <div>
-            <div class="card" style="margin-bottom:0.8rem;border-color:rgba(45,91,255,0.4)">
-              <h3>Parte I — Fundamentos</h3>
-              <ul style="padding-left:1.2rem;font-size:1rem">
-                <li>Directiva <code>v-on</code> / <code>@</code> para capturar eventos</li>
-                <li>Métodos manejadores y manejadores en línea</li>
-                <li>Objeto <code>$event</code> — acceso a detalles del evento</li>
-                <li>Modificadores: <code>.stop</code> <code>.prevent</code> <code>.once</code> <code>.self</code></li>
-                <li>Modificadores de tecla: <code>.enter</code> <code>.esc</code> <code>.ctrl</code></li>
-              </ul>
+    <!-- ══ 8 · CIERRE ══ -->
+    <div class="slide s-cover" data-title="Cierre y resumen" data-dot="d-cov">
+      <div class="container" style="align-items:center;text-align:center;gap:1.2rem">
+        <span class="badge b-green">🏁 Cierre</span>
+        <h2>Conceptos que se <span class="gradient-text">llevan hoy</span></h2>
+        <div class="grid-2" style="text-align:left;width:100%">
+          <div class="card" style="border-color:rgba(45,91,255,0.35)">
+            <h3 style="margin-bottom:0.8rem">Demo 1</h3>
+            <div class="chips">
+              <span class="chip">data() { return {} }</span>
+              <span class="chip">methods: {}</span>
+              <span class="chip">computed: {}</span>
+              <span class="chip">@click · @keydown.enter</span>
+              <span class="chip">$event · .once · .stop</span>
+              <span class="chip g">props · this.$emit</span>
             </div>
           </div>
-          <div>
-            <div class="card" style="border-color:rgba(0,212,170,0.4)">
-              <h3>Parte II — Avanzado</h3>
-              <ul style="padding-left:1.2rem;font-size:1rem">
-                <li><code>defineEmits</code> y <code>emit()</code> en Composition API</li>
-                <li>Validación de payload en eventos personalizados</li>
-                <li>Patrones Observador y Mediador</li>
-                <li>Debounce y throttle para rendimiento</li>
-                <li>Accesibilidad: teclado, ARIA, feedback visual</li>
-              </ul>
+          <div class="card" style="border-color:rgba(0,212,170,0.35)">
+            <h3 style="margin-bottom:0.8rem">Demo 2</h3>
+            <div class="chips">
+              <span class="chip">.prevent · .ctrl.enter</span>
+              <span class="chip">:disabled</span>
+              <span class="chip g">this.$emit con payload</span>
+              <span class="chip o">Vuex state</span>
+              <span class="chip o">mutations · $store.commit</span>
+              <span class="chip o">computed ← $store.state</span>
             </div>
           </div>
         </div>
-        <div class="highlight-box" style="margin-top:0.8rem;text-align:center">
-          <p><strong>Próxima clase:</strong> Manejo de Rutas en Vue — Vue Router, rutas dinámicas, navegación programática 🗺️</p>
+        <div class="hl" style="width:100%">
+          <p><strong>Regla de oro:</strong> Props bajan ↓ &nbsp;·&nbsp; Eventos suben ↑ &nbsp;·&nbsp; Vuex para el estado global ↔</p>
         </div>
+        <p class="muted">Próxima clase: <strong>Vue Router</strong> — rutas, navegación programática, parámetros dinámicos 🗺️</p>
       </div>
     </div>
 
-  </div><!-- /slides-viewport -->
+  </div>
 
-  <!-- FOOTER -->
   <footer>
     <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Anterior</button>
     <div class="slide-dots" id="dots"></div>
     <button class="nav-btn" id="btn-next" onclick="navigate(1)">Siguiente →</button>
   </footer>
-
-</div><!-- /app -->
+</div>
 
 <script>
   const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let current = 0;
+  const total  = slides.length;
+  let current  = 0;
 
-  // Build dots
-  const dotsContainer = document.getElementById('dots');
+  const dotsEl = document.getElementById('dots');
   slides.forEach((s, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'dot';
-    // Color by type
-    if (s.classList.contains('slide-activity')) dot.classList.add('activity');
-    if (s.classList.contains('slide-break')) dot.classList.add('break');
-    dot.onclick = () => goTo(i);
-    dotsContainer.appendChild(dot);
+    const d  = document.createElement('div');
+    const dc = s.dataset.dot || '';
+    d.className = 'dot' + (dc ? ' ' + dc : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
   });
 
   function updateUI() {
-    slides.forEach((s, i) => s.classList.toggle('active', i === current));
-    document.getElementById('slide-counter').textContent = `${current + 1} / ${total}`;
+    slides.forEach((s,i) => s.classList.toggle('active', i===current));
+    document.getElementById('slide-counter').textContent      = `${current+1} / ${total}`;
     document.getElementById('slide-title-header').textContent = slides[current].dataset.title || '';
-    document.getElementById('progress-fill').style.width = `${((current + 1) / total) * 100}%`;
-    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    document.getElementById('progress-fill').style.width      = `${((current+1)/total)*100}%`;
+    document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===current));
     document.getElementById('btn-prev').disabled = current === 0;
-    document.getElementById('btn-next').disabled = current === total - 1;
+    document.getElementById('btn-next').disabled = current === total-1;
   }
-
-  function navigate(dir) {
-    const next = current + dir;
-    if (next >= 0 && next < total) { current = next; updateUI(); }
-  }
-
-  function goTo(i) { current = i; updateUI(); }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
-    if (e.key === 'ArrowLeft') navigate(-1);
+  function navigate(dir) { const n=current+dir; if(n>=0&&n<total){current=n;updateUI();} }
+  function goTo(i) { current=i; updateUI(); }
+  document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();navigate(1);}
+    if(e.key==='ArrowLeft') navigate(-1);
   });
-
   updateUI();
 
-  // ── TIMERS ──
   const timers = {};
-
-  function pad(n) { return String(n).padStart(2, '0'); }
+  const pad = n => String(n).padStart(2,'0');
 
   function beep() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      for (let i = 0; i < 3; i++) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.4);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.4 + 0.3);
-        osc.start(ctx.currentTime + i * 0.4);
-        osc.stop(ctx.currentTime + i * 0.4 + 0.3);
-      }
-    } catch(e) {}
+      const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      [0,0.4,0.8].forEach(t => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=880;
+        g.gain.setValueAtTime(0.3,ctx.currentTime+t);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.3);
+        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.3);
+      });
+    } catch(e){}
   }
 
   function startTimer(id, minutes) {
-    if (timers[id] && timers[id].interval) return; // already running
-    if (!timers[id]) {
-      timers[id] = { remaining: minutes * 60, interval: null };
-    }
-    const display = document.getElementById(id);
-    const status = document.getElementById(id + '-status');
-    if (!display) return;
-
+    if(timers[id]?.interval) return;
+    if(!timers[id]) timers[id] = { remaining:minutes*60, interval:null };
+    const disp = document.getElementById(id);
+    const stat = document.getElementById(id+'-s');
+    if(!disp) return;
     timers[id].interval = setInterval(() => {
       timers[id].remaining--;
-      const r = timers[id].remaining;
-      const m = Math.floor(r / 60), s = r % 60;
-      display.textContent = `${pad(m)}:${pad(s)}`;
-
-      // Color states
-      display.className = 'timer-display';
-      if (r <= 60) { display.classList.add('danger'); status.textContent = '⚠️ ¡Menos de 1 minuto!'; }
-      else if (r <= 300) { display.classList.add('warn'); status.textContent = '⏰ Menos de 5 minutos'; }
-      else { status.textContent = 'En progreso...'; }
-
-      if (r <= 0) {
-        clearInterval(timers[id].interval);
-        timers[id].interval = null;
-        display.textContent = '00:00';
-        status.textContent = '✅ ¡Tiempo completado!';
-        beep();
-      }
+      const r=timers[id].remaining, m=Math.floor(r/60), s=r%60;
+      disp.textContent = `${pad(m)}:${pad(s)}`;
+      disp.className = 't-display';
+      if(id==='t-brk') disp.classList.add('warn');
+      if(r<=60)       { disp.classList.add('danger'); stat.textContent='⚠️ ¡Menos de 1 minuto!'; }
+      else if(r<=300) { disp.classList.add('warn');   stat.textContent='⏰ Menos de 5 minutos'; }
+      else              stat.textContent='En progreso...';
+      if(r<=0){ clearInterval(timers[id].interval); timers[id].interval=null; disp.textContent='00:00'; stat.textContent='✅ ¡Tiempo!'; beep(); }
     }, 1000);
-    status.textContent = 'En progreso...';
+    stat.textContent='En progreso...';
   }
-
   function pauseTimer(id) {
-    if (timers[id] && timers[id].interval) {
-      clearInterval(timers[id].interval);
-      timers[id].interval = null;
-      const status = document.getElementById(id + '-status');
-      if (status) status.textContent = '⏸ Pausado';
-    }
+    if(timers[id]?.interval){ clearInterval(timers[id].interval); timers[id].interval=null;
+      const s=document.getElementById(id+'-s'); if(s) s.textContent='⏸ Pausado'; }
   }
-
   function resetTimer(id, minutes) {
     pauseTimer(id);
-    timers[id] = { remaining: minutes * 60, interval: null };
-    const display = document.getElementById(id);
-    const status = document.getElementById(id + '-status');
-    if (display) {
-      display.textContent = `${pad(minutes)}:00`;
-      display.className = 'timer-display';
-      if (id === 't-break') display.classList.add('warn');
-    }
-    if (status) status.textContent = 'Listo para iniciar';
+    timers[id] = { remaining:minutes*60, interval:null };
+    const disp=document.getElementById(id), stat=document.getElementById(id+'-s');
+    if(disp){ disp.textContent=`${pad(minutes)}:00`; disp.className='t-display'; if(id==='t-brk') disp.classList.add('warn'); }
+    if(stat) stat.textContent='Listo para iniciar';
   }
 </script>
 </body>

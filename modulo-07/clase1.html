@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Componentes y Ciclo de Vida en Vue - Clase 3h</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #2D5BFF;
+  --secondary: #00D4AA;
+  --accent: #FF6B6B;
+  --dark: #1A1A2E;
+  --light: #F8F9FA;
+  --warning: #FFA500;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--dark);
+  color: var(--light);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ── HEADER ── */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,26,46,0.92);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.slide-counter {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95rem;
+  color: rgba(248,249,250,0.7);
+  letter-spacing: 2px;
+}
+.slide-counter .current { color: var(--secondary); font-weight: 700; }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed;
+  top: 52px; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* ── SLIDE CONTAINER ── */
+.slides-wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 55px;
+}
+.slide {
+  display: none;
+  max-width: 1200px;
+  width: 100%;
+  padding: 2rem;
+  animation: slideIn 0.6s ease-out;
+}
+.slide.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TYPOGRAPHY ── */
+h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; text-align: center;
+     background: linear-gradient(135deg, var(--primary), var(--secondary));
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.3; text-align: center; margin-bottom: 1.2rem;
+     background: linear-gradient(135deg, var(--light), var(--secondary));
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h3 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--secondary); }
+p, li { font-size: 1.3rem; line-height: 1.8; }
+p { text-align: center; max-width: 900px; color: rgba(248,249,250,0.85); }
+.subtitle { font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.5rem; font-weight: 500; }
+
+/* ── CODE ── */
+pre {
+  font-family: 'Space Mono', monospace;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(45,91,255,0.2);
+  border-radius: var(--border-radius);
+  padding: 1.2rem 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 900px;
+  text-align: left;
+  color: #e0e0e0;
+}
+pre .kw { color: #c792ea; }
+pre .str { color: #c3e88d; }
+pre .fn { color: #82aaff; }
+pre .cm { color: #546e7a; }
+pre .tag { color: #f07178; }
+pre .attr { color: #ffcb6b; }
+pre .num { color: #f78c6c; }
+
+/* ── CARDS GRID ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 30px rgba(45,91,255,0.15);
+}
+.card h3 { font-size: 1.4rem; margin-bottom: 0.6rem; }
+.card p { font-size: 1.15rem; text-align: left; }
+
+/* 3-col cards */
+.cards-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1100px;
+}
+.cards-grid-3 .card h3 { font-size: 1.25rem; }
+.cards-grid-3 .card p { font-size: 1.05rem; }
+
+/* ── TABLE ── */
+table {
+  width: 100%;
+  max-width: 1000px;
+  border-collapse: collapse;
+  font-size: 1.1rem;
+}
+th {
+  background: rgba(45,91,255,0.2);
+  color: var(--secondary);
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+tr:hover td { background: rgba(255,255,255,0.03); }
+
+/* ── ACTIVITY LAYOUT ── */
+.activity-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1100px;
+  align-items: start;
+}
+.timer-panel {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--border-radius);
+  padding: 1.8rem;
+  text-align: center;
+}
+.timer-display {
+  font-family: 'Space Mono', monospace;
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-shadow: 0 0 30px rgba(0,212,170,0.3);
+  margin: 0.8rem 0;
+  letter-spacing: 4px;
+}
+.timer-display.warning { color: var(--warning); text-shadow: 0 0 30px rgba(255,165,0,0.4); }
+.timer-display.danger { color: var(--accent); text-shadow: 0 0 30px rgba(255,107,107,0.5); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+.timer-controls {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.timer-btn {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.timer-btn.start { background: var(--secondary); color: var(--dark); }
+.timer-btn.pause { background: var(--warning); color: var(--dark); }
+.timer-btn.reset { background: rgba(255,255,255,0.1); color: var(--light); border: 1px solid rgba(255,255,255,0.2); }
+.timer-btn:hover { transform: scale(1.05); }
+.timer-status {
+  font-size: 0.95rem;
+  margin-top: 0.8rem;
+  color: rgba(248,249,250,0.6);
+}
+
+.activity-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  text-align: left;
+}
+.activity-card h3 { margin-bottom: 0.8rem; }
+.activity-card ol, .activity-card ul { padding-left: 1.5rem; }
+.activity-card li { font-size: 1.15rem; line-height: 1.8; margin-bottom: 0.3rem; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 0.8rem;
+}
+.badge-demo { background: rgba(45,91,255,0.2); color: var(--primary); border: 1px solid var(--primary); }
+.badge-activity { background: rgba(0,212,170,0.15); color: var(--secondary); border: 1px solid var(--secondary); }
+.badge-break { background: rgba(255,165,0,0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+/* ── 2-COL LIST ── */
+.list-2col { column-count: 2; column-gap: 3rem; text-align: left; width: 100%; max-width: 900px; }
+.list-2col li { break-inside: avoid; margin-bottom: 0.4rem; }
+
+/* ── NAV ── */
+.nav {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%; transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+.nav-btn {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(26,26,46,0.9);
+  color: var(--light);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+.nav-btn:hover { border-color: var(--primary); background: rgba(45,91,255,0.15); }
+
+/* ── DEMO SLIDE LAYOUT ── */
+.demo-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+  align-items: start;
+}
+.demo-layout pre { max-width: 100%; font-size: 0.82rem; }
+.demo-layout .card { display: flex; flex-direction: column; gap: 0.6rem; }
+
+/* ── SMALL TEXT HELPER ── */
+.small { font-size: 1rem; color: rgba(248,249,250,0.6); }
+
+/* ── ICON EMOJI ── */
+.icon { font-size: 2.2rem; margin-bottom: 0.5rem; display: block; }
+
+/* ── FLOW VISUAL ── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+.flow-item {
+  background: rgba(45,91,255,0.12);
+  border: 1px solid rgba(45,91,255,0.3);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.flow-arrow { font-size: 1.5rem; color: var(--secondary); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">28</span></div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- SLIDES -->
+<div class="slides-wrapper">
+
+<!-- ====== SLIDE 1: PORTADA ====== -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 7 — Desarrollo de aplicaciones front-end con Vue</p>
+  <h1>Componentes y Ciclo de Vida en Vue</h1>
+  <p>Componentización, comunicación, hooks y estilos dinámicos</p>
+  <p class="small" style="margin-top:1.5rem;">Vue 2 · Options API · Clase de 3 horas</p>
+</div>
+
+<!-- ====== SLIDE 2: OBJETIVOS ====== -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🧩</span><h3>Componentes</h3><p>Crear y reutilizar componentes dividiendo la app en módulos claros.</p></div>
+    <div class="card"><span class="icon">🔗</span><h3>Comunicación</h3><p>Conectar componentes con props, $emit y slots.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>Ciclo de vida</h3><p>Usar los hooks para ejecutar lógica en el momento preciso.</p></div>
+    <div class="card"><span class="icon">🎨</span><h3>Estilos dinámicos</h3><p>Aplicar class binding, style binding y scoped styles.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 3: ¿QUÉ ES UN COMPONENTE? ====== -->
+<div class="slide" data-slide="3">
+  <h2>¿Qué es un componente?</h2>
+  <p>Una pieza independiente de la interfaz con su propio template, lógica y estilos, todo en un archivo <code>.vue</code>.</p>
+  <pre style="margin-top:1.2rem;">
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"saludo"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>{{ mensaje }}<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      mensaje: <span class="str">'¡Hola desde mi componente!'</span>
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+
+<span class="tag">&lt;style scoped&gt;</span>
+<span class="fn">.saludo</span> { <span class="attr">color</span>: <span class="str">navy</span>; }
+<span class="tag">&lt;/style&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 4: BENEFICIOS ====== -->
+<div class="slide" data-slide="4">
+  <h2>¿Por qué componentizar?</h2>
+  <div class="cards-grid-3">
+    <div class="card"><span class="icon">♻️</span><h3>Reutilización</h3><p>Usa el mismo componente en distintas partes sin duplicar código.</p></div>
+    <div class="card"><span class="icon">📦</span><h3>Modularización</h3><p>Código organizado, fácil de leer, mantener y escalar.</p></div>
+    <div class="card"><span class="icon">👥</span><h3>Trabajo en equipo</h3><p>Cada dev trabaja en componentes distintos sin conflictos.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 5: JERARQUÍA ====== -->
+<div class="slide" data-slide="5">
+  <h2>Jerarquía padre → hijo</h2>
+  <p>Los componentes forman un árbol. El padre contiene hijos; cada hijo puede contener más hijos.</p>
+  <pre style="margin-top:1rem;">
+<span class="cm">// App.vue (Padre)</span>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;HeaderApp /&gt;</span>
+    <span class="tag">&lt;ListaTareas /&gt;</span>
+    <span class="tag">&lt;FooterApp /&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> HeaderApp <span class="kw">from</span> <span class="str">'./components/HeaderApp.vue'</span>
+<span class="kw">import</span> ListaTareas <span class="kw">from</span> <span class="str">'./components/ListaTareas.vue'</span>
+<span class="kw">import</span> FooterApp <span class="kw">from</span> <span class="str">'./components/FooterApp.vue'</span>
+
+<span class="kw">export default</span> {
+  <span class="attr">components</span>: { HeaderApp, ListaTareas, FooterApp }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 6: DEMO — Componente básico ====== -->
+<div class="slide" data-slide="6">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Primer componente</h2>
+  <p>Crearemos un componente <code>Saludo.vue</code> y lo usaremos dentro de <code>App.vue</code>.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear Saludo.vue</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Importar en App.vue</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Registrar y usar &lt;Saludo /&gt;</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 7: PROPS ====== -->
+<div class="slide" data-slide="7">
+  <h2>Props — Datos del padre al hijo</h2>
+  <p>Las props permiten enviar datos del componente padre al hijo, en flujo unidireccional.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Padre</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;Tarjeta</span>
+    <span class="attr">titulo</span>=<span class="str">"Aprende Vue"</span>
+    <span class="attr">:likes</span>=<span class="str">"42"</span>
+  <span class="tag">/&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Hijo (Tarjeta.vue)</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>{{ titulo }}<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;span&gt;</span>{{ likes }} likes<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="attr">props</span>: [<span class="str">'titulo'</span>, <span class="str">'likes'</span>]
+}
+<span class="tag">&lt;/script&gt;</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 8: PROPS VALIDACIÓN ====== -->
+<div class="slide" data-slide="8">
+  <h2>Validación de props</h2>
+  <p>Podemos tipar, requerir y validar cada prop para hacer componentes más robustos.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">export default</span> {
+  <span class="attr">props</span>: {
+    titulo: {
+      <span class="attr">type</span>: String,
+      <span class="attr">required</span>: <span class="kw">true</span>
+    },
+    likes: {
+      <span class="attr">type</span>: Number,
+      <span class="attr">default</span>: <span class="num">0</span>
+    },
+    tipo: {
+      <span class="attr">type</span>: String,
+      <span class="attr">default</span>: <span class="str">'info'</span>,
+      <span class="fn">validator</span>(value) {
+        <span class="kw">return</span> [<span class="str">'info'</span>, <span class="str">'success'</span>, <span class="str">'error'</span>].includes(value)
+      }
+    }
+  }
+}
+  </pre>
+</div>
+
+<!-- ====== SLIDE 9: DEMO PROPS ====== -->
+<div class="slide" data-slide="9">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Props y validación</h2>
+  <p>Crearemos un componente <code>Tarjeta.vue</code> que reciba props validadas desde el padre.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Definir props con type y default</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Pasar datos desde App.vue</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Probar validator</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 10: $emit ====== -->
+<div class="slide" data-slide="10">
+  <h2>$emit — Eventos hijo → padre</h2>
+  <p>El hijo notifica al padre que algo ocurrió usando <code>this.$emit('nombre-evento')</code>.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Hijo (Boton.vue)</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"notificar"</span><span class="tag">&gt;</span>
+    Click aquí
+  <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="attr">methods</span>: {
+    <span class="fn">notificar</span>() {
+      <span class="kw">this</span>.$emit(<span class="str">'clicked'</span>, <span class="str">'dato extra'</span>)
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Padre</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;Boton</span>
+    <span class="attr">@clicked</span>=<span class="str">"manejarClick"</span>
+  <span class="tag">/&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="attr">methods</span>: {
+    <span class="fn">manejarClick</span>(dato) {
+      console.log(<span class="str">'Recibido:'</span>, dato)
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 11: DEMO $emit ====== -->
+<div class="slide" data-slide="11">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Contador con $emit</h2>
+  <p>El hijo emite un evento cada vez que se hace click; el padre lleva la cuenta.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Hijo emite 'incrementar'</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Padre escucha @incrementar</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Padre actualiza count</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 12: ACTIVIDAD 1 ====== -->
+<div class="slide" data-slide="12">
+  <span class="badge badge-activity">ACTIVIDAD 1</span>
+  <h2>Componente con props y $emit</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer1">20:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer1',20*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer1',20*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer1-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Crea un componente <code>ItemLista.vue</code> que reciba una prop <code>texto</code> (String, required).</li>
+        <li>Dentro del componente, muestra el texto y un botón "Eliminar".</li>
+        <li>Al hacer click en "Eliminar", emite el evento <code>eliminar</code> al padre.</li>
+        <li>En <code>App.vue</code>, renderiza 3 instancias de <code>ItemLista</code> con un <code>v-for</code> y elimina el item correspondiente al recibir el evento.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 13: SLOTS ====== -->
+<div class="slide" data-slide="13">
+  <h2>Slots — Contenido flexible</h2>
+  <p>Los slots permiten inyectar contenido desde el padre dentro de la estructura del hijo.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Hijo (Panel.vue)</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"panel"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"header"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;slot</span> <span class="attr">name</span>=<span class="str">"header"</span><span class="tag">&gt;</span>
+        Título por defecto
+      <span class="tag">&lt;/slot&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"body"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;slot&gt;&lt;/slot&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Padre</h3>
+      <pre>
+<span class="tag">&lt;Panel&gt;</span>
+  <span class="tag">&lt;template</span> <span class="attr">v-slot:header</span><span class="tag">&gt;</span>
+    Mi título personalizado
+  <span class="tag">&lt;/template&gt;</span>
+
+  <span class="tag">&lt;p&gt;</span>Contenido del panel<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/Panel&gt;</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 14: DEMO SLOTS ====== -->
+<div class="slide" data-slide="14">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Componente Panel con slots</h2>
+  <p>Crearemos un Panel reutilizable con slot default y slot con nombre.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear Panel.vue con &lt;slot&gt;</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Agregar named slot "header"</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Usar en App con v-slot</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 15: COMPONENTES DINÁMICOS ====== -->
+<div class="slide" data-slide="15">
+  <h2>Componentes dinámicos</h2>
+  <p>Con <code>&lt;component :is="..."&gt;</code> renderizamos distintos componentes en el mismo lugar.</p>
+  <pre style="margin-top:1rem;">
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"vista = 'TabInicio'"</span><span class="tag">&gt;</span>Inicio<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">@click</span>=<span class="str">"vista = 'TabPerfil'"</span><span class="tag">&gt;</span>Perfil<span class="tag">&lt;/button&gt;</span>
+
+    <span class="tag">&lt;keep-alive&gt;</span>
+      <span class="tag">&lt;component</span> <span class="attr">:is</span>=<span class="str">"vista"</span><span class="tag">&gt;&lt;/component&gt;</span>
+    <span class="tag">&lt;/keep-alive&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> TabInicio <span class="kw">from</span> <span class="str">'./TabInicio.vue'</span>
+<span class="kw">import</span> TabPerfil <span class="kw">from</span> <span class="str">'./TabPerfil.vue'</span>
+
+<span class="kw">export default</span> {
+  <span class="attr">components</span>: { TabInicio, TabPerfil },
+  <span class="fn">data</span>() { <span class="kw">return</span> { vista: <span class="str">'TabInicio'</span> } }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 16: DEMO DINÁMICOS ====== -->
+<div class="slide" data-slide="16">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Tabs con componente dinámico</h2>
+  <p>Dos tabs que cambian el componente renderizado con <code>:is</code> y <code>keep-alive</code>.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear TabInicio y TabPerfil</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. &lt;component :is&gt;</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Envolver con keep-alive</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 17: BREAK ====== -->
+<div class="slide" data-slide="17">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem; max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 18: CICLO DE VIDA INTRO ====== -->
+<div class="slide" data-slide="18">
+  <h2>Ciclo de vida de un componente</h2>
+  <p>Cada componente pasa por etapas desde que nace hasta que se destruye. Vue nos da hooks para intervenir en cada momento.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">beforeCreate</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">created</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">beforeMount</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">mounted</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">beforeUpdate</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">updated</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">beforeDestroy</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">destroyed</div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 19: HOOKS TABLA ====== -->
+<div class="slide" data-slide="19">
+  <h2>Hooks del ciclo de vida</h2>
+  <table>
+    <thead><tr><th>Hook</th><th>Momento</th><th>Uso típico</th></tr></thead>
+    <tbody>
+      <tr><td><code>beforeCreate</code></td><td>Antes de inicializar data</td><td>Config temprana</td></tr>
+      <tr><td><code>created</code></td><td>Data y eventos listos</td><td>Llamadas a API, lógica inicial</td></tr>
+      <tr><td><code>beforeMount</code></td><td>Antes de insertar en el DOM</td><td>Ajustes pre-render</td></tr>
+      <tr><td><code>mounted</code></td><td>Ya insertado en el DOM</td><td>Acceso al DOM, librerías externas</td></tr>
+      <tr><td><code>beforeUpdate</code></td><td>Antes de re-render</td><td>Validaciones</td></tr>
+      <tr><td><code>updated</code></td><td>Después de re-render</td><td>Monitoreo de cambios</td></tr>
+      <tr><td><code>beforeDestroy</code></td><td>Antes de destruir</td><td>Limpiar listeners, timers</td></tr>
+      <tr><td><code>destroyed</code></td><td>Componente destruido</td><td>Confirmación de limpieza</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ====== SLIDE 20: CUÁNDO USAR HOOKS ====== -->
+<div class="slide" data-slide="20">
+  <h2>¿Cuándo usar cada hook?</h2>
+  <div class="cards-grid">
+    <div class="card"><h3><code>created</code></h3><p>Fetch de datos, inicialización de lógica. La data ya existe pero el DOM aún no.</p></div>
+    <div class="card"><h3><code>mounted</code></h3><p>Integrar Chart.js, manipular el DOM, iniciar suscripciones WebSocket.</p></div>
+    <div class="card"><h3><code>beforeDestroy</code></h3><p>Limpiar setInterval, removeEventListener, cerrar conexiones.</p></div>
+    <div class="card"><h3><code>updated</code></h3><p>Reaccionar a cambios del DOM ya renderizado. Evitar lógica pesada aquí.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 21: DEMO CICLO DE VIDA ====== -->
+<div class="slide" data-slide="21">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Hooks en acción</h2>
+  <p>Componente con un <code>setInterval</code> en <code>mounted</code> y limpieza en <code>beforeDestroy</code>.</p>
+  <pre style="margin-top:1rem;">
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { segundos: <span class="num">0</span>, intervalo: <span class="kw">null</span> }
+  },
+  <span class="fn">created</span>() {
+    console.log(<span class="str">'created: data lista, DOM no existe aún'</span>)
+  },
+  <span class="fn">mounted</span>() {
+    console.log(<span class="str">'mounted: DOM listo'</span>)
+    <span class="kw">this</span>.intervalo = setInterval(() => {
+      <span class="kw">this</span>.segundos++
+    }, <span class="num">1000</span>)
+  },
+  <span class="fn">beforeDestroy</span>() {
+    console.log(<span class="str">'beforeDestroy: limpiando...'</span>)
+    clearInterval(<span class="kw">this</span>.intervalo)
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+  <p class="small" style="margin-top:0.8rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 22: SCOPED STYLES ====== -->
+<div class="slide" data-slide="22">
+  <h2>Estilos encapsulados — scoped</h2>
+  <p>El atributo <code>scoped</code> limita los estilos al componente actual, evitando colisiones.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Sin scoped (global)</h3>
+      <pre>
+<span class="tag">&lt;style&gt;</span>
+<span class="fn">h2</span> { <span class="attr">color</span>: <span class="str">red</span>; }
+<span class="cm">/* Afecta a TODOS los h2 */</span>
+<span class="tag">&lt;/style&gt;</span>
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Con scoped (aislado)</h3>
+      <pre>
+<span class="tag">&lt;style scoped&gt;</span>
+<span class="fn">h2</span> { <span class="attr">color</span>: <span class="str">red</span>; }
+<span class="cm">/* Solo afecta a ESTE componente */</span>
+<span class="tag">&lt;/style&gt;</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 23: CLASS BINDING ====== -->
+<div class="slide" data-slide="23">
+  <h2>Class Binding — :class</h2>
+  <p>Asigna clases CSS dinámicamente según condiciones reactivas.</p>
+  <pre style="margin-top:1rem;">
+<span class="tag">&lt;template&gt;</span>
+  <span class="cm">&lt;!-- Con objeto --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">:class</span>=<span class="str">"{ activo: esActivo, error: tieneError }"</span><span class="tag">&gt;</span>
+    Ejemplo 1
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- Con array --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">:class</span>=<span class="str">"[claseBase, esGrande ? 'grande' : 'chico']"</span><span class="tag">&gt;</span>
+    Ejemplo 2
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      esActivo: <span class="kw">true</span>,
+      tieneError: <span class="kw">false</span>,
+      claseBase: <span class="str">'tarjeta'</span>,
+      esGrande: <span class="kw">true</span>
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 24: STYLE BINDING ====== -->
+<div class="slide" data-slide="24">
+  <h2>Style Binding — :style</h2>
+  <p>Aplica estilos en línea reactivamente con objetos JavaScript.</p>
+  <pre style="margin-top:1rem;">
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"{ color: colorTexto, fontSize: tamano + 'px' }"</span><span class="tag">&gt;</span>
+    Texto dinámico
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- Con array de objetos --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">:style</span>=<span class="str">"[estiloBase, estiloExtra]"</span><span class="tag">&gt;</span>
+    Combinado
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> {
+      colorTexto: <span class="str">'#2D5BFF'</span>,
+      tamano: <span class="num">24</span>,
+      estiloBase: { <span class="attr">fontWeight</span>: <span class="str">'bold'</span> },
+      estiloExtra: { <span class="attr">backgroundColor</span>: <span class="str">'#f0f0f0'</span> }
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 25: DEMO ESTILOS ====== -->
+<div class="slide" data-slide="25">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: AlertBox con estilos dinámicos</h2>
+  <p>Componente que cambia de color según la prop <code>tipo</code> usando class binding y scoped styles.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear AlertBox.vue</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Prop tipo + :class</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. &lt;style scoped&gt; por tipo</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 26: ACTIVIDAD 2 ====== -->
+<div class="slide" data-slide="26">
+  <span class="badge badge-activity">ACTIVIDAD 2</span>
+  <h2>Componente reutilizable completo</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer2">35:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer2',35*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer2')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer2',35*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer2-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Crea un componente desde cero (tarjeta de usuario, modal, lista, etc.).</li>
+        <li>Debe recibir al menos 2 props con validación (<code>type</code>, <code>required</code> o <code>default</code>).</li>
+        <li>Incluye estilos encapsulados (<code>scoped</code>) y al menos un class binding dinámico.</li>
+        <li>Emite al menos un evento al padre con <code>$emit</code>.</li>
+        <li>Bonus: usa un slot para permitir contenido personalizable.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 27: RESUMEN ====== -->
+<div class="slide" data-slide="27">
+  <h2>Resumen de la clase</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🧩</span><h3>Componentes</h3><p>Creamos componentes reutilizables con estructura template + script + style.</p></div>
+    <div class="card"><span class="icon">📡</span><h3>Props y $emit</h3><p>Padre envía datos con props, hijo notifica con $emit. Flujo unidireccional.</p></div>
+    <div class="card"><span class="icon">🔌</span><h3>Slots y dinámicos</h3><p>Slots para contenido flexible. &lt;component :is&gt; para renderizado dinámico.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>Ciclo de vida</h3><p>Hooks para intervenir en cada etapa: created, mounted, beforeDestroy.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 28: CIERRE ====== -->
+<div class="slide" data-slide="28">
+  <h2>¡Buen trabajo!</h2>
+  <p>Hoy aprendimos los fundamentos para construir aplicaciones Vue modulares, comunicadas y con estilos dinámicos.</p>
+  <p style="margin-top:1.5rem; font-size:1.5rem; color: var(--secondary); font-weight:600;">Practiquen, experimenten, rompan cosas.</p>
+  <p class="small" style="margin-top:2rem;">Próxima clase: Consumo de datos desde una API</p>
+</div>
+
+</div><!-- /slides-wrapper -->
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<!-- AUDIO for timer -->
+<script>
+// ── SLIDES ──
+let currentSlide = 1;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+document.getElementById('totalSlides').textContent = totalSlides;
+
+function showSlide(n) {
+  slides.forEach(s => s.classList.remove('active'));
+  slides[n - 1].classList.add('active');
+  document.getElementById('currentSlide').textContent = n;
+  document.getElementById('progressBar').style.width = ((n / totalSlides) * 100) + '%';
+}
+
+function changeSlide(dir) {
+  const next = currentSlide + dir;
+  if (next >= 1 && next <= totalSlides) {
+    currentSlide = next;
+    showSlide(currentSlide);
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
+});
+
+// ── TIMERS ──
+const timers = {};
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.value = 0.3;
+    osc.start();
+    setTimeout(() => { osc.stop(); ctx.close(); }, 400);
+  } catch(e) {}
+}
+
+function updateTimerDisplay(id) {
+  const t = timers[id];
+  const el = document.getElementById(id);
+  const statusEl = document.getElementById(id + '-status');
+  el.textContent = formatTime(t.remaining);
+
+  el.classList.remove('warning', 'danger');
+  if (t.remaining <= 60) {
+    el.classList.add('danger');
+    if (statusEl) statusEl.textContent = '¡Menos de 1 minuto!';
+  } else if (t.remaining <= 300) {
+    el.classList.add('warning');
+    if (statusEl) statusEl.textContent = 'Menos de 5 minutos';
+  } else {
+    if (statusEl && t.running) statusEl.textContent = 'En curso...';
+  }
+}
+
+function startTimer(id, duration) {
+  if (!timers[id]) timers[id] = { remaining: duration, running: false, interval: null, total: duration };
+  const t = timers[id];
+  if (t.running) return;
+  t.running = true;
+  const statusEl = document.getElementById(id + '-status');
+  if (statusEl) statusEl.textContent = 'En curso...';
+
+  t.interval = setInterval(() => {
+    t.remaining--;
+    updateTimerDisplay(id);
+    if (t.remaining <= 0) {
+      clearInterval(t.interval);
+      t.running = false;
+      if (statusEl) statusEl.textContent = '¡Tiempo terminado!';
+      beep();
+    }
+  }, 1000);
+}
+
+function pauseTimer(id) {
+  const t = timers[id];
+  if (!t || !t.running) return;
+  clearInterval(t.interval);
+  t.running = false;
+  const statusEl = document.getElementById(id + '-status');
+  if (statusEl) statusEl.textContent = 'Pausado';
+}
+
+function resetTimer(id, duration) {
+  const t = timers[id];
+  if (t) { clearInterval(t.interval); t.running = false; }
+  timers[id] = { remaining: duration, running: false, interval: null, total: duration };
+  updateTimerDisplay(id);
+  const statusEl = document.getElementById(id + '-status');
+  if (statusEl) statusEl.textContent = 'Listo para comenzar';
+}
+
+showSlide(1);
+</script>
+</body>
+</html>

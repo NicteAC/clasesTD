@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumo de datos desde una API — Clase 3h</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #2D5BFF;
+  --secondary: #00D4AA;
+  --accent: #FF6B6B;
+  --dark: #1A1A2E;
+  --light: #F8F9FA;
+  --warning: #FFA500;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--dark);
+  color: var(--light);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,26,46,0.92);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.slide-counter {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95rem;
+  color: rgba(248,249,250,0.7);
+  letter-spacing: 2px;
+}
+.slide-counter .current { color: var(--secondary); font-weight: 700; }
+
+.progress-bar {
+  position: fixed;
+  top: 52px; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+.slides-wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 55px;
+}
+.slide {
+  display: none;
+  max-width: 1200px;
+  width: 100%;
+  padding: 2rem;
+  animation: slideIn 0.6s ease-out;
+}
+.slide.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; text-align: center;
+     background: linear-gradient(135deg, var(--primary), var(--secondary));
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.3; text-align: center; margin-bottom: 1.2rem;
+     background: linear-gradient(135deg, var(--light), var(--secondary));
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h3 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--secondary); }
+p, li { font-size: 1.3rem; line-height: 1.8; }
+p { text-align: center; max-width: 900px; color: rgba(248,249,250,0.85); }
+.subtitle { font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.5rem; font-weight: 500; }
+
+pre {
+  font-family: 'Space Mono', monospace;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(45,91,255,0.2);
+  border-radius: var(--border-radius);
+  padding: 1.2rem 1.5rem;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 900px;
+  text-align: left;
+  color: #e0e0e0;
+}
+pre .kw { color: #c792ea; }
+pre .str { color: #c3e88d; }
+pre .fn { color: #82aaff; }
+pre .cm { color: #546e7a; }
+pre .tag { color: #f07178; }
+pre .attr { color: #ffcb6b; }
+pre .num { color: #f78c6c; }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 30px rgba(45,91,255,0.15);
+}
+.card h3 { font-size: 1.4rem; margin-bottom: 0.6rem; }
+.card p { font-size: 1.15rem; text-align: left; }
+
+.cards-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1100px;
+}
+.cards-grid-3 .card h3 { font-size: 1.25rem; }
+.cards-grid-3 .card p { font-size: 1.05rem; }
+
+.cards-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 1100px;
+}
+.cards-grid-4 .card { padding: 1.2rem; }
+.cards-grid-4 .card h3 { font-size: 1.15rem; }
+.cards-grid-4 .card p { font-size: 1rem; }
+
+table {
+  width: 100%;
+  max-width: 1000px;
+  border-collapse: collapse;
+  font-size: 1.1rem;
+}
+th {
+  background: rgba(45,91,255,0.2);
+  color: var(--secondary);
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+tr:hover td { background: rgba(255,255,255,0.03); }
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1100px;
+  align-items: start;
+}
+.timer-panel {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--border-radius);
+  padding: 1.8rem;
+  text-align: center;
+}
+.timer-display {
+  font-family: 'Space Mono', monospace;
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-shadow: 0 0 30px rgba(0,212,170,0.3);
+  margin: 0.8rem 0;
+  letter-spacing: 4px;
+}
+.timer-display.warning { color: var(--warning); text-shadow: 0 0 30px rgba(255,165,0,0.4); }
+.timer-display.danger { color: var(--accent); text-shadow: 0 0 30px rgba(255,107,107,0.5); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+.timer-controls {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.timer-btn {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.timer-btn.start { background: var(--secondary); color: var(--dark); }
+.timer-btn.pause { background: var(--warning); color: var(--dark); }
+.timer-btn.reset { background: rgba(255,255,255,0.1); color: var(--light); border: 1px solid rgba(255,255,255,0.2); }
+.timer-btn:hover { transform: scale(1.05); }
+.timer-status {
+  font-size: 0.95rem;
+  margin-top: 0.8rem;
+  color: rgba(248,249,250,0.6);
+}
+
+.activity-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  text-align: left;
+}
+.activity-card h3 { margin-bottom: 0.8rem; }
+.activity-card ol, .activity-card ul { padding-left: 1.5rem; }
+.activity-card li { font-size: 1.15rem; line-height: 1.8; margin-bottom: 0.3rem; }
+
+.badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 0.8rem;
+}
+.badge-demo { background: rgba(45,91,255,0.2); color: var(--primary); border: 1px solid var(--primary); }
+.badge-activity { background: rgba(0,212,170,0.15); color: var(--secondary); border: 1px solid var(--secondary); }
+.badge-break { background: rgba(255,165,0,0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+.flow-item {
+  background: rgba(45,91,255,0.12);
+  border: 1px solid rgba(45,91,255,0.3);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.flow-arrow { font-size: 1.5rem; color: var(--secondary); }
+
+.demo-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+  align-items: start;
+}
+.demo-layout pre { max-width: 100%; font-size: 0.82rem; }
+
+.nav {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%; transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+.nav-btn {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(26,26,46,0.9);
+  color: var(--light);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+.nav-btn:hover { border-color: var(--primary); background: rgba(45,91,255,0.15); }
+
+.small { font-size: 1rem; color: rgba(248,249,250,0.6); }
+.icon { font-size: 2.2rem; margin-bottom: 0.5rem; display: block; }
+
+.highlight-box {
+  background: rgba(45,91,255,0.08);
+  border: 1px solid rgba(45,91,255,0.25);
+  border-radius: var(--border-radius);
+  padding: 1.2rem 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  text-align: left;
+  margin-top: 1rem;
+}
+.highlight-box p { text-align: left; font-size: 1.15rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">30</span></div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slides-wrapper">
+
+<!-- ====== SLIDE 1: PORTADA ====== -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 7 — Desarrollo de aplicaciones front-end con Vue</p>
+  <h1>Consumo de Datos desde una API</h1>
+  <p>APIs REST, Postman, Axios, promesas, JWT y manejo de errores</p>
+  <p class="small" style="margin-top:1.5rem;">Vue 2 · Options API · Clase de 3 horas</p>
+</div>
+
+<!-- ====== SLIDE 2: OBJETIVOS ====== -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🔌</span><h3>APIs y REST</h3><p>Entender qué es una API, la comunicación cliente/servidor y los verbos HTTP.</p></div>
+    <div class="card"><span class="icon">🧪</span><h3>Postman + Reqres</h3><p>Probar endpoints reales con una herramienta cliente antes de codificar.</p></div>
+    <div class="card"><span class="icon">📡</span><h3>Axios en Vue</h3><p>Consumir datos desde componentes Vue usando Axios con GET, POST, PUT y DELETE.</p></div>
+    <div class="card"><span class="icon">🔐</span><h3>JWT y errores</h3><p>Autenticación con tokens, manejo de promesas, callbacks y errores.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 3: ¿QUÉ ES UNA API? ====== -->
+<div class="slide" data-slide="3">
+  <h2>¿Qué es una API?</h2>
+  <p>Una API (Application Programming Interface) es un conjunto de reglas que permite que dos sistemas de software se comuniquen entre sí.</p>
+  <div class="cards-grid-3" style="margin-top:1.5rem;">
+    <div class="card"><span class="icon">🔀</span><h3>Separación</h3><p>El frontend se ocupa de la UI, el backend de los datos y la lógica. La API los conecta.</p></div>
+    <div class="card"><span class="icon">🌐</span><h3>Flexibilidad</h3><p>APIs públicas (OpenWeather, Reqres) y privadas (requieren auth). Formato estándar: JSON sobre HTTP.</p></div>
+    <div class="card"><span class="icon">🔒</span><h3>Seguridad</h3><p>Control de acceso, monitoreo de uso y protección de datos mediante tokens y permisos.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 4: CLIENTE / SERVIDOR ====== -->
+<div class="slide" data-slide="4">
+  <h2>Comunicación Cliente / Servidor</h2>
+  <p>Toda petición HTTP tiene tres partes clave:</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">📋</span><h3>Header</h3><p>Meta-información: tipo de contenido (<code>Content-Type</code>), autorización (<code>Authorization: Bearer ...</code>).</p></div>
+    <div class="card"><span class="icon">📦</span><h3>Body</h3><p>El contenido principal. En POST/PUT contiene los datos enviados. En la respuesta, los datos que vuelven (JSON).</p></div>
+    <div class="card"><span class="icon">🚦</span><h3>Status</h3><p>Código numérico del resultado: <code>200</code> OK, <code>201</code> Created, <code>404</code> Not Found, <code>500</code> Server Error.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 5: STATUS CODES ====== -->
+<div class="slide" data-slide="5">
+  <h2>Códigos de estado HTTP</h2>
+  <table>
+    <thead><tr><th>Código</th><th>Significado</th><th>Cuándo ocurre</th></tr></thead>
+    <tbody>
+      <tr><td><code>200</code></td><td>OK</td><td>La petición fue exitosa</td></tr>
+      <tr><td><code>201</code></td><td>Created</td><td>Se creó un recurso nuevo (POST exitoso)</td></tr>
+      <tr><td><code>400</code></td><td>Bad Request</td><td>Datos mal formados o inválidos</td></tr>
+      <tr><td><code>401</code></td><td>Unauthorized</td><td>Falta token o token inválido</td></tr>
+      <tr><td><code>404</code></td><td>Not Found</td><td>El recurso no existe</td></tr>
+      <tr><td><code>500</code></td><td>Internal Server Error</td><td>Error del lado del servidor</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ====== SLIDE 6: CRUD Y REST ====== -->
+<div class="slide" data-slide="6">
+  <h2>CRUD, Web Services y REST</h2>
+  <p>CRUD son las 4 operaciones básicas sobre datos. REST es el estilo de arquitectura que usa verbos HTTP para ejecutarlas.</p>
+  <div class="cards-grid-4" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--secondary);"><h3>GET</h3><p>Leer datos. Obtener lista de usuarios.</p></div>
+    <div class="card" style="border-left:3px solid var(--primary);"><h3>POST</h3><p>Crear datos. Registrar un usuario nuevo.</p></div>
+    <div class="card" style="border-left:3px solid var(--warning);"><h3>PUT / PATCH</h3><p>Actualizar datos existentes total o parcialmente.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>DELETE</h3><p>Eliminar un recurso específico.</p></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.2rem;">
+    <p>Un Web Service expone estas operaciones mediante URLs (endpoints). Ejemplo: <code>GET /api/users</code> devuelve la lista de usuarios.</p>
+  </div>
+</div>
+
+<!-- ====== SLIDE 7: JSON ====== -->
+<div class="slide" data-slide="7">
+  <h2>JSON — El formato de los datos</h2>
+  <p>JSON (JavaScript Object Notation) es el formato estándar que usan las APIs para enviar y recibir datos.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Ejemplo de JSON</h3>
+      <pre>
+{
+  <span class="attr">"id"</span>: <span class="num">1</span>,
+  <span class="attr">"name"</span>: <span class="str">"Juan Pérez"</span>,
+  <span class="attr">"email"</span>: <span class="str">"juan@mail.com"</span>,
+  <span class="attr">"active"</span>: <span class="kw">true</span>,
+  <span class="attr">"roles"</span>: [<span class="str">"admin"</span>, <span class="str">"editor"</span>],
+  <span class="attr">"address"</span>: {
+    <span class="attr">"city"</span>: <span class="str">"Santiago"</span>,
+    <span class="attr">"zip"</span>: <span class="str">"8320000"</span>
+  }
+}
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Características</h3>
+      <div class="card" style="margin-bottom:1rem;"><p>Claves siempre entre comillas dobles.</p></div>
+      <div class="card" style="margin-bottom:1rem;"><p>Valores: string, number, boolean, array, object, null.</p></div>
+      <div class="card" style="margin-bottom:1rem;"><p>Sintaxis casi idéntica a objetos JS — fácil de parsear.</p></div>
+      <div class="card"><p>Más liviano que XML. Estándar de la industria.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 8: POSTMAN ====== -->
+<div class="slide" data-slide="8">
+  <h2>Postman — Probando APIs</h2>
+  <p>Herramienta gráfica para hacer peticiones HTTP sin escribir código. Ideal para validar endpoints antes de integrarlos.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Elegir método (GET)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Escribir la URL</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Presionar Send</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Ver respuesta JSON</div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.5rem;">
+    <p><strong>Reqres.in</strong> — API gratuita de pruebas. Simula un backend real con usuarios, login y CRUD. URL base: <code>https://reqres.in/api</code></p>
+  </div>
+</div>
+
+<!-- ====== SLIDE 9: DEMO POSTMAN ====== -->
+<div class="slide" data-slide="9">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Postman + Reqres</h2>
+  <p>Probaremos los 4 verbos HTTP contra Reqres directamente en Postman.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">GET /api/users</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">POST /api/users</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">PUT /api/users/2</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">DELETE /api/users/2</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~12 minutos</p>
+</div>
+
+<!-- ====== SLIDE 10: ACTIVIDAD 1 ====== -->
+<div class="slide" data-slide="10">
+  <span class="badge badge-activity">ACTIVIDAD 1</span>
+  <h2>Explora Reqres con Postman</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer1">15:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer1',15*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer1',15*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer1-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Abre Postman y haz un <code>GET</code> a <code>https://reqres.in/api/users?page=2</code>. Identifica header, body y status.</li>
+        <li>Haz un <code>POST</code> a <code>/api/users</code> con body JSON: <code>{"name":"Tu nombre","job":"dev"}</code>. Observa el status 201.</li>
+        <li>Haz un <code>PUT</code> a <code>/api/users/2</code> con datos actualizados.</li>
+        <li>Haz un <code>DELETE</code> a <code>/api/users/2</code>. Observa el status 204.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 11: PROMESAS Y CALLBACKS ====== -->
+<div class="slide" data-slide="11">
+  <h2>Promesas y Callbacks</h2>
+  <p>Las llamadas a API son asíncronas: el código no espera la respuesta. Necesitamos mecanismos para manejar eso.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Callback (el problema)</h3>
+      <pre>
+<span class="fn">fetchData</span>(<span class="kw">function</span>(error, data) {
+  <span class="kw">if</span> (error) {
+    console.error(error)
+    <span class="kw">return</span>
+  }
+  <span class="cm">// Callback dentro de callback</span>
+  <span class="fn">fetchMore</span>(data.id, <span class="kw">function</span>(err, more) {
+    <span class="cm">// Callback hell...</span>
+  })
+})
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Promesa (la solución)</h3>
+      <pre>
+<span class="fn">fetchData</span>()
+  .then(<span class="kw">function</span>(data) {
+    console.log(<span class="str">'Datos:'</span>, data)
+    <span class="kw">return</span> <span class="fn">fetchMore</span>(data.id)
+  })
+  .then(<span class="kw">function</span>(more) {
+    console.log(<span class="str">'Más datos:'</span>, more)
+  })
+  .catch(<span class="kw">function</span>(error) {
+    console.error(<span class="str">'Error:'</span>, error)
+  })
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 12: ASYNC/AWAIT ====== -->
+<div class="slide" data-slide="12">
+  <h2>Async / Await</h2>
+  <p>Sintaxis moderna que hace que el código asíncrono se lea como si fuera síncrono.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">async</span> <span class="fn">fetchData</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">var</span> response = <span class="kw">await</span> axios.get(<span class="str">'https://reqres.in/api/users'</span>)
+    <span class="kw">this</span>.users = response.data.data
+    console.log(<span class="str">'Usuarios cargados:'</span>, <span class="kw">this</span>.users)
+  } <span class="kw">catch</span> (error) {
+    console.error(<span class="str">'Error:'</span>, error)
+    <span class="kw">this</span>.errorMsg = <span class="str">'No se pudieron cargar los datos'</span>
+  } <span class="kw">finally</span> {
+    <span class="kw">this</span>.loading = <span class="kw">false</span>
+  }
+}
+  </pre>
+  <p class="small" style="margin-top:1rem;"><code>try</code> ejecuta el código, <code>catch</code> atrapa errores, <code>finally</code> se ejecuta siempre.</p>
+</div>
+
+<!-- ====== SLIDE 13: AXIOS INTRO ====== -->
+<div class="slide" data-slide="13">
+  <h2>Axios — Consumiendo APIs</h2>
+  <p>Librería basada en promesas para hacer peticiones HTTP. Se instala con <code>npm install axios</code>.</p>
+  <div class="cards-grid" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">⚡</span><h3>Basado en Promesas</h3><p>Código limpio con .then/.catch o async/await. Sin XMLHttpRequest manual.</p></div>
+    <div class="card"><span class="icon">⚙️</span><h3>Configuración global</h3><p>URL base, headers por defecto e instancias reutilizables.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>Interceptores</h3><p>Interceptar peticiones y respuestas para lógica centralizada (tokens, errores).</p></div>
+    <div class="card"><span class="icon">🌍</span><h3>Compatible</h3><p>Funciona en navegador y Node.js. Transforma JSON automáticamente.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 14: AXIOS GET ====== -->
+<div class="slide" data-slide="14">
+  <h2>Axios GET en Vue</h2>
+  <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;div&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"loading"</span><span class="tag">&gt;</span>Cargando...<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">v-if</span>=<span class="str">"error"</span> <span class="attr">class</span>=<span class="str">"error"</span><span class="tag">&gt;</span>{{ error }}<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;ul&gt;</span>
+      <span class="tag">&lt;li</span> <span class="attr">v-for</span>=<span class="str">"user in users"</span> <span class="attr">:key</span>=<span class="str">"user.id"</span><span class="tag">&gt;</span>
+        {{ user.first_name }} {{ user.last_name }}
+      <span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">'axios'</span>
+
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { users: [], loading: <span class="kw">true</span>, error: <span class="str">''</span> }
+  },
+  <span class="fn">created</span>() {
+    axios.get(<span class="str">'https://reqres.in/api/users'</span>)
+      .then(<span class="kw">function</span>(response) {
+        <span class="kw">this</span>.users = response.data.data
+      }.bind(<span class="kw">this</span>))
+      .catch(<span class="kw">function</span>(err) {
+        <span class="kw">this</span>.error = <span class="str">'Error al cargar usuarios'</span>
+      }.bind(<span class="kw">this</span>))
+      .finally(<span class="kw">function</span>() {
+        <span class="kw">this</span>.loading = <span class="kw">false</span>
+      }.bind(<span class="kw">this</span>))
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 15: DEMO GET ====== -->
+<div class="slide" data-slide="15">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Lista de usuarios con GET</h2>
+  <p>Componente <code>UserList.vue</code> que consume <code>/api/users</code> y muestra loading, error y datos.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. npm install axios</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. GET en created()</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. v-if loading/error</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. v-for usuarios</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 16: AXIOS POST ====== -->
+<div class="slide" data-slide="16">
+  <h2>Axios POST — Crear datos</h2>
+  <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;form</span> <span class="attr">@submit.prevent</span>=<span class="str">"crearUsuario"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"nombre"</span> <span class="attr">placeholder</span>=<span class="str">"Nombre"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">v-model</span>=<span class="str">"trabajo"</span> <span class="attr">placeholder</span>=<span class="str">"Trabajo"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"submit"</span><span class="tag">&gt;</span>Crear<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/form&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">'axios'</span>
+
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { nombre: <span class="str">''</span>, trabajo: <span class="str">''</span> }
+  },
+  <span class="attr">methods</span>: {
+    <span class="fn">crearUsuario</span>() {
+      axios.post(<span class="str">'https://reqres.in/api/users'</span>, {
+        name: <span class="kw">this</span>.nombre,
+        job: <span class="kw">this</span>.trabajo
+      })
+      .then(<span class="kw">function</span>(res) {
+        console.log(<span class="str">'Creado:'</span>, res.data)
+        alert(<span class="str">'Usuario creado con id: '</span> + res.data.id)
+      })
+      .catch(<span class="kw">function</span>(err) {
+        console.error(err)
+      })
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 17: DEMO POST + PUT + DELETE ====== -->
+<div class="slide" data-slide="17">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: POST, PUT y DELETE</h2>
+  <p>Extendemos el componente para crear, editar y eliminar usuarios contra Reqres.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. POST /api/users</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. PUT /api/users/:id</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. DELETE /api/users/:id</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~12 minutos</p>
+</div>
+
+<!-- ====== SLIDE 18: MANEJO DE ERRORES ====== -->
+<div class="slide" data-slide="18">
+  <h2>Manejo de errores con Axios</h2>
+  <p>Axios distingue 3 tipos de error según dónde ocurrió el problema:</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>error.response</h3><p>El servidor respondió con un código de error (4xx, 5xx). Tenemos status y data.</p></div>
+    <div class="card" style="border-left:3px solid var(--warning);"><h3>error.request</h3><p>La petición se envió pero no hubo respuesta. Problemas de red o servidor caído.</p></div>
+    <div class="card" style="border-left:3px solid var(--primary);"><h3>error.message</h3><p>Error al configurar la petición. URL mal escrita, error de código.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 19: DEMO ERRORES ====== -->
+<div class="slide" data-slide="19">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Manejando errores</h2>
+  <p>Provocaremos errores a propósito y los atraparemos mostrando feedback visual al usuario.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. GET a URL inválida</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Detectar error.response</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Mostrar mensaje en la UI</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 20: BREAK ====== -->
+<div class="slide" data-slide="20">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem; max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 21: JWT INTRO ====== -->
+<div class="slide" data-slide="21">
+  <h2>Autenticación con JWT</h2>
+  <p>JSON Web Token: un token firmado que el servidor genera al hacer login y el cliente envía en cada petición.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Login (user + pass)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Servidor genera JWT</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Cliente guarda token</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Token en cada request</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">5. Servidor valida</div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.5rem;">
+    <p>El JWT tiene 3 partes: <strong>Header</strong> (algoritmo), <strong>Payload</strong> (datos del usuario) y <strong>Signature</strong> (firma de verificación).</p>
+  </div>
+</div>
+
+<!-- ====== SLIDE 22: JWT EN VUE ====== -->
+<div class="slide" data-slide="22">
+  <h2>JWT con Axios en Vue</h2>
+  <pre>
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">'axios'</span>
+
+<span class="kw">export default</span> {
+  <span class="fn">data</span>() {
+    <span class="kw">return</span> { email: <span class="str">''</span>, password: <span class="str">''</span>, token: <span class="str">''</span> }
+  },
+  <span class="attr">methods</span>: {
+    <span class="fn">login</span>() {
+      axios.post(<span class="str">'https://reqres.in/api/login'</span>, {
+        email: <span class="kw">this</span>.email,
+        password: <span class="kw">this</span>.password
+      })
+      .then(<span class="kw">function</span>(res) {
+        <span class="kw">this</span>.token = res.data.token
+        localStorage.setItem(<span class="str">'token'</span>, <span class="kw">this</span>.token)
+      }.bind(<span class="kw">this</span>))
+      .catch(<span class="kw">function</span>(err) {
+        alert(<span class="str">'Login fallido'</span>)
+      })
+    },
+    <span class="fn">fetchProtected</span>() {
+      <span class="kw">var</span> token = localStorage.getItem(<span class="str">'token'</span>)
+      axios.get(<span class="str">'https://reqres.in/api/users'</span>, {
+        <span class="attr">headers</span>: { <span class="str">'Authorization'</span>: <span class="str">'Bearer '</span> + token }
+      })
+      .then(<span class="kw">function</span>(res) {
+        console.log(<span class="str">'Datos protegidos:'</span>, res.data)
+      }.bind(<span class="kw">this</span>))
+    }
+  }
+}
+<span class="tag">&lt;/script&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 23: ENCRIPTACIÓN CLIENTE ====== -->
+<div class="slide" data-slide="23">
+  <h2>Encriptación en el cliente</h2>
+  <p>Capa adicional de seguridad para datos sensibles antes de enviarlos al servidor.</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">🔐</span><h3>¿Qué encriptar?</h3><p>Contraseñas antes del envío, tokens temporales, datos sensibles en tránsito.</p></div>
+    <div class="card"><span class="icon">⚠️</span><h3>Limitaciones</h3><p>No reemplaza HTTPS ni la validación del servidor. Es una capa extra, no la única.</p></div>
+    <div class="card"><span class="icon">🛠️</span><h3>Herramientas</h3><p>Librerías como CryptoJS para AES, SHA-256. Se usan en métodos o funciones auxiliares.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 24: DEMO JWT + LOGIN ====== -->
+<div class="slide" data-slide="24">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Login con JWT</h2>
+  <p>Formulario de login contra Reqres. Guardamos el token y lo enviamos en peticiones autenticadas.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. POST /api/login</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Guardar token</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. GET con Authorization</div>
+  </div>
+  <p class="small" style="margin-top:1rem;">Credenciales Reqres: <code>eve.holt@reqres.in</code> / <code>cityslicka</code></p>
+  <p class="small">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 25: INSTANCIA GLOBAL ====== -->
+<div class="slide" data-slide="25">
+  <h2>Instancia global de Axios</h2>
+  <p>Centralizamos configuración para no repetir la URL base y los headers en cada componente.</p>
+  <pre style="margin-top:1rem;">
+<span class="cm">// src/services/api.js</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">'axios'</span>
+
+<span class="kw">var</span> api = axios.create({
+  <span class="attr">baseURL</span>: <span class="str">'https://reqres.in/api'</span>,
+  <span class="attr">headers</span>: {
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>
+  }
+})
+
+<span class="cm">// Interceptor: agregar token automáticamente</span>
+api.interceptors.request.use(<span class="kw">function</span>(config) {
+  <span class="kw">var</span> token = localStorage.getItem(<span class="str">'token'</span>)
+  <span class="kw">if</span> (token) {
+    config.headers.Authorization = <span class="str">'Bearer '</span> + token
+  }
+  <span class="kw">return</span> config
+})
+
+<span class="cm">// Interceptor de respuesta: manejo global de errores</span>
+api.interceptors.response.use(
+  <span class="kw">function</span>(response) { <span class="kw">return</span> response },
+  <span class="kw">function</span>(error) {
+    <span class="kw">if</span> (error.response && error.response.status === <span class="num">401</span>) {
+      alert(<span class="str">'Sesión expirada'</span>)
+    }
+    <span class="kw">return</span> Promise.reject(error)
+  }
+)
+
+<span class="kw">export default</span> api
+  </pre>
+</div>
+
+<!-- ====== SLIDE 26: DEMO INSTANCIA GLOBAL ====== -->
+<div class="slide" data-slide="26">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Refactorizando con instancia global</h2>
+  <p>Creamos <code>api.js</code> con interceptores y lo usamos en los componentes.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear api.js</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. axios.create + interceptors</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. import api from api.js</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. api.get() en vez de axios.get()</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 27: ACTIVIDAD 2 ====== -->
+<div class="slide" data-slide="27">
+  <span class="badge badge-activity">ACTIVIDAD 2</span>
+  <h2>Módulo CRUD con Axios</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer2">35:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer2',35*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer2')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer2',35*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer2-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Crea un componente que liste datos de Reqres (<code>GET /api/users</code>).</li>
+        <li>Agrega un formulario para crear un usuario (<code>POST /api/users</code>).</li>
+        <li>Muestra estados visuales: loading mientras carga, mensaje de error si falla.</li>
+        <li>Crea un archivo <code>api.js</code> con instancia global de Axios y al menos un interceptor.</li>
+        <li>Bonus: agrega botón de eliminar con <code>DELETE</code> y login simulado con JWT.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 28: RESUMEN VISUAL ====== -->
+<div class="slide" data-slide="28">
+  <h2>Todo el flujo junto</h2>
+  <div class="flow" style="margin-top:1rem;">
+    <div class="flow-item">API REST</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Postman (probar)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Axios (consumir)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Vue (mostrar)</div>
+  </div>
+  <div class="cards-grid" style="margin-top:2rem;">
+    <div class="card"><span class="icon">📡</span><h3>GET / POST / PUT / DELETE</h3><p>Los 4 verbos del CRUD para leer, crear, actualizar y eliminar datos.</p></div>
+    <div class="card"><span class="icon">⚡</span><h3>Promesas y async/await</h3><p>Manejo de asincronía para que la UI no se bloquee esperando respuestas.</p></div>
+    <div class="card"><span class="icon">🔐</span><h3>JWT + Headers</h3><p>Token de autenticación enviado en el header Authorization de cada petición.</p></div>
+    <div class="card"><span class="icon">🛡️</span><h3>Errores + Interceptores</h3><p>Captura centralizada de errores y lógica global con interceptores de Axios.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 29: RESUMEN ====== -->
+<div class="slide" data-slide="29">
+  <h2>Resumen de la clase</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🔌</span><h3>APIs y REST</h3><p>Entendimos qué es una API, la comunicación HTTP y los verbos CRUD.</p></div>
+    <div class="card"><span class="icon">🧪</span><h3>Postman + Reqres</h3><p>Probamos endpoints reales verificando headers, body y status codes.</p></div>
+    <div class="card"><span class="icon">📡</span><h3>Axios en Vue</h3><p>Consumimos datos con GET, POST, PUT y DELETE desde componentes Vue.</p></div>
+    <div class="card"><span class="icon">🔐</span><h3>JWT y errores</h3><p>Implementamos login con JWT, manejo de errores y configuración centralizada.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 30: CIERRE ====== -->
+<div class="slide" data-slide="30">
+  <h2>¡Buen trabajo!</h2>
+  <p>Hoy conectaron sus componentes Vue con el mundo exterior a través de APIs REST.</p>
+  <p style="margin-top:1.5rem; font-size:1.5rem; color: var(--secondary); font-weight:600;">Ahora sus apps pueden leer, crear, editar y eliminar datos reales.</p>
+  <p class="small" style="margin-top:2rem;">Próxima clase: Almacenamiento de estado en Vuex</p>
+</div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+let currentSlide = 1;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+document.getElementById('totalSlides').textContent = totalSlides;
+
+function showSlide(n) {
+  slides.forEach(s => s.classList.remove('active'));
+  slides[n - 1].classList.add('active');
+  document.getElementById('currentSlide').textContent = n;
+  document.getElementById('progressBar').style.width = ((n / totalSlides) * 100) + '%';
+}
+function changeSlide(dir) {
+  const next = currentSlide + dir;
+  if (next >= 1 && next <= totalSlides) { currentSlide = next; showSlide(currentSlide); }
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
+});
+
+const timers = {};
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+function beep() {
+  try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; g.gain.value=0.3; o.start(); setTimeout(()=>{o.stop();ctx.close();},400); } catch(e){}
+}
+function updateTimerDisplay(id) {
+  const t = timers[id], el = document.getElementById(id), st = document.getElementById(id+'-status');
+  el.textContent = formatTime(t.remaining);
+  el.classList.remove('warning','danger');
+  if (t.remaining <= 60) { el.classList.add('danger'); if(st) st.textContent='¡Menos de 1 minuto!'; }
+  else if (t.remaining <= 300) { el.classList.add('warning'); if(st) st.textContent='Menos de 5 minutos'; }
+  else { if(st && t.running) st.textContent='En curso...'; }
+}
+function startTimer(id, dur) {
+  if (!timers[id]) timers[id] = {remaining:dur,running:false,interval:null,total:dur};
+  const t = timers[id]; if(t.running) return; t.running=true;
+  const st = document.getElementById(id+'-status'); if(st) st.textContent='En curso...';
+  t.interval = setInterval(()=>{ t.remaining--; updateTimerDisplay(id); if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep();}},1000);
+}
+function pauseTimer(id) { const t=timers[id]; if(!t||!t.running)return; clearInterval(t.interval); t.running=false; const st=document.getElementById(id+'-status'); if(st)st.textContent='Pausado'; }
+function resetTimer(id, dur) { const t=timers[id]; if(t){clearInterval(t.interval);t.running=false;} timers[id]={remaining:dur,running:false,interval:null,total:dur}; updateTimerDisplay(id); const st=document.getElementById(id+'-status'); if(st)st.textContent='Listo para comenzar'; }
+showSlide(1);
+</script>
+</body>
+</html>

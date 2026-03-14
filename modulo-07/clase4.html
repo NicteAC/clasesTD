@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almacenamiento de Estado en Vuex — Clase 3h</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #2D5BFF;
+  --secondary: #00D4AA;
+  --accent: #FF6B6B;
+  --dark: #1A1A2E;
+  --light: #F8F9FA;
+  --warning: #FFA500;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Sora', sans-serif; background: var(--dark); color: var(--light); overflow: hidden; height: 100vh; width: 100vw; }
+
+.header { position: fixed; top: 0; left: 0; right: 0; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(26,26,46,0.92); backdrop-filter: blur(8px); z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.slide-counter { font-family: 'Space Mono', monospace; font-size: 0.95rem; color: rgba(248,249,250,0.7); letter-spacing: 2px; }
+.slide-counter .current { color: var(--secondary); font-weight: 700; }
+
+.progress-bar { position: fixed; top: 52px; left: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.4s ease; z-index: 100; }
+
+.slides-wrapper { height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; padding-top: 55px; }
+.slide { display: none; max-width: 1200px; width: 100%; padding: 2rem; animation: slideIn 0.6s ease-out; }
+.slide.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.3; text-align: center; margin-bottom: 1.2rem; background: linear-gradient(135deg, var(--light), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h3 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--secondary); }
+p, li { font-size: 1.3rem; line-height: 1.8; }
+p { text-align: center; max-width: 900px; color: rgba(248,249,250,0.85); }
+.subtitle { font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.5rem; font-weight: 500; }
+
+pre { font-family: 'Space Mono', monospace; background: rgba(0,0,0,0.45); border: 1px solid rgba(45,91,255,0.2); border-radius: var(--border-radius); padding: 1.2rem 1.5rem; font-size: 0.82rem; line-height: 1.65; overflow-x: auto; width: 100%; max-width: 900px; text-align: left; color: #e0e0e0; }
+pre .kw { color: #c792ea; }
+pre .str { color: #c3e88d; }
+pre .fn { color: #82aaff; }
+pre .cm { color: #546e7a; }
+pre .tag { color: #f07178; }
+pre .attr { color: #ffcb6b; }
+pre .num { color: #f78c6c; }
+
+.cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; width: 100%; max-width: 1100px; }
+.card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius); padding: 1.5rem; transition: all 0.3s ease; text-align: left; }
+.card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 30px rgba(45,91,255,0.15); }
+.card h3 { font-size: 1.4rem; margin-bottom: 0.6rem; }
+.card p { font-size: 1.15rem; text-align: left; }
+
+.cards-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; width: 100%; max-width: 1100px; }
+.cards-grid-3 .card h3 { font-size: 1.25rem; }
+.cards-grid-3 .card p { font-size: 1.05rem; }
+
+.cards-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; width: 100%; max-width: 1100px; }
+.cards-grid-5 .card { padding: 1rem; }
+.cards-grid-5 .card h3 { font-size: 1.1rem; }
+.cards-grid-5 .card p { font-size: 0.95rem; }
+
+.activity-grid { display: grid; grid-template-columns: 340px 1fr; gap: 3rem; width: 100%; max-width: 1100px; align-items: start; }
+.timer-panel { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius); padding: 1.8rem; text-align: center; }
+.timer-display { font-family: 'Space Mono', monospace; font-size: 5rem; font-weight: 700; color: var(--secondary); text-shadow: 0 0 30px rgba(0,212,170,0.3); margin: 0.8rem 0; letter-spacing: 4px; }
+.timer-display.warning { color: var(--warning); text-shadow: 0 0 30px rgba(255,165,0,0.4); }
+.timer-display.danger { color: var(--accent); text-shadow: 0 0 30px rgba(255,107,107,0.5); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+.timer-controls { display: flex; gap: 0.8rem; justify-content: center; margin-top: 1rem; }
+.timer-btn { font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 600; padding: 0.5rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; }
+.timer-btn.start { background: var(--secondary); color: var(--dark); }
+.timer-btn.pause { background: var(--warning); color: var(--dark); }
+.timer-btn.reset { background: rgba(255,255,255,0.1); color: var(--light); border: 1px solid rgba(255,255,255,0.2); }
+.timer-btn:hover { transform: scale(1.05); }
+.timer-status { font-size: 0.95rem; margin-top: 0.8rem; color: rgba(248,249,250,0.6); }
+
+.activity-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius); padding: 1.5rem; text-align: left; }
+.activity-card h3 { margin-bottom: 0.8rem; }
+.activity-card ol, .activity-card ul { padding-left: 1.5rem; }
+.activity-card li { font-size: 1.1rem; line-height: 1.7; margin-bottom: 0.2rem; }
+
+.badge { display: inline-block; font-size: 0.85rem; font-weight: 600; padding: 0.25rem 0.8rem; border-radius: 20px; margin-bottom: 0.8rem; }
+.badge-demo { background: rgba(45,91,255,0.2); color: var(--primary); border: 1px solid var(--primary); }
+.badge-activity { background: rgba(0,212,170,0.15); color: var(--secondary); border: 1px solid var(--secondary); }
+.badge-break { background: rgba(255,165,0,0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+.flow { display: flex; align-items: center; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 1rem 0; }
+.flow-item { background: rgba(45,91,255,0.12); border: 1px solid rgba(45,91,255,0.3); border-radius: 10px; padding: 0.6rem 1.2rem; font-size: 1.1rem; font-weight: 500; }
+.flow-arrow { font-size: 1.5rem; color: var(--secondary); }
+
+.demo-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; width: 100%; max-width: 1100px; align-items: start; }
+.demo-layout pre { max-width: 100%; font-size: 0.78rem; }
+
+.nav { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; z-index: 100; }
+.nav-btn { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 600; padding: 0.6rem 1.8rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(26,26,46,0.9); color: var(--light); cursor: pointer; backdrop-filter: blur(8px); transition: all 0.3s ease; }
+.nav-btn:hover { border-color: var(--primary); background: rgba(45,91,255,0.15); }
+
+.small { font-size: 1rem; color: rgba(248,249,250,0.6); }
+.icon { font-size: 2.2rem; margin-bottom: 0.5rem; display: block; }
+
+.highlight-box { background: rgba(45,91,255,0.08); border: 1px solid rgba(45,91,255,0.25); border-radius: var(--border-radius); padding: 1.2rem 1.5rem; width: 100%; max-width: 900px; text-align: left; margin-top: 1rem; }
+.highlight-box p { text-align: left; font-size: 1.15rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">29</span></div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slides-wrapper">
+
+<!-- ====== SLIDE 1: PORTADA ====== -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 7 — Desarrollo de aplicaciones front-end con Vue</p>
+  <h1>Almacenamiento de Estado en Vuex</h1>
+  <p>State, Getters, Mutations, Actions y Modules</p>
+  <p class="small" style="margin-top:1.5rem;">Vue 2 · Options API · Firebase Auth · Clase de 3 horas</p>
+</div>
+
+<!-- ====== SLIDE 2: OBJETIVOS ====== -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🤔</span><h3>¿Por qué Vuex?</h3><p>Entender cuándo el estado local no alcanza y necesitamos un store centralizado.</p></div>
+    <div class="card"><span class="icon">🏗️</span><h3>Estructura de Vuex</h3><p>State, Getters, Mutations, Actions y Modules: qué hace cada uno.</p></div>
+    <div class="card"><span class="icon">⚡</span><h3>Implementar Vuex</h3><p>Configurar un store desde cero y usarlo en componentes reales.</p></div>
+    <div class="card"><span class="icon">🔥</span><h3>Vuex + Firebase</h3><p>Autenticación real con Firebase Auth centralizada en el store.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 3: EL PROBLEMA ====== -->
+<div class="slide" data-slide="3">
+  <h2>El problema: prop drilling</h2>
+  <p>Cuando muchos componentes necesitan los mismos datos, pasar props de padre a hijo a nieto se vuelve inmanejable.</p>
+  <div class="demo-layout" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--accent);">
+      <h3>Sin Vuex</h3>
+      <p>App pasa <code>usuario</code> a Header, Header a NavBar, NavBar a UserBadge...</p>
+      <p style="margin-top:0.5rem;">Cada componente intermedio recibe y re-envía props que no usa.</p>
+      <p style="margin-top:0.5rem; color:var(--accent);">❌ Difícil de mantener</p>
+      <p style="color:var(--accent);">❌ Props innecesarias</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--secondary);">
+      <h3>Con Vuex</h3>
+      <p>El estado vive en un store central. Cualquier componente accede directo.</p>
+      <p style="margin-top:0.5rem;">No importa qué tan profundo esté el componente en el árbol.</p>
+      <p style="margin-top:0.5rem; color:var(--secondary);">✅ Acceso directo</p>
+      <p style="color:var(--secondary);">✅ Fuente única de verdad</p>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 4: ¿QUÉ ES VUEX? ====== -->
+<div class="slide" data-slide="4">
+  <h2>¿Qué es Vuex?</h2>
+  <p>Librería oficial de Vue para manejar estado global de forma centralizada y predecible.</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">📦</span><h3>Centralizado</h3><p>Un solo store con todos los datos compartidos. Una fuente única de verdad.</p></div>
+    <div class="card"><span class="icon">🔍</span><h3>Predecible</h3><p>Solo las mutations pueden cambiar el estado. Cada cambio es rastreable en Vue DevTools.</p></div>
+    <div class="card"><span class="icon">📏</span><h3>Escalable</h3><p>Modules permiten dividir el store en secciones cuando la app crece.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 5: CUÁNDO USAR ====== -->
+<div class="slide" data-slide="5">
+  <h2>¿Cuándo usar Vuex?</h2>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div class="card">
+      <h3 style="color:var(--secondary);">Sí, usa Vuex</h3>
+      <p>Datos de usuario autenticado compartidos en toda la app.</p>
+      <p style="margin-top:0.5rem;">Carrito de compras accesible desde múltiples vistas.</p>
+      <p style="margin-top:0.5rem;">Formularios multi-paso que persisten entre rutas.</p>
+      <p style="margin-top:0.5rem;">Dashboards con datos de varias fuentes.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent);">No necesitas Vuex</h3>
+      <p>Estado que solo usa un componente (usar <code>data()</code>).</p>
+      <p style="margin-top:0.5rem;">Comunicación simple padre-hijo (usar props y $emit).</p>
+      <p style="margin-top:0.5rem;">Apps pequeñas con pocos componentes.</p>
+      <p style="margin-top:0.5rem;">Toggle de un modal o sidebar local.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 6: FLUJO VUEX ====== -->
+<div class="slide" data-slide="6">
+  <h2>El flujo de Vuex</h2>
+  <p>Componente → Action → Mutation → State → Componente</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">Componente<br><span class="small">dispatch('action')</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Action<br><span class="small">Firebase Auth</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Mutation<br><span class="small">commit('MUTATION')</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">State<br><span class="small">se actualiza</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Componente<br><span class="small">reacciona</span></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.2rem;">
+    <p><strong>Regla de oro:</strong> Solo las mutations modifican el state. Las actions hacen el trabajo asíncrono y luego llaman a mutations.</p>
+  </div>
+</div>
+
+<!-- ====== SLIDE 7: 5 ELEMENTOS ====== -->
+<div class="slide" data-slide="7">
+  <h2>Los 5 elementos de Vuex</h2>
+  <div class="cards-grid-5" style="margin-top:1rem;">
+    <div class="card" style="border-top:3px solid var(--secondary);"><h3>State</h3><p>Los datos centrales de la app.</p></div>
+    <div class="card" style="border-top:3px solid var(--primary);"><h3>Getters</h3><p>Propiedades computadas del state.</p></div>
+    <div class="card" style="border-top:3px solid var(--warning);"><h3>Mutations</h3><p>Cambian el state. Síncronas.</p></div>
+    <div class="card" style="border-top:3px solid var(--accent);"><h3>Actions</h3><p>Lógica async. Llaman mutations.</p></div>
+    <div class="card" style="border-top:3px solid #9C27B0;"><h3>Modules</h3><p>Dividen el store en secciones.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 8: INSTALACIÓN ====== -->
+<div class="slide" data-slide="8">
+  <h2>Instalar y configurar Vuex</h2>
+  <pre>
+<span class="cm">// Terminal</span>
+npm install vuex@3
+
+<span class="cm">// src/store/index.js</span>
+<span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> Vuex <span class="kw">from</span> <span class="str">'vuex'</span>
+
+Vue.use(Vuex)
+
+<span class="kw">export default new</span> Vuex.Store({
+  <span class="attr">state</span>: {
+    count: <span class="num">0</span>
+  },
+  <span class="attr">mutations</span>: {
+    <span class="fn">INCREMENT</span>(state) { state.count++ }
+  },
+  <span class="attr">actions</span>: {},
+  <span class="attr">getters</span>: {}
+})
+
+<span class="cm">// src/main.js</span>
+<span class="kw">import</span> store <span class="kw">from</span> <span class="str">'./store'</span>
+<span class="kw">new</span> Vue({ store, render: <span class="kw">function</span>(h) { <span class="kw">return</span> h(App) } }).$mount(<span class="str">'#app'</span>)
+  </pre>
+</div>
+
+<!-- ====== SLIDE 9: STATE ====== -->
+<div class="slide" data-slide="9">
+  <h2>State — Los datos centrales</h2>
+  <p>Es el objeto que contiene todos los datos compartidos. Se accede con <code>this.$store.state</code>.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Definir en el store</h3>
+      <pre>
+<span class="attr">state</span>: {
+  usuario: <span class="kw">null</span>,
+  productos: [],
+  carrito: [],
+  loading: <span class="kw">false</span>
+}
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Usar en un componente</h3>
+      <pre>
+<span class="tag">&lt;template&gt;</span>
+  <span class="tag">&lt;p&gt;</span>{{ $store.state.usuario }}<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="cm">// O con computed</span>
+<span class="attr">computed</span>: {
+  <span class="fn">usuario</span>() {
+    <span class="kw">return this</span>.$store.state.usuario
+  }
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 10: MUTATIONS ====== -->
+<div class="slide" data-slide="10">
+  <h2>Mutations — Cambiar el state</h2>
+  <p>La única forma de modificar el state. Siempre síncronas. Se llaman con <code>this.$store.commit('NOMBRE')</code>.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Definir mutation</h3>
+      <pre>
+<span class="attr">mutations</span>: {
+  <span class="fn">INCREMENT</span>(state) {
+    state.count++
+  },
+  <span class="fn">SET_USUARIO</span>(state, usuario) {
+    state.usuario = usuario
+  },
+  <span class="fn">AGREGAR_AL_CARRITO</span>(state, producto) {
+    state.carrito.push(producto)
+  }
+}
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Llamar desde componente</h3>
+      <pre>
+<span class="attr">methods</span>: {
+  <span class="fn">incrementar</span>() {
+    <span class="kw">this</span>.$store.commit(<span class="str">'INCREMENT'</span>)
+  },
+  <span class="fn">setUser</span>(user) {
+    <span class="kw">this</span>.$store.commit(<span class="str">'SET_USUARIO'</span>, user)
+  }
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 11: GETTERS ====== -->
+<div class="slide" data-slide="11">
+  <h2>Getters — Datos derivados</h2>
+  <p>Propiedades computadas del store. Se acceden con <code>this.$store.getters.nombre</code>.</p>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div>
+      <h3 style="font-size:1.2rem;">Definir getter</h3>
+      <pre>
+<span class="attr">getters</span>: {
+  <span class="fn">totalCarrito</span>(state) {
+    <span class="kw">return</span> state.carrito.length
+  },
+  <span class="fn">carritoTotal</span>(state) {
+    <span class="kw">return</span> state.carrito.reduce(
+      <span class="kw">function</span>(sum, item) {
+        <span class="kw">return</span> sum + item.precio
+      }, <span class="num">0</span>
+    )
+  },
+  <span class="fn">isAuthenticated</span>(state) {
+    <span class="kw">return</span> !!state.usuario
+  }
+}
+      </pre>
+    </div>
+    <div>
+      <h3 style="font-size:1.2rem;">Usar en componente</h3>
+      <pre>
+<span class="attr">computed</span>: {
+  <span class="fn">total</span>() {
+    <span class="kw">return this</span>.$store.getters.totalCarrito
+  },
+  <span class="fn">logueado</span>() {
+    <span class="kw">return this</span>.$store.getters.isAuthenticated
+  }
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 12: ACTIONS ====== -->
+<div class="slide" data-slide="12">
+  <h2>Actions — Lógica asíncrona</h2>
+  <p>Para Firebase Auth, Firestore u operaciones async. Se llaman con <code>this.$store.dispatch('nombre')</code>.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">import</span> { auth } <span class="kw">from</span> <span class="str">'../firebase'</span>
+<span class="kw">import</span> { signInWithEmailAndPassword } <span class="kw">from</span> <span class="str">'firebase/auth'</span>
+
+<span class="attr">actions</span>: {
+  <span class="fn">login</span>(context, credenciales) {
+    context.commit(<span class="str">'SET_LOADING'</span>, <span class="kw">true</span>)
+    signInWithEmailAndPassword(auth, credenciales.email, credenciales.password)
+      .then(<span class="kw">function</span>(result) {
+        context.commit(<span class="str">'SET_USUARIO'</span>, {
+          <span class="attr">uid</span>: result.user.uid, <span class="attr">email</span>: result.user.email
+        })
+      })
+      .catch(<span class="kw">function</span>(err) {
+        context.commit(<span class="str">'SET_ERROR'</span>, err.message)
+      })
+      .finally(<span class="kw">function</span>() {
+        context.commit(<span class="str">'SET_LOADING'</span>, <span class="kw">false</span>)
+      })
+  }
+}
+  </pre>
+</div>
+
+<!-- ====== SLIDE 13: DEMO CONTADOR ====== -->
+<div class="slide" data-slide="13">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Contador global</h2>
+  <p>Un store con state, mutation, action y getter. Dos componentes acceden al mismo contador.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear store con count</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Mutation INCREMENT</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Action incrementAsync</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Getter doubleCount</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~12 minutos</p>
+</div>
+
+<!-- ====== SLIDE 14: DEMO DOS COMPONENTES ====== -->
+<div class="slide" data-slide="14">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Dos componentes, un store</h2>
+  <p>Un componente muestra el contador, otro lo incrementa. Ambos leen del mismo store.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Display.vue lee state</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Controls.vue hace commit</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Ambos reaccionan</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 15: FORMULARIO ====== -->
+<div class="slide" data-slide="15">
+  <h2>Caso práctico: Formulario multi-paso</h2>
+  <p>Los datos del formulario se guardan en el store y persisten al navegar entre pasos.</p>
+  <pre style="margin-top:1rem;">
+<span class="attr">state</span>: {
+  formulario: { nombre: <span class="str">''</span>, email: <span class="str">''</span>, edad: <span class="str">''</span> }
+},
+<span class="attr">mutations</span>: {
+  <span class="fn">ACTUALIZAR_CAMPO</span>(state, payload) {
+    state.formulario[payload.campo] = payload.valor
+  },
+  <span class="fn">RESET_FORMULARIO</span>(state) {
+    state.formulario = { nombre: <span class="str">''</span>, email: <span class="str">''</span>, edad: <span class="str">''</span> }
+  }
+}
+
+<span class="cm">// En el componente</span>
+<span class="tag">&lt;input</span>
+  <span class="attr">:value</span>=<span class="str">"$store.state.formulario.nombre"</span>
+  <span class="attr">@input</span>=<span class="str">"$store.commit('ACTUALIZAR_CAMPO', { campo: 'nombre', valor: $event.target.value })"</span>
+<span class="tag">/&gt;</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 16: DEMO FORMULARIO ====== -->
+<div class="slide" data-slide="16">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Formulario multi-paso</h2>
+  <p>Tres componentes (Paso1, Paso2, Resumen) comparten datos del formulario vía Vuex.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. State con formulario</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Mutation ACTUALIZAR_CAMPO</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Paso1 y Paso2 editan</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Resumen lee todo</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 17: BREAK ====== -->
+<div class="slide" data-slide="17">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem; max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 18: AUTH CON VUEX + FIREBASE ====== -->
+<div class="slide" data-slide="18">
+  <h2>Auth con Vuex + Firebase</h2>
+  <p>El usuario autenticado vive en el store. Firebase Auth maneja las credenciales, Vuex centraliza el estado.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">import</span> { auth } <span class="kw">from</span> <span class="str">'../../firebase'</span>
+<span class="kw">import</span> { signInWithEmailAndPassword, signOut, onAuthStateChanged } <span class="kw">from</span> <span class="str">'firebase/auth'</span>
+
+<span class="attr">state</span>: { usuario: <span class="kw">null</span>, loading: <span class="kw">false</span>, error: <span class="kw">null</span> },
+<span class="attr">mutations</span>: {
+  <span class="fn">SET_USUARIO</span>(state, user) { state.usuario = user },
+  <span class="fn">SET_LOADING</span>(state, val) { state.loading = val },
+  <span class="fn">SET_ERROR</span>(state, err) { state.error = err }
+},
+<span class="attr">getters</span>: {
+  <span class="fn">isAuthenticated</span>(state) { <span class="kw">return</span> !!state.usuario },
+  <span class="fn">currentUser</span>(state) { <span class="kw">return</span> state.usuario }
+}
+  </pre>
+</div>
+
+<!-- ====== SLIDE 19: ACTIONS FIREBASE ====== -->
+<div class="slide" data-slide="19">
+  <h2>Actions: login, registro, logout</h2>
+  <pre>
+<span class="attr">actions</span>: {
+  <span class="fn">login</span>(context, cred) {
+    context.commit(<span class="str">'SET_LOADING'</span>, <span class="kw">true</span>)
+    context.commit(<span class="str">'SET_ERROR'</span>, <span class="kw">null</span>)
+    <span class="kw">return</span> signInWithEmailAndPassword(auth, cred.email, cred.password)
+      .then(<span class="kw">function</span>(result) {
+        context.commit(<span class="str">'SET_USUARIO'</span>, {
+          <span class="attr">uid</span>: result.user.uid, <span class="attr">email</span>: result.user.email
+        })
+      })
+      .catch(<span class="kw">function</span>(err) { context.commit(<span class="str">'SET_ERROR'</span>, err.message) })
+      .finally(<span class="kw">function</span>() { context.commit(<span class="str">'SET_LOADING'</span>, <span class="kw">false</span>) })
+  },
+  <span class="fn">logout</span>(context) {
+    <span class="kw">return</span> signOut(auth).then(<span class="kw">function</span>() {
+      context.commit(<span class="str">'SET_USUARIO'</span>, <span class="kw">null</span>)
+    })
+  },
+  <span class="fn">escucharAuth</span>(context) {
+    onAuthStateChanged(auth, <span class="kw">function</span>(user) {
+      <span class="kw">if</span> (user) {
+        context.commit(<span class="str">'SET_USUARIO'</span>, { <span class="attr">uid</span>: user.uid, <span class="attr">email</span>: user.email })
+      } <span class="kw">else</span> {
+        context.commit(<span class="str">'SET_USUARIO'</span>, <span class="kw">null</span>)
+      }
+    })
+  }
+}
+  </pre>
+</div>
+
+<!-- ====== SLIDE 20: DEMO AUTH FIREBASE ====== -->
+<div class="slide" data-slide="20">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Login con Vuex + Firebase</h2>
+  <p>El componente hace dispatch, el action llama a Firebase Auth, la mutation guarda el usuario.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. dispatch('auth/login')</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Firebase Auth</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. commit SET_USUARIO</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. UI reacciona</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- ====== SLIDE 21: MODULES ====== -->
+<div class="slide" data-slide="21">
+  <h2>Modules — Dividir el store</h2>
+  <p>Cada módulo tiene su propio state, mutations, actions y getters. Con <code>namespaced: true</code> se accede con prefijo.</p>
+  <pre style="margin-top:1rem;">
+<span class="cm">// store/modules/auth.js</span>
+<span class="kw">export default</span> {
+  <span class="attr">namespaced</span>: <span class="kw">true</span>,
+  <span class="attr">state</span>: { usuario: <span class="kw">null</span>, loading: <span class="kw">false</span>, error: <span class="kw">null</span> },
+  <span class="attr">mutations</span>: { <span class="cm">/* SET_USUARIO, SET_LOADING, SET_ERROR */</span> },
+  <span class="attr">actions</span>: { <span class="cm">/* login, logout, escucharAuth */</span> },
+  <span class="attr">getters</span>: { <span class="cm">/* isAuthenticated, currentUser */</span> }
+}
+
+<span class="cm">// store/index.js</span>
+<span class="kw">import</span> auth <span class="kw">from</span> <span class="str">'./modules/auth'</span>
+<span class="kw">export default new</span> Vuex.Store({ <span class="attr">modules</span>: { auth } })
+
+<span class="cm">// En componente</span>
+<span class="kw">this</span>.$store.dispatch(<span class="str">'auth/login'</span>, datos)
+<span class="kw">this</span>.$store.getters[<span class="str">'auth/isAuthenticated'</span>]
+<span class="kw">this</span>.$store.state.auth.usuario
+  </pre>
+</div>
+
+<!-- ====== SLIDE 22: DEMO MODULES ====== -->
+<div class="slide" data-slide="22">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Módulo auth separado</h2>
+  <p>Extraemos toda la lógica Firebase a <code>store/modules/auth.js</code>.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear modules/auth.js</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Registrar en store</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. dispatch('auth/login')</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- ====== SLIDE 23: MAP HELPERS ====== -->
+<div class="slide" data-slide="23">
+  <h2>Helpers: mapState, mapGetters, mapActions</h2>
+  <p>Atajos para no escribir <code>this.$store</code> en cada computed o method.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">import</span> { mapState, mapGetters, mapActions } <span class="kw">from</span> <span class="str">'vuex'</span>
+
+<span class="kw">export default</span> {
+  <span class="attr">computed</span>: {
+    ...mapState(<span class="str">'auth'</span>, [<span class="str">'usuario'</span>, <span class="str">'loading'</span>, <span class="str">'error'</span>]),
+    ...mapGetters(<span class="str">'auth'</span>, [<span class="str">'isAuthenticated'</span>, <span class="str">'currentUser'</span>])
+  },
+  <span class="attr">methods</span>: {
+    ...mapActions(<span class="str">'auth'</span>, [<span class="str">'login'</span>, <span class="str">'logout'</span>, <span class="str">'escucharAuth'</span>])
+  }
+}
+
+<span class="cm">// Ahora se usan como propiedades/métodos locales:</span>
+<span class="cm">// this.usuario, this.isAuthenticated, this.login({...})</span>
+  </pre>
+</div>
+
+<!-- ====== SLIDE 24: DEVTOOLS ====== -->
+<div class="slide" data-slide="24">
+  <h2>Vue DevTools + Vuex</h2>
+  <p>Cada mutation queda registrada. Pueden ver el estado antes y después de cada cambio.</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">📋</span><h3>Log de mutations</h3><p>Cada commit aparece con nombre, payload y timestamp.</p></div>
+    <div class="card"><span class="icon">⏪</span><h3>Time travel</h3><p>Volver a cualquier estado anterior con un click.</p></div>
+    <div class="card"><span class="icon">📸</span><h3>Snapshots</h3><p>Guardar y restaurar estados completos del store.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 25: ERRORES COMUNES ====== -->
+<div class="slide" data-slide="25">
+  <h2>Errores comunes</h2>
+  <div class="cards-grid">
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Vuex para todo</h3><p>No metas todo en el store. <code>data()</code> sigue siendo válido para estado local.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Mutar sin mutation</h3><p>Nunca hagas <code>this.$store.state.count++</code>. Siempre usa <code>commit</code>.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Async en mutations</h3><p>Las mutations son síncronas. Firebase Auth va en actions.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Store gigante</h3><p>Divide en modules. Un archivo enorme es difícil de mantener.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 26: FLUJO COMPLETO ====== -->
+<div class="slide" data-slide="26">
+  <h2>Todo el flujo junto</h2>
+  <div class="flow" style="margin-top:1rem;">
+    <div class="flow-item">Componente</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">dispatch(action)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Firebase Auth</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">commit(mutation)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">State</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Getters → UI</div>
+  </div>
+  <div class="cards-grid" style="margin-top:2rem;">
+    <div class="card"><span class="icon">📦</span><h3>State</h3><p>Fuente única de verdad. Usuario, loading, error.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>Mutations</h3><p>SET_USUARIO, SET_LOADING, SET_ERROR. Síncronas y rastreables.</p></div>
+    <div class="card"><span class="icon">🔥</span><h3>Actions</h3><p>login, logout, escucharAuth. Llaman a Firebase y luego commit.</p></div>
+    <div class="card"><span class="icon">🔍</span><h3>Getters</h3><p>isAuthenticated, currentUser. Computed del store.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 27: ACTIVIDAD ====== -->
+<div class="slide" data-slide="27">
+  <span class="badge badge-activity">ACTIVIDAD</span>
+  <h2>Centraliza el estado con Vuex + Firebase</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer1">45:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer1',45*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer1',45*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer1-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Instala Vuex y crea un store con un módulo <code>auth</code> que use Firebase Auth (login, logout, escucharAuth).</li>
+        <li>Agrega al menos otra sección de datos (carrito, tareas, formulario) con sus mutations.</li>
+        <li>Implementa getters para datos derivados (isAuthenticated, total items, etc.).</li>
+        <li>Usa los datos del store en al menos dos componentes distintos sin props.</li>
+        <li>Inicia el listener <code>escucharAuth</code> en App.vue para mantener la sesión al recargar.</li>
+        <li>Bonus: usa <code>mapState</code>/<code>mapGetters</code>/<code>mapActions</code> en los componentes.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 28: RESUMEN ====== -->
+<div class="slide" data-slide="28">
+  <h2>Resumen de la clase</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🤔</span><h3>¿Por qué Vuex?</h3><p>Evitar prop drilling. Estado centralizado para apps medianas y grandes.</p></div>
+    <div class="card"><span class="icon">🏗️</span><h3>5 elementos</h3><p>State, Getters, Mutations, Actions y Modules. Cada uno con su rol.</p></div>
+    <div class="card"><span class="icon">🔥</span><h3>Vuex + Firebase</h3><p>Auth real centralizado en el store. escucharAuth para persistir sesión.</p></div>
+    <div class="card"><span class="icon">🛠️</span><h3>Herramientas</h3><p>mapHelpers para código limpio. Vue DevTools para debug.</p></div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 29: CIERRE ====== -->
+<div class="slide" data-slide="29">
+  <h2>¡Buen trabajo!</h2>
+  <p>Hoy centralizaron el estado de su aplicación con Vuex y lo conectaron con Firebase Auth real.</p>
+  <p style="margin-top:1.5rem; font-size:1.5rem; color: var(--secondary); font-weight:600;">Un store, una verdad, todos los componentes conectados.</p>
+  <p class="small" style="margin-top:2rem;">Próxima clase: Pruebas en Vue</p>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+let currentSlide = 1;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+document.getElementById('totalSlides').textContent = totalSlides;
+function showSlide(n) { slides.forEach(s => s.classList.remove('active')); slides[n-1].classList.add('active'); document.getElementById('currentSlide').textContent = n; document.getElementById('progressBar').style.width = ((n/totalSlides)*100)+'%'; }
+function changeSlide(dir) { const next = currentSlide + dir; if (next >= 1 && next <= totalSlides) { currentSlide = next; showSlide(currentSlide); } }
+document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); } if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); } });
+const timers = {};
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+function beep() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; g.gain.value=0.3; o.start(); setTimeout(()=>{o.stop();ctx.close();},400); } catch(e){} }
+function updateTimerDisplay(id) { const t=timers[id],el=document.getElementById(id),st=document.getElementById(id+'-status'); el.textContent=formatTime(t.remaining); el.classList.remove('warning','danger'); if(t.remaining<=60){el.classList.add('danger');if(st)st.textContent='¡Menos de 1 minuto!';} else if(t.remaining<=300){el.classList.add('warning');if(st)st.textContent='Menos de 5 minutos';} else{if(st&&t.running)st.textContent='En curso...';} }
+function startTimer(id,dur){if(!timers[id])timers[id]={remaining:dur,running:false,interval:null,total:dur};const t=timers[id];if(t.running)return;t.running=true;const st=document.getElementById(id+'-status');if(st)st.textContent='En curso...';t.interval=setInterval(()=>{t.remaining--;updateTimerDisplay(id);if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep();}},1000);}
+function pauseTimer(id){const t=timers[id];if(!t||!t.running)return;clearInterval(t.interval);t.running=false;const st=document.getElementById(id+'-status');if(st)st.textContent='Pausado';}
+function resetTimer(id,dur){const t=timers[id];if(t){clearInterval(t.interval);t.running=false;}timers[id]={remaining:dur,running:false,interval:null,total:dur};updateTimerDisplay(id);const st=document.getElementById(id+'-status');if(st)st.textContent='Listo para comenzar';}
+showSlide(1);
+</script>
+</body>
+</html>

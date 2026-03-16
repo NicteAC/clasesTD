@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuex Avanzado + Axios — Clase 3h</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#2D5BFF;--secondary:#00D4AA;--accent:#FF6B6B;--dark:#1A1A2E;--light:#F8F9FA;--warning:#FFA500;--card-bg:rgba(255,255,255,0.05);--border-radius:12px}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sora',sans-serif;background:var(--dark);color:var(--light);overflow:hidden;height:100vh;width:100vw}.header{position:fixed;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(26,26,46,0.92);backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}.slide-counter{font-family:'Space Mono',monospace;font-size:0.95rem;color:rgba(248,249,250,0.7);letter-spacing:2px}.slide-counter .current{color:var(--secondary);font-weight:700}.progress-bar{position:fixed;top:52px;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.4s ease;z-index:100}.slides-wrapper{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;padding-top:55px}.slide{display:none;max-width:1200px;width:100%;padding:2rem;animation:slideIn 0.6s ease-out}.slide.active{display:flex;flex-direction:column;justify-content:center;align-items:center}@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}h1{font-size:3.5rem;font-weight:800;line-height:1.2;text-align:center;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}h2{font-size:2.5rem;font-weight:700;line-height:1.3;text-align:center;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--light),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}h3{font-size:1.8rem;font-weight:600;margin-bottom:0.8rem;color:var(--secondary)}p,li{font-size:1.3rem;line-height:1.8}p{text-align:center;max-width:900px;color:rgba(248,249,250,0.85)}.subtitle{font-size:1.4rem;color:var(--secondary);margin-bottom:0.5rem;font-weight:500}pre{font-family:'Space Mono',monospace;background:rgba(0,0,0,0.45);border:1px solid rgba(45,91,255,0.2);border-radius:var(--border-radius);padding:1.2rem 1.5rem;font-size:0.82rem;line-height:1.65;overflow-x:auto;width:100%;max-width:900px;text-align:left;color:#e0e0e0}pre .kw{color:#c792ea}pre .str{color:#c3e88d}pre .fn{color:#82aaff}pre .cm{color:#546e7a}pre .tag{color:#f07178}pre .attr{color:#ffcb6b}pre .num{color:#f78c6c}.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px}.card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.5rem;transition:all 0.3s ease;text-align:left}.card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 30px rgba(45,91,255,0.15)}.card h3{font-size:1.4rem;margin-bottom:0.6rem}.card p{font-size:1.15rem;text-align:left}.cards-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;width:100%;max-width:1100px}.cards-grid-3 .card h3{font-size:1.25rem}.cards-grid-3 .card p{font-size:1.05rem}.activity-grid{display:grid;grid-template-columns:340px 1fr;gap:3rem;width:100%;max-width:1100px;align-items:start}.timer-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:var(--border-radius);padding:1.8rem;text-align:center}.timer-display{font-family:'Space Mono',monospace;font-size:5rem;font-weight:700;color:var(--secondary);text-shadow:0 0 30px rgba(0,212,170,0.3);margin:0.8rem 0;letter-spacing:4px}.timer-display.warning{color:var(--warning);text-shadow:0 0 30px rgba(255,165,0,0.4)}.timer-display.danger{color:var(--accent);text-shadow:0 0 30px rgba(255,107,107,0.5);animation:pulse 1s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.timer-controls{display:flex;gap:0.8rem;justify-content:center;margin-top:1rem}.timer-btn{font-family:'Sora',sans-serif;font-size:0.9rem;font-weight:600;padding:0.5rem 1.2rem;border-radius:8px;border:none;cursor:pointer;transition:all 0.3s ease}.timer-btn.start{background:var(--secondary);color:var(--dark)}.timer-btn.pause{background:var(--warning);color:var(--dark)}.timer-btn.reset{background:rgba(255,255,255,0.1);color:var(--light);border:1px solid rgba(255,255,255,0.2)}.timer-btn:hover{transform:scale(1.05)}.timer-status{font-size:0.95rem;margin-top:0.8rem;color:rgba(248,249,250,0.6)}.activity-card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.5rem;text-align:left}.activity-card h3{margin-bottom:0.8rem}.activity-card ol,.activity-card ul{padding-left:1.5rem}.activity-card li{font-size:1.1rem;line-height:1.7;margin-bottom:0.2rem}.badge{display:inline-block;font-size:0.85rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:0.8rem}.badge-demo{background:rgba(45,91,255,0.2);color:var(--primary);border:1px solid var(--primary)}.badge-activity{background:rgba(0,212,170,0.15);color:var(--secondary);border:1px solid var(--secondary)}.badge-break{background:rgba(255,165,0,0.15);color:var(--warning);border:1px solid var(--warning)}.flow{display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1rem 0}.flow-item{background:rgba(45,91,255,0.12);border:1px solid rgba(45,91,255,0.3);border-radius:10px;padding:0.6rem 1.2rem;font-size:1.1rem;font-weight:500}.flow-arrow{font-size:1.5rem;color:var(--secondary)}.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;align-items:start}.demo-layout pre{max-width:100%;font-size:0.76rem}.nav{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:1rem;z-index:100}.nav-btn{font-family:'Sora',sans-serif;font-size:1rem;font-weight:600;padding:0.6rem 1.8rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(26,26,46,0.9);color:var(--light);cursor:pointer;backdrop-filter:blur(8px);transition:all 0.3s ease}.nav-btn:hover{border-color:var(--primary);background:rgba(45,91,255,0.15)}.small{font-size:1rem;color:rgba(248,249,250,0.6)}.icon{font-size:2.2rem;margin-bottom:0.5rem;display:block}.highlight-box{background:rgba(45,91,255,0.08);border:1px solid rgba(45,91,255,0.25);border-radius:var(--border-radius);padding:1.2rem 1.5rem;width:100%;max-width:900px;text-align:left;margin-top:1rem}.highlight-box p{text-align:left;font-size:1.15rem}
+</style>
+</head>
+<body>
+
+<div class="header"><div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">25</span></div></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slides-wrapper">
+
+<!-- SLIDE 1 -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 7 — Desarrollo de aplicaciones front-end con Vue</p>
+  <h1>Vuex Avanzado + Axios</h1>
+  <p>Actions con APIs, estados de carga, getters, plugins de persistencia y Pinia</p>
+  <p class="small" style="margin-top:1.5rem;">Vue 2 · Vuex 3 · Axios · PokéAPI · Clase de 3 horas</p>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">📡</span><h3>Vuex + Axios</h3><p>Consumir APIs reales desde actions. Los componentes solo hacen dispatch.</p></div>
+    <div class="card"><span class="icon">🎯</span><h3>Estados de carga</h3><p>Controlar loading, error y datos de forma centralizada en el store.</p></div>
+    <div class="card"><span class="icon">💾</span><h3>Plugins y persistencia</h3><p>Persistir datos en localStorage con un plugin de Vuex.</p></div>
+    <div class="card"><span class="icon">🔮</span><h3>DevTools y Pinia</h3><p>Debugging con Vue DevTools. Conocer Pinia como alternativa moderna.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" data-slide="3">
+  <h2>Repaso: el flujo de Vuex</h2>
+  <div class="flow" style="margin-top:1rem;">
+    <div class="flow-item">Componente<br><span class="small">dispatch</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Action<br><span class="small">Axios / API</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Mutation<br><span class="small">commit</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">State<br><span class="small">reactivo</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Getters → UI</div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.5rem;">
+    <p><strong>Hoy:</strong> PokéAPI (<code>pokeapi.co</code>) — gratuita, sin API key. Axios en actions, <code>mapHelpers</code> en los componentes desde el inicio.</p>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" data-slide="4">
+  <h2>PokéAPI — Nuestra fuente de datos</h2>
+  <p>API REST gratuita con datos de más de 1000 Pokémon. Sin autenticación.</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">📋</span><h3>Listar</h3><p><code>GET /api/v2/pokemon?limit=20</code><br>Lista con nombre y URL de cada Pokémon.</p></div>
+    <div class="card"><span class="icon">🔍</span><h3>Detalle</h3><p><code>GET /api/v2/pokemon/:id</code><br>Nombre, imagen, tipos, stats y más.</p></div>
+    <div class="card"><span class="icon">⭐</span><h3>Favoritos</h3><p>La API es solo lectura. CRUD de favoritos local en Vuex.</p></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1rem;">
+    <p><strong>CRUD:</strong> Read desde la API con Axios. Create, Update y Delete de favoritos localmente en el store.</p>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" data-slide="5">
+  <h2>¿Por qué Axios en Actions?</h2>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">♻️</span><h3>Reutilización</h3><p>Cualquier componente pide datos con dispatch sin duplicar lógica.</p></div>
+    <div class="card"><span class="icon">🎯</span><h3>Control de estado</h3><p>Loading, error y datos en un solo lugar.</p></div>
+    <div class="card"><span class="icon">🧪</span><h3>Testeable</h3><p>Lógica desacoplada del componente.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" data-slide="6">
+  <h2>El store — State y Mutations</h2>
+  <pre>
+<span class="cm">// store/index.js</span>
+<span class="kw">import</span> Vue <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> Vuex <span class="kw">from</span> <span class="str">'vuex'</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">'axios'</span>
+
+Vue.use(Vuex)
+
+<span class="kw">export default new</span> Vuex.Store({
+  <span class="attr">state</span>: {
+    pokemones: [],
+    detalle: <span class="kw">null</span>,
+    favoritos: [],
+    loading: <span class="kw">false</span>,
+    error: <span class="kw">null</span>
+  },
+  <span class="attr">mutations</span>: {
+    <span class="fn">SET_POKEMONES</span>(state, lista) { state.pokemones = lista },
+    <span class="fn">SET_DETALLE</span>(state, poke) { state.detalle = poke },
+    <span class="fn">ADD_FAVORITO</span>(state, poke) { state.favoritos.push(poke) },
+    <span class="fn">REMOVE_FAVORITO</span>(state, id) {
+      state.favoritos = state.favoritos.filter(f => f.id !== id)
+    },
+    <span class="fn">UPDATE_FAVORITO</span>(state, poke) {
+      <span class="kw">const</span> i = state.favoritos.findIndex(f => f.id === poke.id)
+      <span class="kw">if</span> (i !== -<span class="num">1</span>) state.favoritos.splice(i, <span class="num">1</span>, poke)
+    },
+    <span class="fn">SET_LOADING</span>(state, v) { state.loading = v },
+    <span class="fn">SET_ERROR</span>(state, e) { state.error = e }
+  }
+})
+  </pre>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" data-slide="7">
+  <h2>Actions — Axios contra la PokéAPI</h2>
+  <pre>
+<span class="attr">actions</span>: {
+  <span class="fn">fetchPokemones</span>({ commit }) {
+    commit(<span class="str">'SET_LOADING'</span>, <span class="kw">true</span>)
+    commit(<span class="str">'SET_ERROR'</span>, <span class="kw">null</span>)
+    axios.get(<span class="str">'https://pokeapi.co/api/v2/pokemon?limit=20'</span>)
+      .then(res => {
+        <span class="kw">const</span> lista = res.data.results.map((p, i) => ({
+          <span class="attr">id</span>: i + <span class="num">1</span>,
+          <span class="attr">name</span>: p.name,
+          <span class="attr">image</span>: <span class="str">`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i + 1}.png`</span>
+        }))
+        commit(<span class="str">'SET_POKEMONES'</span>, lista)
+      })
+      .catch(err => commit(<span class="str">'SET_ERROR'</span>, err.message))
+      .finally(() => commit(<span class="str">'SET_LOADING'</span>, <span class="kw">false</span>))
+  },
+  <span class="fn">fetchDetalle</span>({ commit }, id) {
+    commit(<span class="str">'SET_LOADING'</span>, <span class="kw">true</span>)
+    axios.get(<span class="str">`https://pokeapi.co/api/v2/pokemon/${id}`</span>)
+      .then(res => {
+        commit(<span class="str">'SET_DETALLE'</span>, {
+          <span class="attr">id</span>: res.data.id, <span class="attr">name</span>: res.data.name,
+          <span class="attr">image</span>: res.data.sprites.front_default,
+          <span class="attr">types</span>: res.data.types.map(t => t.type.name),
+          <span class="attr">height</span>: res.data.height, <span class="attr">weight</span>: res.data.weight
+        })
+      })
+      .catch(err => commit(<span class="str">'SET_ERROR'</span>, err.message))
+      .finally(() => commit(<span class="str">'SET_LOADING'</span>, <span class="kw">false</span>))
+  }
+}
+  </pre>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" data-slide="8">
+  <h2>CRUD local — Favoritos en Vuex</h2>
+  <div class="cards-grid" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--secondary);"><h3>Create</h3><p><code>commit('ADD_FAVORITO', pokemon)</code><br>push al array de favoritos.</p></div>
+    <div class="card" style="border-left:3px solid var(--primary);"><h3>Read</h3><p><code>state.favoritos</code> + getters<br>Listar, contar y filtrar.</p></div>
+    <div class="card" style="border-left:3px solid var(--warning);"><h3>Update</h3><p><code>commit('UPDATE_FAVORITO', pokemon)</code><br>Editar apodo con splice.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Delete</h3><p><code>commit('REMOVE_FAVORITO', id)</code><br>Filtrar por id.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" data-slide="9">
+  <h2>Getters — Datos derivados</h2>
+  <pre style="margin-top:1rem;">
+<span class="attr">getters</span>: {
+  <span class="fn">totalFavoritos</span>: state => state.favoritos.length,
+
+  <span class="fn">esFavorito</span>: state => id => {
+    <span class="kw">return</span> state.favoritos.some(f => f.id === id)
+  },
+
+  <span class="fn">pokemonesFiltrados</span>: state => busqueda => {
+    <span class="kw">return</span> state.pokemones.filter(p =>
+      p.name.includes(busqueda.toLowerCase())
+    )
+  }
+}
+  </pre>
+  <div class="highlight-box">
+    <p><code>esFavorito</code> retorna una función: se usa como <code>esFavorito(pokemon.id)</code> para pintar el botón de estrella.</p>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" data-slide="10">
+  <h2>mapHelpers en los componentes</h2>
+  <p>Usamos <code>mapState</code>, <code>mapGetters</code>, <code>mapActions</code> y <code>mapMutations</code> desde el inicio para código limpio.</p>
+  <pre style="margin-top:1rem;">
+<span class="kw">import</span> { mapState, mapGetters, mapActions, mapMutations } <span class="kw">from</span> <span class="str">'vuex'</span>
+
+<span class="kw">export default</span> {
+  <span class="attr">computed</span>: {
+    ...mapState([<span class="str">'pokemones'</span>, <span class="str">'detalle'</span>, <span class="str">'favoritos'</span>, <span class="str">'loading'</span>, <span class="str">'error'</span>]),
+    ...mapGetters([<span class="str">'totalFavoritos'</span>, <span class="str">'esFavorito'</span>, <span class="str">'pokemonesFiltrados'</span>])
+  },
+  <span class="attr">methods</span>: {
+    ...mapActions([<span class="str">'fetchPokemones'</span>, <span class="str">'fetchDetalle'</span>]),
+    ...mapMutations([<span class="str">'ADD_FAVORITO'</span>, <span class="str">'REMOVE_FAVORITO'</span>, <span class="str">'UPDATE_FAVORITO'</span>])
+  }
+}
+
+<span class="cm">// En el template: {{ totalFavoritos }}, v-for="p in pokemones"</span>
+<span class="cm">// this.fetchPokemones(), this.ADD_FAVORITO(pokemon)</span>
+  </pre>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" data-slide="11">
+  <h2>El patrón loading / error / datos</h2>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card" style="border-top:3px solid var(--primary);"><span class="icon">⏳</span><h3>Loading</h3><p><code>v-if="loading"</code><br>Spinner o "Cargando..."</p></div>
+    <div class="card" style="border-top:3px solid var(--accent);"><span class="icon">❌</span><h3>Error</h3><p><code>v-if="error"</code><br>Mensaje de error al usuario.</p></div>
+    <div class="card" style="border-top:3px solid var(--secondary);"><span class="icon">✅</span><h3>Datos</h3><p><code>v-for="p in pokemones"</code><br>Renderizar la lista.</p></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1rem;">
+    <p>En cada action: <code>SET_LOADING true</code> → Axios → <code>SET_LOADING false</code>. En el catch: <code>SET_ERROR</code>.</p>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" data-slide="12">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Store + Lista de Pokémon</h2>
+  <p>Store completo con Axios y componente con mapHelpers desde el inicio.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Store con Axios</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. fetchPokemones</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Componente + mapHelpers</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Loading → datos</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~15 minutos</p>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" data-slide="13">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Detalle de un Pokémon</h2>
+  <p>Click en un Pokémon → dispatch fetchDetalle → imagen, tipos, altura y peso.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Click en Pokémon</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. this.fetchDetalle(id)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Axios GET</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Mostrar detalle</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" data-slide="14">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: CRUD de favoritos</h2>
+  <p>Agregar, editar apodo, eliminar. Todo en el store con mutations.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. ADD_FAVORITO</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. UPDATE_FAVORITO (apodo)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. REMOVE_FAVORITO</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Getter esFavorito</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" data-slide="15">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Búsqueda con getter</h2>
+  <p>Input que filtra Pokémon en tiempo real usando <code>pokemonesFiltrados</code>.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Input v-model busqueda</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Computed con getter</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. v-for filtra en vivo</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~5 minutos</p>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" data-slide="16">
+  <h2>Manejo de errores en Actions</h2>
+  <pre style="margin-top:1rem;">
+<span class="fn">fetchPokemones</span>({ commit }) {
+  commit(<span class="str">'SET_LOADING'</span>, <span class="kw">true</span>)
+  commit(<span class="str">'SET_ERROR'</span>, <span class="kw">null</span>)
+  axios.get(<span class="str">'https://pokeapi.co/api/v2/pokemon?limit=20'</span>)
+    .then(res => {
+      <span class="cm">// ... procesar datos</span>
+    })
+    .catch(err => {
+      <span class="kw">if</span> (err.response) {
+        commit(<span class="str">'SET_ERROR'</span>, <span class="str">`Error ${err.response.status}`</span>)
+      } <span class="kw">else if</span> (err.request) {
+        commit(<span class="str">'SET_ERROR'</span>, <span class="str">'Sin conexión al servidor'</span>)
+      } <span class="kw">else</span> {
+        commit(<span class="str">'SET_ERROR'</span>, err.message)
+      }
+    })
+    .finally(() => commit(<span class="str">'SET_LOADING'</span>, <span class="kw">false</span>))
+}
+  </pre>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" data-slide="17">
+  <h2>Plugin de persistencia — Favoritos</h2>
+  <pre style="margin-top:1rem;">
+<span class="cm">// store/plugins/persistence.js</span>
+<span class="kw">const</span> persistencePlugin = (store) => {
+  <span class="cm">// Al iniciar: restaurar favoritos guardados</span>
+  <span class="kw">const</span> saved = localStorage.getItem(<span class="str">'pokemon-favoritos'</span>)
+  <span class="kw">if</span> (saved) {
+    <span class="kw">try</span> {
+      JSON.parse(saved).forEach(fav => {
+        store.commit(<span class="str">'ADD_FAVORITO'</span>, fav)
+      })
+    } <span class="kw">catch</span> (e) {
+      localStorage.removeItem(<span class="str">'pokemon-favoritos'</span>)
+    }
+  }
+
+  <span class="cm">// En cada mutation de favoritos: guardar</span>
+  store.subscribe((mutation, state) => {
+    <span class="kw">if</span> (mutation.type.includes(<span class="str">'FAVORITO'</span>)) {
+      localStorage.setItem(
+        <span class="str">'pokemon-favoritos'</span>,
+        JSON.stringify(state.favoritos)
+      )
+    }
+  })
+}
+
+<span class="kw">export default</span> persistencePlugin
+  </pre>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" data-slide="18">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Plugin de persistencia</h2>
+  <p>Favoritos persisten al recargar gracias al plugin de localStorage.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Crear persistence.js</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Registrar en plugins</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. Agregar favoritos</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Recargar → persisten</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- SLIDE 19: BREAK -->
+<div class="slide" data-slide="19">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem;max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide" data-slide="20">
+  <h2>Vue DevTools + Vuex</h2>
+  <div class="cards-grid-3" style="margin-top:1rem;">
+    <div class="card"><span class="icon">📋</span><h3>Log de mutations</h3><p>Cada commit con nombre y payload en tiempo real.</p></div>
+    <div class="card"><span class="icon">⏪</span><h3>Time travel</h3><p>Click en cualquier mutation anterior para volver a ese estado.</p></div>
+    <div class="card"><span class="icon">📸</span><h3>Inspeccionar state</h3><p>Ver <code>pokemones</code>, <code>favoritos</code>, <code>loading</code> en vivo.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide" data-slide="21">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Debugging con Vue DevTools</h2>
+  <p>CRUD completo viendo cada mutation en tiempo real y haciendo time travel.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Abrir DevTools → Vuex</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. fetchPokemones</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. CRUD favoritos</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Time travel</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide" data-slide="22">
+  <h2>Pinia — La evolución de Vuex</h2>
+  <div class="demo-layout" style="margin-top:1rem;">
+    <div class="card" style="border-left:3px solid var(--warning);"><h3>Vuex</h3><p>State, Getters, Mutations, Actions. Mutations obligatorias. <code>commit</code> + <code>dispatch</code>.</p></div>
+    <div class="card" style="border-left:3px solid var(--secondary);"><h3>Pinia</h3><p>State, Getters, Actions. Sin mutations: se muta directo con <code>this.count++</code>.</p></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.2rem;">
+    <p><strong>Vue 2 → Vuex 3.</strong> Si migran a Vue 3, Pinia es la recomendación oficial. Los conceptos son los mismos.</p>
+  </div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide" data-slide="23">
+  <h2>Errores comunes</h2>
+  <div class="cards-grid">
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Axios en mutations</h3><p>Las mutations son síncronas. Axios va siempre en actions.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>No manejar loading</h3><p>Sin SET_LOADING la UI no muestra feedback. Siempre: true → operación → false.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Mutar state directo</h3><p>Nunca <code>this.favoritos.push()</code> desde el componente. Siempre commit.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Persistir datos sensibles</h3><p>No guardes tokens ni contraseñas en localStorage con el plugin.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide" data-slide="24">
+  <span class="badge badge-activity">ACTIVIDAD</span>
+  <h2>Pokédex con Vuex + Axios</h2>
+  <div class="activity-grid">
+    <div class="timer-panel">
+      <div class="small">Tiempo restante</div>
+      <div class="timer-display" id="timer1">45:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn start" onclick="startTimer('timer1',45*60)">Iniciar</button>
+        <button class="timer-btn pause" onclick="pauseTimer('timer1')">Pausar</button>
+        <button class="timer-btn reset" onclick="resetTimer('timer1',45*60)">Reiniciar</button>
+      </div>
+      <div class="timer-status" id="timer1-status">Listo para comenzar</div>
+    </div>
+    <div class="activity-card">
+      <h3>Instrucciones</h3>
+      <ol>
+        <li>Crea un store que consuma la PokéAPI con Axios en las actions.</li>
+        <li>Implementa <code>fetchPokemones</code> y <code>fetchDetalle</code> con loading y error.</li>
+        <li>Agrega favoritos con las 4 operaciones: agregar, listar, editar apodo y eliminar.</li>
+        <li>Crea getters: <code>totalFavoritos</code>, <code>esFavorito(id)</code> y filtro de búsqueda.</li>
+        <li>Usa <code>mapState</code>, <code>mapGetters</code>, <code>mapActions</code> y <code>mapMutations</code>.</li>
+        <li>Bonus: agrega plugin de persistencia para los favoritos.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide" data-slide="25">
+  <h2>¡Buen trabajo!</h2>
+  <p>Hoy conectaron Vuex con una API real, manejaron estados de carga, implementaron CRUD de favoritos y persistieron datos.</p>
+  <p style="margin-top:1.5rem;font-size:1.5rem;color:var(--secondary);font-weight:600;">Store centralizado, datos reales, app robusta.</p>
+  <p class="small" style="margin-top:2rem;">Próxima clase: Pruebas en Vue</p>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+let currentSlide=1;const slides=document.querySelectorAll('.slide');const totalSlides=slides.length;document.getElementById('totalSlides').textContent=totalSlides;function showSlide(n){slides.forEach(s=>s.classList.remove('active'));slides[n-1].classList.add('active');document.getElementById('currentSlide').textContent=n;document.getElementById('progressBar').style.width=((n/totalSlides)*100)+'%'}function changeSlide(d){const n=currentSlide+d;if(n>=1&&n<=totalSlides){currentSlide=n;showSlide(currentSlide)}}document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1)}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1)}});const timers={};function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.3;o.start();setTimeout(()=>{o.stop();c.close()},400)}catch(e){}}function updateTimerDisplay(id){const t=timers[id],el=document.getElementById(id),st=document.getElementById(id+'-status');el.textContent=formatTime(t.remaining);el.classList.remove('warning','danger');if(t.remaining<=60){el.classList.add('danger');if(st)st.textContent='¡Menos de 1 minuto!'}else if(t.remaining<=300){el.classList.add('warning');if(st)st.textContent='Menos de 5 minutos'}else{if(st&&t.running)st.textContent='En curso...'}}function startTimer(id,dur){if(!timers[id])timers[id]={remaining:dur,running:false,interval:null,total:dur};const t=timers[id];if(t.running)return;t.running=true;const st=document.getElementById(id+'-status');if(st)st.textContent='En curso...';t.interval=setInterval(()=>{t.remaining--;updateTimerDisplay(id);if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep()}},1000)}function pauseTimer(id){const t=timers[id];if(!t||!t.running)return;clearInterval(t.interval);t.running=false;const st=document.getElementById(id+'-status');if(st)st.textContent='Pausado'}function resetTimer(id,dur){const t=timers[id];if(t){clearInterval(t.interval);t.running=false}timers[id]={remaining:dur,running:false,interval:null,total:dur};updateTimerDisplay(id);const st=document.getElementById(id+'-status');if(st)st.textContent='Listo para comenzar'}showSlide(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pruebas en Vue — Clase 3h</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#2D5BFF;--secondary:#00D4AA;--accent:#FF6B6B;--dark:#1A1A2E;--light:#F8F9FA;--warning:#FFA500;--card-bg:rgba(255,255,255,0.05);--border-radius:12px}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sora',sans-serif;background:var(--dark);color:var(--light);overflow:hidden;height:100vh;width:100vw}.header{position:fixed;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(26,26,46,0.92);backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}.slide-counter{font-family:'Space Mono',monospace;font-size:0.95rem;color:rgba(248,249,250,0.7);letter-spacing:2px}.slide-counter .current{color:var(--secondary);font-weight:700}.progress-bar{position:fixed;top:52px;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.4s ease;z-index:100}.slides-wrapper{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;padding-top:55px}.slide{display:none;max-width:1200px;width:100%;padding:2rem;animation:slideIn 0.6s ease-out}.slide.active{display:flex;flex-direction:column;justify-content:center;align-items:center}@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}h1{font-size:3.5rem;font-weight:800;line-height:1.2;text-align:center;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}h2{font-size:2.5rem;font-weight:700;line-height:1.3;text-align:center;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--light),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}h3{font-size:1.8rem;font-weight:600;margin-bottom:0.8rem;color:var(--secondary)}p,li{font-size:1.3rem;line-height:1.8}p{text-align:center;max-width:900px;color:rgba(248,249,250,0.85)}.subtitle{font-size:1.4rem;color:var(--secondary);margin-bottom:0.5rem;font-weight:500}pre{font-family:'Space Mono',monospace;background:rgba(0,0,0,0.45);border:1px solid rgba(45,91,255,0.2);border-radius:var(--border-radius);padding:1.2rem 1.5rem;font-size:0.82rem;line-height:1.65;overflow-x:auto;width:100%;max-width:900px;text-align:left;color:#e0e0e0}pre .kw{color:#c792ea}pre .str{color:#c3e88d}pre .fn{color:#82aaff}pre .cm{color:#546e7a}pre .tag{color:#f07178}pre .attr{color:#ffcb6b}pre .num{color:#f78c6c}.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px}.card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.5rem;transition:all 0.3s ease;text-align:left}.card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 30px rgba(45,91,255,0.15)}.card h3{font-size:1.4rem;margin-bottom:0.6rem}.card p{font-size:1.15rem;text-align:left}.cards-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;width:100%;max-width:1100px}.cards-grid-3 .card h3{font-size:1.25rem}.cards-grid-3 .card p{font-size:1.05rem}table{width:100%;max-width:1000px;border-collapse:collapse;font-size:1.05rem}th{background:rgba(45,91,255,0.2);color:var(--secondary);padding:0.8rem 1rem;text-align:left;font-weight:600}td{padding:0.7rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06)}tr:hover td{background:rgba(255,255,255,0.03)}.activity-grid{display:grid;grid-template-columns:300px 1fr;gap:2.5rem;width:100%;max-width:1100px;align-items:start}.timer-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:var(--border-radius);padding:1.5rem;text-align:center}.timer-display{font-family:'Space Mono',monospace;font-size:4.5rem;font-weight:700;color:var(--secondary);text-shadow:0 0 30px rgba(0,212,170,0.3);margin:0.6rem 0;letter-spacing:4px}.timer-display.warning{color:var(--warning);text-shadow:0 0 30px rgba(255,165,0,0.4)}.timer-display.danger{color:var(--accent);text-shadow:0 0 30px rgba(255,107,107,0.5);animation:pulse 1s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.timer-controls{display:flex;gap:0.8rem;justify-content:center;margin-top:0.8rem}.timer-btn{font-family:'Sora',sans-serif;font-size:0.85rem;font-weight:600;padding:0.45rem 1rem;border-radius:8px;border:none;cursor:pointer;transition:all 0.3s ease}.timer-btn.start{background:var(--secondary);color:var(--dark)}.timer-btn.pause{background:var(--warning);color:var(--dark)}.timer-btn.reset{background:rgba(255,255,255,0.1);color:var(--light);border:1px solid rgba(255,255,255,0.2)}.timer-btn:hover{transform:scale(1.05)}.timer-status{font-size:0.9rem;margin-top:0.6rem;color:rgba(248,249,250,0.6)}.activity-card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.2rem;text-align:left}.activity-card h3{margin-bottom:0.6rem;font-size:1.3rem}.activity-card ol,.activity-card ul{padding-left:1.3rem}.activity-card li{font-size:1.05rem;line-height:1.6;margin-bottom:0.15rem}.badge{display:inline-block;font-size:0.85rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:0.8rem}.badge-demo{background:rgba(45,91,255,0.2);color:var(--primary);border:1px solid var(--primary)}.badge-activity{background:rgba(0,212,170,0.15);color:var(--secondary);border:1px solid var(--secondary)}.badge-break{background:rgba(255,165,0,0.15);color:var(--warning);border:1px solid var(--warning)}.flow{display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1rem 0}.flow-item{background:rgba(45,91,255,0.12);border:1px solid rgba(45,91,255,0.3);border-radius:10px;padding:0.6rem 1.2rem;font-size:1.1rem;font-weight:500}.flow-arrow{font-size:1.5rem;color:var(--secondary)}.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;align-items:start}.demo-layout pre{max-width:100%;font-size:0.76rem}.nav{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:1rem;z-index:100}.nav-btn{font-family:'Sora',sans-serif;font-size:1rem;font-weight:600;padding:0.6rem 1.8rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(26,26,46,0.9);color:var(--light);cursor:pointer;backdrop-filter:blur(8px);transition:all 0.3s ease}.nav-btn:hover{border-color:var(--primary);background:rgba(45,91,255,0.15)}.small{font-size:1rem;color:rgba(248,249,250,0.6)}.icon{font-size:2.2rem;margin-bottom:0.5rem;display:block}.highlight-box{background:rgba(45,91,255,0.08);border:1px solid rgba(45,91,255,0.25);border-radius:var(--border-radius);padding:1.2rem 1.5rem;width:100%;max-width:900px;text-align:left;margin-top:1rem}.highlight-box p{text-align:left;font-size:1.15rem}.exercise-block{background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:var(--border-radius);padding:1rem 1.2rem;text-align:left;height:100%;display:flex;flex-direction:column;justify-content:flex-start}.exercise-block h4{color:var(--secondary);font-size:1.05rem;margin-bottom:0.4rem}.exercise-block p{text-align:left;font-size:0.95rem;color:rgba(248,249,250,0.75);line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="header"><div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">22</span></div></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slides-wrapper">
+
+<!-- SLIDE 1 -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 7 — Desarrollo de aplicaciones front-end con Vue</p>
+  <h1>Pruebas en Vue</h1>
+  <p>Pruebas unitarias con Jest, Vue Test Utils, mocks, TDD y pruebas E2E con Cypress</p>
+  <p class="small" style="margin-top:1.5rem;">Vue 2 · Jest · Cypress · Clase de 3 horas</p>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🧪</span><h3>Pruebas unitarias</h3><p>Características, herramientas (Jest, Mocha), Vue Test Utils, mocks y stubs.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>TDD</h3><p>Desarrollo dirigido por tests: rojo → verde → refactorizar.</p></div>
+    <div class="card"><span class="icon">🌐</span><h3>Pruebas E2E</h3><p>Flujos completos con Cypress y Nightwatch. Diferencias con unitarias.</p></div>
+    <div class="card"><span class="icon">💪</span><h3>Mucha práctica</h3><p>La segunda mitad de la clase es 100% práctica con ejercicios guiados.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" data-slide="3">
+  <h2>¿Por qué testear?</h2>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">🐛</span><h3>Detectar errores</h3><p>Antes de que lleguen al usuario final. Menos bugs en producción.</p></div>
+    <div class="card"><span class="icon">🔧</span><h3>Refactorizar seguro</h3><p>Cambiar código sin miedo. Si los tests pasan, no rompiste nada.</p></div>
+    <div class="card"><span class="icon">📄</span><h3>Documentación viva</h3><p>Los tests describen cómo se espera que funcione cada componente.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" data-slide="4">
+  <h2>Pruebas unitarias — Características</h2>
+  <p>Verifican que una unidad de código (función, método, componente) funciona correctamente de forma aislada.</p>
+  <div class="cards-grid" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--secondary);"><h3>Ventajas</h3><p>Rápidas (sin navegador). Precisas (saben exactamente qué falló). Fáciles de automatizar. Ideales para TDD.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Limitaciones</h3><p>No detectan errores de integración entre componentes. No validan la experiencia del usuario real.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" data-slide="5">
+  <h2>TDD — Desarrollo dirigido por tests</h2>
+  <p>Se escribe la prueba antes que el código. Parece al revés, pero funciona.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item" style="border-color:var(--accent);color:var(--accent);">🔴 Rojo<br><span class="small">Escribir test que falla</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item" style="border-color:var(--secondary);color:var(--secondary);">🟢 Verde<br><span class="small">Código mínimo para pasar</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item" style="border-color:var(--primary);color:var(--primary);">🔵 Refactorizar<br><span class="small">Mejorar sin romper tests</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item" style="border-color:var(--accent);color:var(--accent);">🔴 Repetir</div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.2rem;">
+    <p><strong>Beneficio:</strong> cada funcionalidad nace cubierta por tests. El código es más enfocado y menos propenso a errores.</p>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" data-slide="6">
+  <h2>Herramientas — Jest vs Mocha</h2>
+  <table style="margin-top:1rem;">
+    <thead><tr><th></th><th>Jest</th><th>Mocha + Chai</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Mantenido por</strong></td><td>Meta (Facebook)</td><td>Comunidad open source</td></tr>
+      <tr><td><strong>Configuración</strong></td><td>Casi cero, viene todo incluido</td><td>Requiere agregar Chai, Sinon, etc.</td></tr>
+      <tr><td><strong>Mocks</strong></td><td>Integrados (<code>jest.fn()</code>)</td><td>Necesita Sinon aparte</td></tr>
+      <tr><td><strong>Snapshots</strong></td><td>Sí, built-in</td><td>No</td></tr>
+      <tr><td><strong>Velocidad</strong></td><td>Paralelo por defecto</td><td>Secuencial por defecto</td></tr>
+      <tr><td><strong>Ideal para</strong></td><td>La mayoría de proyectos Vue</td><td>Configuraciones muy personalizadas</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" data-slide="7">
+  <h2>Vue Test Utils</h2>
+  <p>Librería oficial para testear componentes Vue. Monta componentes sin navegador.</p>
+  <div class="cards-grid-3" style="margin-top:1.2rem;">
+    <div class="card"><span class="icon">🔌</span><h3>mount / shallowMount</h3><p><code>mount</code> renderiza todo. <code>shallowMount</code> reemplaza hijos por stubs.</p></div>
+    <div class="card"><span class="icon">🔍</span><h3>find / findAll</h3><p>Buscar elementos en el DOM renderizado por selector CSS.</p></div>
+    <div class="card"><span class="icon">⚡</span><h3>trigger / setValue</h3><p>Simular clicks, inputs, submits y otros eventos del usuario.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" data-slide="8">
+  <h2>Setup con Vue CLI</h2>
+  <pre style="margin-top:1rem;">
+<span class="cm"># Al crear el proyecto, elegir Unit Testing → Jest</span>
+vue create mi-proyecto
+
+<span class="cm"># O agregar a un proyecto existente</span>
+vue add @vue/unit-jest
+
+<span class="cm"># Ejecutar pruebas unitarias</span>
+npm run test:unit
+
+<span class="cm"># Estructura generada:</span>
+tests/
+└── unit/
+    └── example.spec.js    <span class="cm">← tus tests van acá</span>
+  </pre>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" data-slide="9">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Primera prueba unitaria</h2>
+  <p>Componente Counter + test que valida renderizado, click e incremento.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Counter.vue</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Counter.spec.js</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. npm run test:unit</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~12 minutos</p>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" data-slide="10">
+  <h2>Mocks y Stubs — ¿Qué son?</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card" style="border-left:3px solid var(--primary);"><h3>Stub</h3><p>Reemplaza una función por una versión falsa que devuelve un resultado fijo. Ejemplo: simular respuesta de API sin hacer la petición real.</p></div>
+    <div class="card" style="border-left:3px solid var(--warning);"><h3>Mock</h3><p>Igual que un stub pero además registra cómo fue llamado: cuántas veces, con qué argumentos. Permite verificar interacciones.</p></div>
+  </div>
+  <pre style="margin-top:1.2rem;">
+<span class="cm">// Mock con Jest</span>
+<span class="kw">const</span> mockFn = jest.fn()
+mockFn(<span class="str">'hola'</span>)
+
+expect(mockFn).toHaveBeenCalled()
+expect(mockFn).toHaveBeenCalledWith(<span class="str">'hola'</span>)
+expect(mockFn).toHaveBeenCalledTimes(<span class="num">1</span>)
+  </pre>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" data-slide="11">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Mock de una función</h2>
+  <p>Componente que emite evento + test con mock para verificar la emisión.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. Componente con $emit</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. Test con wrapper.emitted()</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. jest.fn() para mock</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~8 minutos</p>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" data-slide="12">
+  <h2>Pruebas E2E — Características</h2>
+  <p>Validan flujos completos como lo haría un usuario real: clicks, inputs, navegación.</p>
+  <div class="cards-grid" style="margin-top:1.2rem;">
+    <div class="card" style="border-left:3px solid var(--secondary);"><h3>Ventajas</h3><p>Alta fidelidad al comportamiento real. Detectan errores de integración. Validan UX completa.</p></div>
+    <div class="card" style="border-left:3px solid var(--accent);"><h3>Limitaciones</h3><p>Más lentas. Más frágiles ante cambios de UI. Requieren servidor corriendo. Mantenimiento constante.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" data-slide="13">
+  <h2>Unitarias vs E2E</h2>
+  <table style="margin-top:1rem;">
+    <thead><tr><th>Criterio</th><th>Unitarias</th><th>E2E</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Alcance</strong></td><td>Un componente aislado</td><td>Flujo completo de usuario</td></tr>
+      <tr><td><strong>Velocidad</strong></td><td>Milisegundos</td><td>Segundos a minutos</td></tr>
+      <tr><td><strong>Navegador</strong></td><td>No (jsdom)</td><td>Sí (real o emulado)</td></tr>
+      <tr><td><strong>Dependencias</strong></td><td>Mocks / stubs</td><td>Servidor, DB, APIs reales</td></tr>
+      <tr><td><strong>Herramientas</strong></td><td>Jest + Vue Test Utils</td><td>Cypress / Nightwatch</td></tr>
+      <tr><td><strong>Detecta</strong></td><td>Errores de lógica</td><td>Errores de integración</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" data-slide="14">
+  <h2>Cypress vs Nightwatch</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card" style="border-left:3px solid var(--secondary);">
+      <h3>Cypress</h3>
+      <p>Interfaz visual, ve tests en tiempo real. Capturas y videos automáticos. Documentación excelente. Curva baja.</p>
+      <p style="margin-top:0.5rem;color:var(--accent);font-size:1rem;">Limitado a navegadores Chromium.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--primary);">
+      <h3>Nightwatch</h3>
+      <p>Basado en Selenium/WebDriver. Multi-browser (Firefox, Safari, Edge). Integración CI/CD robusta.</p>
+      <p style="margin-top:0.5rem;color:var(--accent);font-size:1rem;">Más complejo de configurar.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" data-slide="15">
+  <h2>Setup Cypress con Vue CLI</h2>
+  <pre style="margin-top:1rem;">
+<span class="cm"># Agregar Cypress al proyecto</span>
+vue add e2e-cypress
+
+<span class="cm"># Ejecutar en modo interactivo</span>
+npm run test:e2e
+
+<span class="cm"># Estructura generada:</span>
+tests/
+└── e2e/
+    ├── specs/
+    │   └── test.js          <span class="cm">← tus tests E2E</span>
+    ├── plugins/
+    └── support/
+  </pre>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" data-slide="16">
+  <h2>Anatomía de un test Cypress</h2>
+  <pre style="margin-top:1rem;">
+describe(<span class="str">'Pokédex'</span>, () => {
+  it(<span class="str">'carga la lista de pokémon'</span>, () => {
+    cy.visit(<span class="str">'/'</span>)
+    cy.contains(<span class="str">'Pokédex'</span>)
+    cy.get(<span class="str">'[data-cy="pokemon-card"]'</span>).should(<span class="str">'have.length.greaterThan'</span>, <span class="num">0</span>)
+  })
+
+  it(<span class="str">'agrega un pokémon a favoritos'</span>, () => {
+    cy.visit(<span class="str">'/'</span>)
+    cy.get(<span class="str">'[data-cy="fav-btn"]'</span>).first().click()
+    cy.get(<span class="str">'[data-cy="fav-count"]'</span>).should(<span class="str">'contain'</span>, <span class="str">'1'</span>)
+  })
+
+  it(<span class="str">'busca un pokémon por nombre'</span>, () => {
+    cy.visit(<span class="str">'/'</span>)
+    cy.get(<span class="str">'[data-cy="search"]'</span>).type(<span class="str">'pikachu'</span>)
+    cy.get(<span class="str">'[data-cy="pokemon-card"]'</span>).should(<span class="str">'have.length'</span>, <span class="num">1</span>)
+  })
+})
+  </pre>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" data-slide="17">
+  <span class="badge badge-demo">DEMO EN VIVO</span>
+  <h2>Demo: Primera prueba E2E</h2>
+  <p>Test Cypress que visita la app, verifica contenido y simula interacción.</p>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">1. npm run test:e2e</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">2. cy.visit + cy.contains</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">3. cy.get + .click()</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">4. Ver en Cypress UI</div>
+  </div>
+  <p class="small" style="margin-top:1.5rem;">⏱ ~10 minutos</p>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" data-slide="18">
+  <h2>Estrategia de testing completa</h2>
+  <div class="flow" style="margin-top:1rem;">
+    <div class="flow-item">Unitarias<br><span class="small">Cada componente</span></div>
+    <span class="flow-arrow">+</span>
+    <div class="flow-item">E2E<br><span class="small">Flujos críticos</span></div>
+    <span class="flow-arrow">=</span>
+    <div class="flow-item">Cobertura completa<br><span class="small">Lógica + UX</span></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.5rem;">
+    <p><strong>Regla práctica:</strong> muchas pruebas unitarias (rápidas, baratas) + pocas pruebas E2E (los flujos más importantes). No es una u otra, es las dos juntas.</p>
+  </div>
+</div>
+
+<!-- SLIDE 19: BREAK -->
+<div class="slide" data-slide="19">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem;max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- SLIDE 20: ACTIVIDADES -->
+<div class="slide" data-slide="20">
+  <span class="badge badge-activity">PRÁCTICA — 80 minutos</span>
+  <h2 style="margin-bottom:0.8rem;">Ejercicios de testing</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;width:100%;max-width:1100px;">
+    <div class="exercise-block">
+      <h4>Ejercicio 1 — Pruebas unitarias básicas (~25 min)</h4>
+      <p>Crea <code>TodoItem.vue</code> con prop <code>texto</code> (String, required) y botón "Eliminar" que emite evento. Escribe 3 tests con Jest + Vue Test Utils:</p>
+      <p style="margin-top:0.4rem;">1. Renderiza el texto de la prop.<br>2. El botón "Eliminar" existe.<br>3. Emite <code>eliminar</code> al hacer click.</p>
+    </div>
+    <div class="exercise-block">
+      <h4>Ejercicio 2 — TDD: construye desde el test (~25 min)</h4>
+      <p>Escribe primero los tests para un componente <code>Buscador.vue</code> que aún no existe:</p>
+      <p style="margin-top:0.4rem;">1. Renderiza un input.<br>2. Al escribir, emite <code>buscar</code> con el texto.<br>3. El input tiene placeholder "Buscar...".</p>
+      <p style="margin-top:0.4rem;">Corre los tests (fallan = rojo). Crea el componente para que pasen (verde).</p>
+    </div>
+    <div class="exercise-block">
+      <h4>Ejercicio 3 — Prueba E2E con Cypress (~20 min)</h4>
+      <p>Escribe un test E2E que:</p>
+      <p style="margin-top:0.4rem;">1. Visite tu app en <code>/</code>.<br>2. Verifique el título principal.<br>3. Interactúe con al menos 2 elementos (input + botón).<br>4. Verifique que el resultado aparece en la UI.</p>
+    </div>
+    <div class="exercise-block">
+      <h4>Bonus — Mock de API (~10 min)</h4>
+      <p>Test unitario para un componente que usa Axios:</p>
+      <p style="margin-top:0.4rem;">1. <code>jest.mock('axios')</code><br>2. <code>axios.get.mockResolvedValue({...})</code><br>3. Montar componente y verificar que renderiza los datos mockeados.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide" data-slide="21">
+  <h2>Resumen de la clase</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🧪</span><h3>Unitarias</h3><p>Jest + Vue Test Utils. mount, find, trigger. Rápidas, precisas, aisladas.</p></div>
+    <div class="card"><span class="icon">🔄</span><h3>TDD</h3><p>Rojo → verde → refactorizar. El test se escribe antes que el código.</p></div>
+    <div class="card"><span class="icon">🎭</span><h3>Mocks y stubs</h3><p>jest.fn(), jest.mock(). Simular dependencias para aislar el componente.</p></div>
+    <div class="card"><span class="icon">🌐</span><h3>E2E</h3><p>Cypress para flujos reales. cy.visit, cy.get, .click(), .should(). Complementa unitarias.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide" data-slide="22">
+  <h2>¡Buen trabajo!</h2>
+  <p>Hoy aprendieron a testear sus componentes Vue con pruebas unitarias y E2E. Sus apps ahora tienen red de seguridad.</p>
+  <p style="margin-top:1.5rem;font-size:1.5rem;color:var(--secondary);font-weight:600;">Código sin tests es código con bugs escondidos.</p>
+  <p class="small" style="margin-top:2rem;">Próxima clase: Librerías y Frameworks Complementarios</p>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+let currentSlide=1;const slides=document.querySelectorAll('.slide');const totalSlides=slides.length;document.getElementById('totalSlides').textContent=totalSlides;function showSlide(n){slides.forEach(s=>s.classList.remove('active'));slides[n-1].classList.add('active');document.getElementById('currentSlide').textContent=n;document.getElementById('progressBar').style.width=((n/totalSlides)*100)+'%'}function changeSlide(d){const n=currentSlide+d;if(n>=1&&n<=totalSlides){currentSlide=n;showSlide(currentSlide)}}document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1)}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1)}});const timers={};function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.3;o.start();setTimeout(()=>{o.stop();c.close()},400)}catch(e){}}function updateTimerDisplay(id){const t=timers[id],el=document.getElementById(id),st=document.getElementById(id+'-status');el.textContent=formatTime(t.remaining);el.classList.remove('warning','danger');if(t.remaining<=60){el.classList.add('danger');if(st)st.textContent='¡Menos de 1 minuto!'}else if(t.remaining<=300){el.classList.add('warning');if(st)st.textContent='Menos de 5 minutos'}else{if(st&&t.running)st.textContent='En curso...'}}function startTimer(id,dur){if(!timers[id])timers[id]={remaining:dur,running:false,interval:null,total:dur};const t=timers[id];if(t.running)return;t.running=true;const st=document.getElementById(id+'-status');if(st)st.textContent='En curso...';t.interval=setInterval(()=>{t.remaining--;updateTimerDisplay(id);if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep()}},1000)}function pauseTimer(id){const t=timers[id];if(!t||!t.running)return;clearInterval(t.interval);t.running=false;const st=document.getElementById(id+'-status');if(st)st.textContent='Pausado'}function resetTimer(id,dur){const t=timers[id];if(t){clearInterval(t.interval);t.running=false}timers[id]={remaining:dur,running:false,interval:null,total:dur};updateTimerDisplay(id);const st=document.getElementById(id+'-status');if(st)st.textContent='Listo para comenzar'}showSlide(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalización del Proyecto — Clase 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#2D5BFF;--secondary:#00D4AA;--accent:#FF6B6B;--dark:#1A1A2E;--light:#F8F9FA;--warning:#FFA500;--card-bg:rgba(255,255,255,0.05);--border-radius:12px}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sora',sans-serif;background:var(--dark);color:var(--light);overflow:hidden;height:100vh;width:100vw}.header{position:fixed;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(26,26,46,0.92);backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}.slide-counter{font-family:'Space Mono',monospace;font-size:0.95rem;color:rgba(248,249,250,0.7);letter-spacing:2px}.slide-counter .current{color:var(--secondary);font-weight:700}.progress-bar{position:fixed;top:52px;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.4s ease;z-index:100}.slides-wrapper{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;padding-top:55px}.slide{display:none;max-width:1200px;width:100%;padding:2rem;animation:slideIn 0.6s ease-out}.slide.active{display:flex;flex-direction:column;justify-content:center;align-items:center}@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}h1{font-size:3.5rem;font-weight:800;line-height:1.2;text-align:center;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}h2{font-size:2.5rem;font-weight:700;line-height:1.3;text-align:center;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--light),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}h3{font-size:1.8rem;font-weight:600;margin-bottom:0.8rem;color:var(--secondary)}p,li{font-size:1.3rem;line-height:1.8}p{text-align:center;max-width:900px;color:rgba(248,249,250,0.85)}.subtitle{font-size:1.4rem;color:var(--secondary);margin-bottom:0.5rem;font-weight:500}.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px}.card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.5rem;transition:all 0.3s ease;text-align:left}.card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 30px rgba(45,91,255,0.15)}.card h3{font-size:1.4rem;margin-bottom:0.6rem}.card p{font-size:1.15rem;text-align:left}.cards-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;width:100%;max-width:1100px}.cards-grid-3 .card h3{font-size:1.25rem}.cards-grid-3 .card p{font-size:1.05rem}.badge{display:inline-block;font-size:0.85rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:0.8rem}.badge-activity{background:rgba(0,212,170,0.15);color:var(--secondary);border:1px solid var(--secondary)}.badge-break{background:rgba(255,165,0,0.15);color:var(--warning);border:1px solid var(--warning)}.flow{display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1rem 0}.flow-item{background:rgba(45,91,255,0.12);border:1px solid rgba(45,91,255,0.3);border-radius:10px;padding:0.6rem 1.2rem;font-size:1.1rem;font-weight:500}.flow-arrow{font-size:1.5rem;color:var(--secondary)}.highlight-box{background:rgba(45,91,255,0.08);border:1px solid rgba(45,91,255,0.25);border-radius:var(--border-radius);padding:1.2rem 1.5rem;width:100%;max-width:900px;text-align:left;margin-top:1rem}.highlight-box p{text-align:left;font-size:1.15rem}.timer-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:var(--border-radius);padding:1.8rem;text-align:center}.timer-display{font-family:'Space Mono',monospace;font-size:5rem;font-weight:700;color:var(--secondary);text-shadow:0 0 30px rgba(0,212,170,0.3);margin:0.8rem 0;letter-spacing:4px}.timer-display.warning{color:var(--warning)}.timer-display.danger{color:var(--accent);animation:pulse 1s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.timer-controls{display:flex;gap:0.8rem;justify-content:center;margin-top:1rem}.timer-btn{font-family:'Sora',sans-serif;font-size:0.9rem;font-weight:600;padding:0.5rem 1.2rem;border-radius:8px;border:none;cursor:pointer;transition:all 0.3s ease}.timer-btn.start{background:var(--secondary);color:var(--dark)}.timer-btn.pause{background:var(--warning);color:var(--dark)}.timer-btn.reset{background:rgba(255,255,255,0.1);color:var(--light);border:1px solid rgba(255,255,255,0.2)}.timer-btn:hover{transform:scale(1.05)}.timer-status{font-size:0.95rem;margin-top:0.8rem;color:rgba(248,249,250,0.6)}.nav{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:1rem;z-index:100}.nav-btn{font-family:'Sora',sans-serif;font-size:1rem;font-weight:600;padding:0.6rem 1.8rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(26,26,46,0.9);color:var(--light);cursor:pointer;backdrop-filter:blur(8px);transition:all 0.3s ease}.nav-btn:hover{border-color:var(--primary);background:rgba(45,91,255,0.15)}.small{font-size:1rem;color:rgba(248,249,250,0.6)}.icon{font-size:2.2rem;margin-bottom:0.5rem;display:block}.checklist{list-style:none;padding:0;width:100%;max-width:900px}.checklist li{font-size:1.15rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:0.8rem}.checklist li::before{content:'☐';font-size:1.3rem;color:var(--secondary)}
+</style>
+</head>
+<body>
+<div class="header"><div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">12</span></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<div class="slides-wrapper">
+
+<!-- SLIDE 1 -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 8 — Desarrollo de portafolio de un producto digital</p>
+  <h1>Cierre del Proyecto</h1>
+  <p>Mejoras finales, pulido de UX, deploy y entrega del portafolio</p>
+  <p class="small" style="margin-top:1.5rem;">Clase 2 de 2 · 3 horas</p>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🔧</span><h3>Mejoras finales</h3><p>Corregir bugs pendientes, incorporar feedback y pulir detalles de UI/UX.</p></div>
+    <div class="card"><span class="icon">🎨</span><h3>Pulido de UX</h3><p>Estados vacíos, loading, mensajes de error amigables, responsive.</p></div>
+    <div class="card"><span class="icon">🚀</span><h3>Deploy</h3><p>Subir el proyecto a producción: Netlify, Vercel o Firebase Hosting.</p></div>
+    <div class="card"><span class="icon">📋</span><h3>Entrega final</h3><p>Checklist de calidad, README completo, repositorio limpio.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" data-slide="3">
+  <h2>Checklist de entrega</h2>
+  <ul class="checklist">
+    <li>Producto funcional — se puede usar de inicio a fin sin errores críticos</li>
+    <li>Cero errores en la consola del navegador</li>
+    <li>Feedback del instructor incorporado</li>
+    <li>Código limpio — sin console.log, sin código comentado, sin funciones muertas</li>
+    <li>README.md completo — descripción, tecnologías, instalación, funcionalidades</li>
+    <li>Repositorio en GitHub — código subido y actualizado</li>
+    <li>UI consistente — estilos coherentes, responsive básico</li>
+    <li>Estados de UX — loading, error, vacío en todas las vistas que consumen datos</li>
+  </ul>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" data-slide="4">
+  <span class="badge badge-activity">ACTIVIDAD 1 — 60 minutos</span>
+  <h2>Correcciones finales y pulido</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Instrucciones</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">1. Revisa los <strong>bugs pendientes</strong> de la clase anterior y corrígelos.<br>2. Incorpora el <strong>feedback</strong> del instructor.<br>3. Limpia el código: quita <strong>console.log</strong>, código comentado y funciones sin usar.<br>4. Mejora la <strong>UX</strong>: agrega loading, mensajes de error y estados vacíos donde falte.<br>5. Verifica que la <strong>navegación</strong> funcione completa.</p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Prioridades</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;"><strong style="color:var(--accent);">1. Crítico:</strong> Lo que está roto. Si no funciona, arréglalo primero.<br><br><strong style="color:var(--warning);">2. Feedback:</strong> Lo que el instructor señaló.<br><br><strong style="color:var(--secondary);">3. UX:</strong> Loading, errores, estados vacíos.<br><br><strong style="color:var(--primary);">4. Código:</strong> Limpieza, nombres claros, estructura.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: BREAK -->
+<div class="slide" data-slide="5">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem;max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" data-slide="6">
+  <span class="badge badge-activity">ACTIVIDAD 2 — 30 minutos</span>
+  <h2>README y documentación final</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">El README debe tener</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">1. <strong>Nombre</strong> del proyecto y descripción breve.<br>2. <strong>Problemática</strong> que resuelve.<br>3. <strong>Tecnologías</strong>: Vue 2, Vuex, Axios, Firebase, etc.<br>4. <strong>Instalación</strong>: npm install → npm run serve.<br>5. <strong>Funcionalidades</strong> implementadas.<br>6. <strong>Capturas de pantalla</strong> (opcional pero recomendado).<br>7. <strong>Link al deploy</strong> si existe.</p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Decisiones técnicas (agregar al README)</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">Agrega una sección breve explicando:<br><br>🔧 <strong>¿Por qué elegiste esas tecnologías?</strong><br>📦 <strong>¿Cómo organizaste el proyecto?</strong><br>🤔 <strong>¿Qué fue lo más difícil?</strong><br>💡 <strong>¿Qué harías diferente?</strong><br><br>Esto demuestra criterio profesional en tu portafolio.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" data-slide="7">
+  <span class="badge badge-activity">ACTIVIDAD 3 — 30 minutos</span>
+  <h2>Deploy y publicación</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Subir a GitHub</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">1. Crea un repositorio en GitHub.<br>2. <code>git init</code> → <code>git add .</code> → <code>git commit -m "entrega final"</code><br>3. <code>git remote add origin URL</code><br>4. <code>git push -u origin main</code><br>5. Verifica que el README se vea bien en GitHub.</p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Deploy (opcional pero recomendado)</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;"><strong>Netlify:</strong> Conecta GitHub → detecta Vue → deploy automático.<br><br><strong>Vercel:</strong> Importar repo → configura build → deploy.<br><br><strong>Firebase Hosting:</strong> <code>firebase init</code> → <code>firebase deploy</code><br><br>Un link en vivo vale más que mil líneas de código.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" data-slide="8">
+  <span class="badge badge-activity">ACTIVIDAD 4 — 20 minutos</span>
+  <h2>Validación final</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Prueba completa como usuario</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">1. Abre tu app desde cero (o desde el link de deploy).<br>2. Recorre <strong>cada funcionalidad</strong> de inicio a fin.<br>3. Abre la <strong>consola</strong> (F12) y verifica cero errores.<br>4. Prueba en <strong>otro tamaño de pantalla</strong>.<br>5. Revisa que el <strong>README en GitHub</strong> se muestre bien.</p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Checklist final</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">☐ Producto funciona sin errores críticos<br>☐ Consola limpia<br>☐ Código sin console.log ni código muerto<br>☐ README completo con decisiones técnicas<br>☐ Repositorio en GitHub actualizado<br>☐ Deploy funcionando (si aplica)<br>☐ Feedback del instructor incorporado</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" data-slide="9">
+  <h2>El recorrido del módulo</h2>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">Componentes<br><span class="small">Ciclo de vida</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">APIs<br><span class="small">Axios</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Firebase<br><span class="small">Auth + Firestore</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Vuex<br><span class="small">Estado global</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Testing<br><span class="small">Jest + Cypress</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Librerías<br><span class="small">Nuxt, Vuetify</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item" style="border-color:var(--secondary);color:var(--secondary);">Portafolio<br><span class="small">Hoy</span></div>
+  </div>
+  <div class="highlight-box" style="margin-top:1.5rem;">
+    <p>De no saber Vue a tener un producto completo con store, API, tests y deploy. Eso es lo que va al portafolio.</p>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" data-slide="10">
+  <h2>Siguientes pasos</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card"><span class="icon">📂</span><h3>GitHub</h3><p>Mantener el repositorio actualizado. Agregar más proyectos. Es tu carta de presentación.</p></div>
+    <div class="card"><span class="icon">📋</span><h3>LinkedIn</h3><p>Agregar el proyecto a la sección de proyectos. Con descripción y link al deploy.</p></div>
+    <div class="card"><span class="icon">📈</span><h3>Seguir aprendiendo</h3><p>Vue 3, Composition API, TypeScript, Pinia. El ecosistema sigue creciendo.</p></div>
+    <div class="card"><span class="icon">🔨</span><h3>Construir más</h3><p>Cada proyecto nuevo refuerza lo aprendido. Busquen problemas reales y resuélvanlos.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" data-slide="11">
+  <h2>Resumen del cierre</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card"><span class="icon">🔧</span><h3>Corregido</h3><p>Bugs resueltos. Feedback incorporado. Código limpio.</p></div>
+    <div class="card"><span class="icon">🎨</span><h3>Pulido</h3><p>UX mejorada: loading, errores, estados vacíos, responsive.</p></div>
+    <div class="card"><span class="icon">📝</span><h3>Documentado</h3><p>README profesional con decisiones técnicas.</p></div>
+    <div class="card"><span class="icon">🚀</span><h3>Publicado</h3><p>GitHub + deploy. Listo para el portafolio.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" data-slide="12">
+  <h1 style="font-size:3.5rem;">¡Felicidades! 🏆</h1>
+  <p style="margin-top:1rem;font-size:1.4rem;">Completaron el módulo de Desarrollo de Aplicaciones Front-end con Vue.</p>
+  <p style="margin-top:1.5rem;font-size:1.5rem;color:var(--secondary);font-weight:600;">Ahora tienen un producto, un portafolio y las habilidades para construir más.</p>
+  <p class="small" style="margin-top:2rem;">Sigan construyendo. Cada proyecto los hace mejores.</p>
+</div>
+
+</div>
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+<script>
+let currentSlide=1;const slides=document.querySelectorAll('.slide');const totalSlides=slides.length;document.getElementById('totalSlides').textContent=totalSlides;function showSlide(n){slides.forEach(s=>s.classList.remove('active'));slides[n-1].classList.add('active');document.getElementById('currentSlide').textContent=n;document.getElementById('progressBar').style.width=((n/totalSlides)*100)+'%'}function changeSlide(d){const n=currentSlide+d;if(n>=1&&n<=totalSlides){currentSlide=n;showSlide(currentSlide)}}document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1)}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1)}});const timers={};function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.3;o.start();setTimeout(()=>{o.stop();c.close()},400)}catch(e){}}function updateTimerDisplay(id){const t=timers[id],el=document.getElementById(id),st=document.getElementById(id+'-status');el.textContent=formatTime(t.remaining);el.classList.remove('warning','danger');if(t.remaining<=60){el.classList.add('danger');if(st)st.textContent='¡Menos de 1 minuto!'}else if(t.remaining<=300){el.classList.add('warning');if(st)st.textContent='Menos de 5 minutos'}else{if(st&&t.running)st.textContent='En curso...'}}function startTimer(id,dur){if(!timers[id])timers[id]={remaining:dur,running:false,interval:null,total:dur};const t=timers[id];if(t.running)return;t.running=true;const st=document.getElementById(id+'-status');if(st)st.textContent='En curso...';t.interval=setInterval(()=>{t.remaining--;updateTimerDisplay(id);if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep()}},1000)}function pauseTimer(id){const t=timers[id];if(!t||!t.running)return;clearInterval(t.interval);t.running=false;const st=document.getElementById(id+'-status');if(st)st.textContent='Pausado'}function resetTimer(id,dur){const t=timers[id];if(t){clearInterval(t.interval);t.running=false}timers[id]={remaining:dur,running:false,interval:null,total:dur};updateTimerDisplay(id);const st=document.getElementById(id+'-status');if(st)st.textContent='Listo para comenzar'}showSlide(1);
+</script>
+</body>
+</html>

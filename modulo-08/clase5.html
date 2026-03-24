@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrega del Portafolio — Clase 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#2D5BFF;--secondary:#00D4AA;--accent:#FF6B6B;--dark:#1A1A2E;--light:#F8F9FA;--warning:#FFA500;--card-bg:rgba(255,255,255,0.05);--border-radius:12px}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sora',sans-serif;background:var(--dark);color:var(--light);overflow:hidden;height:100vh;width:100vw}.header{position:fixed;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(26,26,46,0.92);backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}.slide-counter{font-family:'Space Mono',monospace;font-size:0.95rem;color:rgba(248,249,250,0.7);letter-spacing:2px}.slide-counter .current{color:var(--secondary);font-weight:700}.progress-bar{position:fixed;top:52px;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.4s ease;z-index:100}.slides-wrapper{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;padding-top:55px}.slide{display:none;max-width:1200px;width:100%;padding:2rem;animation:slideIn 0.6s ease-out}.slide.active{display:flex;flex-direction:column;justify-content:center;align-items:center}@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}h1{font-size:3.5rem;font-weight:800;line-height:1.2;text-align:center;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}h2{font-size:2.5rem;font-weight:700;line-height:1.3;text-align:center;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--light),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}h3{font-size:1.8rem;font-weight:600;margin-bottom:0.8rem;color:var(--secondary)}p,li{font-size:1.3rem;line-height:1.8}p{text-align:center;max-width:900px;color:rgba(248,249,250,0.85)}.subtitle{font-size:1.4rem;color:var(--secondary);margin-bottom:0.5rem;font-weight:500}.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px}.card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:var(--border-radius);padding:1.5rem;transition:all 0.3s ease;text-align:left}.card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 8px 30px rgba(45,91,255,0.15)}.card h3{font-size:1.4rem;margin-bottom:0.6rem}.card p{font-size:1.15rem;text-align:left}.cards-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;width:100%;max-width:1100px}.cards-grid-3 .card h3{font-size:1.25rem}.cards-grid-3 .card p{font-size:1.05rem}.badge{display:inline-block;font-size:0.85rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:0.8rem}.badge-activity{background:rgba(0,212,170,0.15);color:var(--secondary);border:1px solid var(--secondary)}.badge-break{background:rgba(255,165,0,0.15);color:var(--warning);border:1px solid var(--warning)}.flow{display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1rem 0}.flow-item{background:rgba(45,91,255,0.12);border:1px solid rgba(45,91,255,0.3);border-radius:10px;padding:0.6rem 1.2rem;font-size:1.1rem;font-weight:500}.flow-arrow{font-size:1.5rem;color:var(--secondary)}.highlight-box{background:rgba(45,91,255,0.08);border:1px solid rgba(45,91,255,0.25);border-radius:var(--border-radius);padding:1.2rem 1.5rem;width:100%;max-width:900px;text-align:left;margin-top:1rem}.highlight-box p{text-align:left;font-size:1.15rem}.timer-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:var(--border-radius);padding:1.8rem;text-align:center}.timer-display{font-family:'Space Mono',monospace;font-size:5rem;font-weight:700;color:var(--secondary);text-shadow:0 0 30px rgba(0,212,170,0.3);margin:0.8rem 0;letter-spacing:4px}.timer-display.warning{color:var(--warning)}.timer-display.danger{color:var(--accent);animation:pulse 1s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.timer-controls{display:flex;gap:0.8rem;justify-content:center;margin-top:1rem}.timer-btn{font-family:'Sora',sans-serif;font-size:0.9rem;font-weight:600;padding:0.5rem 1.2rem;border-radius:8px;border:none;cursor:pointer;transition:all 0.3s ease}.timer-btn.start{background:var(--secondary);color:var(--dark)}.timer-btn.pause{background:var(--warning);color:var(--dark)}.timer-btn.reset{background:rgba(255,255,255,0.1);color:var(--light);border:1px solid rgba(255,255,255,0.2)}.timer-btn:hover{transform:scale(1.05)}.timer-status{font-size:0.95rem;margin-top:0.8rem;color:rgba(248,249,250,0.6)}.nav{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:1rem;z-index:100}.nav-btn{font-family:'Sora',sans-serif;font-size:1rem;font-weight:600;padding:0.6rem 1.8rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(26,26,46,0.9);color:var(--light);cursor:pointer;backdrop-filter:blur(8px);transition:all 0.3s ease}.nav-btn:hover{border-color:var(--primary);background:rgba(45,91,255,0.15)}.small{font-size:1rem;color:rgba(248,249,250,0.6)}.icon{font-size:2.2rem;margin-bottom:0.5rem;display:block}.checklist{list-style:none;padding:0;width:100%;max-width:900px}.checklist li{font-size:1.15rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:0.8rem}.checklist li::before{content:'☐';font-size:1.3rem;color:var(--secondary)}
+</style>
+</head>
+<body>
+<div class="header"><div class="slide-counter"><span class="current" id="currentSlide">1</span> / <span id="totalSlides">12</span></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<div class="slides-wrapper">
+
+<!-- SLIDE 1 -->
+<div class="slide active" data-slide="1">
+  <p class="subtitle">Módulo 8 — Desarrollo de portafolio de un producto digital</p>
+  <h1>Entrega del Portafolio</h1>
+  <p>Pulido final, validación, LinkedIn y entrega</p>
+  <p class="small" style="margin-top:1.5rem;">Última clase del módulo · 3 horas</p>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" data-slide="2">
+  <h2>Objetivos de hoy</h2>
+  <div class="cards-grid">
+    <div class="card"><span class="icon">🔧</span><h3>Terminar pendientes</h3><p>Completar lo que haya quedado de la clase anterior: deploy, README, capturas.</p></div>
+    <div class="card"><span class="icon">✨</span><h3>Pulido final</h3><p>Últimos bugs, UX, código limpio. Dejar el producto en su mejor versión.</p></div>
+    <div class="card"><span class="icon">📋</span><h3>LinkedIn</h3><p>Agregar el proyecto a LinkedIn con descripción profesional y link.</p></div>
+    <div class="card"><span class="icon">🏁</span><h3>Entrega</h3><p>Validación final con checklist y envío del link del portafolio.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" data-slide="3">
+  <h2>Checklist de entrega final</h2>
+  <ul class="checklist">
+    <li>Perfil de GitHub con foto, bio y README de perfil</li>
+    <li>Proyecto en repositorio limpio con README completo</li>
+    <li>README con: descripción, tecnologías, instalación, funcionalidades, capturas</li>
+    <li>Deploy funcionando con link público (GitHub Pages o Netlify)</li>
+    <li>Link del deploy en el README y en la bio del perfil</li>
+    <li>Repositorio pinneado en el perfil de GitHub</li>
+    <li>Producto funcional de inicio a fin sin errores en consola</li>
+    <li>Código limpio: sin console.log, sin código comentado</li>
+    <li>Proyecto agregado a LinkedIn (al final de la clase)</li>
+  </ul>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" data-slide="4">
+  <span class="badge badge-activity">ACTIVIDAD 1 — 60 minutos</span>
+  <h2>Completar y pulir el portafolio</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Si te faltó de la clase anterior</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        1. Completar el <strong>README de perfil</strong>.<br>
+        2. Terminar el <strong>deploy</strong> en GitHub Pages o Netlify.<br>
+        3. Agregar <strong>capturas</strong> al README del proyecto.<br>
+        4. Subir el <strong>código limpio</strong> al repositorio.
+      </p>
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-top:1rem;margin-bottom:0.6rem;">Si ya terminaste todo</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        1. Corregir <strong>últimos bugs</strong> y warnings de consola.<br>
+        2. Mejorar <strong>UX</strong>: loading, errores, estados vacíos.<br>
+        3. Agregar sección de <strong>decisiones técnicas</strong> al README.<br>
+        4. Pinear el repo en tu perfil de GitHub.
+      </p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Prioridades</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        <strong style="color:var(--accent);">1.</strong> Deploy funcionando con link.<br><br>
+        <strong style="color:var(--warning);">2.</strong> README completo con capturas.<br><br>
+        <strong style="color:var(--secondary);">3.</strong> Perfil de GitHub profesional.<br><br>
+        <strong style="color:var(--primary);">4.</strong> Pulido de bugs y UX.<br><br>
+        Si el deploy funciona y el README está completo, ya tienes portafolio.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: BREAK -->
+<div class="slide" data-slide="5">
+  <span class="badge badge-break">DESCANSO</span>
+  <h1 style="font-size:3rem;">Receso — 20 minutos</h1>
+  <div class="timer-panel" style="margin-top:1.5rem;max-width:380px;">
+    <div class="timer-display" id="timerBreak">20:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn start" onclick="startTimer('timerBreak',20*60)">Iniciar</button>
+      <button class="timer-btn pause" onclick="pauseTimer('timerBreak')">Pausar</button>
+      <button class="timer-btn reset" onclick="resetTimer('timerBreak',20*60)">Reiniciar</button>
+    </div>
+    <div class="timer-status" id="timerBreak-status">Listo para comenzar</div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" data-slide="6">
+  <h2>Cómo agregar un proyecto a LinkedIn</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card" style="border-left:3px solid #0077b5;">
+      <h3>Sección "Proyectos"</h3>
+      <p>Perfil → Agregar sección → Proyectos. Nombre del proyecto, descripción breve (2-3 líneas), link al deploy, link al repositorio.</p>
+    </div>
+    <div class="card" style="border-left:3px solid #0077b5;">
+      <h3>Qué escribir</h3>
+      <p>"App web desarrollada con Vue.js, Vuex y Axios que consume la PokéAPI. Incluye sistema de favoritos con persistencia y búsqueda en tiempo real."</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:1rem;">
+    <p><strong>Tip:</strong> También pueden hacer un <strong>post de LinkedIn</strong> mostrando el proyecto: "Acabo de terminar este proyecto con Vue.js..." con captura y link. Genera visibilidad.</p>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" data-slide="7">
+  <span class="badge badge-activity">ACTIVIDAD 2 — 25 minutos</span>
+  <h2>Agregar proyecto a LinkedIn</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Instrucciones</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        1. Abre tu perfil de <strong>LinkedIn</strong>.<br>
+        2. Agrega la sección <strong>"Proyectos"</strong> si no la tienes.<br>
+        3. Agrega tu proyecto con <strong>nombre, descripción y links</strong>.<br>
+        4. Actualiza tu <strong>headline</strong> si es necesario: "Desarrollador Front-end | Vue.js".<br>
+        5. Opcional: escribe un <strong>post breve</strong> compartiendo tu proyecto.
+      </p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Ejemplo de descripción</h3>
+      <p style="text-align:left;font-size:1.05rem;line-height:1.6;color:rgba(248,249,250,0.75);">
+        "Aplicación web tipo Pokédex desarrollada con Vue.js 2, Vuex para manejo de estado y Axios para consumo de la PokéAPI. Incluye sistema de favoritos con persistencia en localStorage, búsqueda en tiempo real con getters de Vuex y deploy en GitHub Pages."<br><br>
+        <strong>Tecnologías:</strong> Vue.js, Vuex, Axios, PokéAPI, GitHub Pages
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" data-slide="8">
+  <span class="badge badge-activity">ACTIVIDAD 3 — 30 minutos</span>
+  <h2>Validación final y entrega</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;width:100%;max-width:1100px;">
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Prueba completa</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        1. Abre el <strong>link de deploy</strong> y recorre toda la app.<br>
+        2. Abre la <strong>consola</strong> (F12) y verifica cero errores.<br>
+        3. Revisa tu <strong>perfil de GitHub</strong>: ¿se ve profesional?<br>
+        4. Revisa el <strong>README</strong>: ¿tiene capturas, link, tecnologías?<br>
+        5. Revisa <strong>LinkedIn</strong>: ¿el proyecto está agregado?
+      </p>
+    </div>
+    <div style="text-align:left;">
+      <h3 style="font-size:1.3rem;color:var(--secondary);margin-bottom:0.6rem;">Entrega</h3>
+      <p style="text-align:left;font-size:1.1rem;line-height:1.7;">
+        Envía al equipo docente:<br><br>
+        📂 Link a tu <strong>perfil de GitHub</strong>.<br>
+        📁 Link al <strong>repositorio</strong> del proyecto.<br>
+        🌐 Link al <strong>deploy</strong> del proyecto.<br>
+        📋 Link a tu <strong>perfil de LinkedIn</strong>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" data-slide="9">
+  <h2>El recorrido completo</h2>
+  <div class="flow" style="margin-top:1.5rem;">
+    <div class="flow-item">Componentes<br><span class="small">Ciclo de vida</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">APIs<br><span class="small">Axios</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Firebase<br><span class="small">Auth + Firestore</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Vuex<br><span class="small">Estado global</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Testing<br><span class="small">Jest + Cypress</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">Librerías<br><span class="small">Nuxt, Vuetify</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item" style="border-color:var(--secondary);color:var(--secondary);">Portafolio<br><span class="small">Hoy ✅</span></div>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" data-slide="10">
+  <h2>Siguientes pasos</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card"><span class="icon">🔨</span><h3>Seguir construyendo</h3><p>Cada proyecto nuevo refuerza lo aprendido. Busquen problemas reales y resuélvanlos con código.</p></div>
+    <div class="card"><span class="icon">📈</span><h3>Aprender más</h3><p>Vue 3, Composition API, TypeScript, Pinia, Nuxt 3. El ecosistema sigue creciendo.</p></div>
+    <div class="card"><span class="icon">🤝</span><h3>Contribuir</h3><p>Open source, ayudar en foros, escribir artículos. Construir reputación en la comunidad.</p></div>
+    <div class="card"><span class="icon">🎯</span><h3>Aplicar a trabajos</h3><p>Con portafolio listo, empiecen a postular. El portafolio es su mejor argumento.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" data-slide="11">
+  <h2>Resumen del módulo completo</h2>
+  <div class="cards-grid" style="margin-top:1rem;">
+    <div class="card"><span class="icon">🧩</span><h3>Vue.js</h3><p>Componentes, props, emit, slots, ciclo de vida, scoped styles.</p></div>
+    <div class="card"><span class="icon">📡</span><h3>APIs y Firebase</h3><p>Axios, CRUD, Auth, Firestore, manejo de errores.</p></div>
+    <div class="card"><span class="icon">📦</span><h3>Vuex</h3><p>State, mutations, actions, getters, plugins de persistencia.</p></div>
+    <div class="card"><span class="icon">🧪</span><h3>Testing</h3><p>Jest, Vue Test Utils, Cypress, TDD, mocks.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" data-slide="12">
+  <h1 style="font-size:3.5rem;">¡Felicidades! 🏆</h1>
+  <p style="margin-top:1rem;font-size:1.4rem;">Completaron el programa. Tienen un producto, un portafolio publicado y las habilidades para construir más.</p>
+  <p style="margin-top:1.5rem;font-size:1.5rem;color:var(--secondary);font-weight:600;">Sigan construyendo. Cada proyecto los hace mejores.</p>
+</div>
+
+</div>
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← Anterior</button>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+<script>
+let currentSlide=1;const slides=document.querySelectorAll('.slide');const totalSlides=slides.length;document.getElementById('totalSlides').textContent=totalSlides;function showSlide(n){slides.forEach(s=>s.classList.remove('active'));slides[n-1].classList.add('active');document.getElementById('currentSlide').textContent=n;document.getElementById('progressBar').style.width=((n/totalSlides)*100)+'%'}function changeSlide(d){const n=currentSlide+d;if(n>=1&&n<=totalSlides){currentSlide=n;showSlide(currentSlide)}}document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1)}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1)}});const timers={};function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.3;o.start();setTimeout(()=>{o.stop();c.close()},400)}catch(e){}}function updateTimerDisplay(id){const t=timers[id],el=document.getElementById(id),st=document.getElementById(id+'-status');el.textContent=formatTime(t.remaining);el.classList.remove('warning','danger');if(t.remaining<=60){el.classList.add('danger');if(st)st.textContent='¡Menos de 1 minuto!'}else if(t.remaining<=300){el.classList.add('warning');if(st)st.textContent='Menos de 5 minutos'}else{if(st&&t.running)st.textContent='En curso...'}}function startTimer(id,dur){if(!timers[id])timers[id]={remaining:dur,running:false,interval:null,total:dur};const t=timers[id];if(t.running)return;t.running=true;const st=document.getElementById(id+'-status');if(st)st.textContent='En curso...';t.interval=setInterval(()=>{t.remaining--;updateTimerDisplay(id);if(t.remaining<=0){clearInterval(t.interval);t.running=false;if(st)st.textContent='¡Tiempo terminado!';beep()}},1000)}function pauseTimer(id){const t=timers[id];if(!t||!t.running)return;clearInterval(t.interval);t.running=false;const st=document.getElementById(id+'-status');if(st)st.textContent='Pausado'}function resetTimer(id,dur){const t=timers[id];if(t){clearInterval(t.interval);t.running=false}timers[id]={remaining:dur,running:false,interval:null,total:dur};updateTimerDisplay(id);const st=document.getElementById(id+'-status');if(st)st.textContent='Listo para comenzar'}showSlide(1);
+</script>
+</body>
+</html>
